@@ -59,3 +59,7 @@ export { FlowingLines } from './FlowingLines';
 export type { LinesScheme } from './FlowingLines';
 export { BlueFire } from './BlueFire';
 export type { FireScheme } from './BlueFire';
+export { TitaniumRibs } from './TitaniumRibs';
+export { BlueLens } from './BlueLens';
+export { ConcentricLens } from './ConcentricLens';
+export type { LensScheme } from './ConcentricLens';

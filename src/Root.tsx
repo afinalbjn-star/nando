@@ -60,6 +60,9 @@ import { FlowingLines } from './components/FlowingLines';
 import type { LinesScheme } from './components/FlowingLines';
 import { BlueFire } from './components/BlueFire';
 import type { FireScheme } from './components/BlueFire';
+import { TitaniumRibs } from './components/TitaniumRibs';
+import { BlueLens } from './components/BlueLens';
+import { ConcentricLens } from './components/ConcentricLens';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1452,6 +1455,66 @@ export const RemotionRoot: React.FC = () => {
         id="BlueFireSolar"
         component={() => (
           <BlueFire width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="solar" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="TitaniumRibs"
+        component={() => (
+          <TitaniumRibs width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BlueLens"
+        component={() => (
+          <BlueLens width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="EmeraldLens"
+        component={() => (
+          <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VioletLens"
+        component={() => (
+          <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="SolarLens"
+        component={() => (
+          <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="solar" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RoseLens"
+        component={() => (
+          <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

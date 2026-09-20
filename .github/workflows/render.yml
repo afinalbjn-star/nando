@@ -1,4 +1,4 @@
-name: Render BlueFire (5 colors)
+name: Render Lens Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,79 +24,79 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render BlueFire (ProRes)
-        run: npx remotion render src/index.tsx BlueFire output/BlueFire-prores.mov --codec prores --prores-profile hq
+      - name: Render BlueLens (ProRes)
+        run: npx remotion render src/index.tsx BlueLens output/BlueLens-prores.mov --codec prores --prores-profile hq
 
-      - name: Render BlueFireCrimson (ProRes)
-        run: npx remotion render src/index.tsx BlueFireCrimson output/BlueFireCrimson-prores.mov --codec prores --prores-profile hq
+      - name: Render EmeraldLens (ProRes)
+        run: npx remotion render src/index.tsx EmeraldLens output/EmeraldLens-prores.mov --codec prores --prores-profile hq
 
-      - name: Render BlueFireToxic (ProRes)
-        run: npx remotion render src/index.tsx BlueFireToxic output/BlueFireToxic-prores.mov --codec prores --prores-profile hq
+      - name: Render VioletLens (ProRes)
+        run: npx remotion render src/index.tsx VioletLens output/VioletLens-prores.mov --codec prores --prores-profile hq
 
-      - name: Render BlueFireViolet (ProRes)
-        run: npx remotion render src/index.tsx BlueFireViolet output/BlueFireViolet-prores.mov --codec prores --prores-profile hq
+      - name: Render SolarLens (ProRes)
+        run: npx remotion render src/index.tsx SolarLens output/SolarLens-prores.mov --codec prores --prores-profile hq
 
-      - name: Render BlueFireSolar (ProRes)
-        run: npx remotion render src/index.tsx BlueFireSolar output/BlueFireSolar-prores.mov --codec prores --prores-profile hq
+      - name: Render RoseLens (ProRes)
+        run: npx remotion render src/index.tsx RoseLens output/RoseLens-prores.mov --codec prores --prores-profile hq
 
       - name: Check ProRes sizes
         run: ls -lh output/*.mov
 
-      - name: Encode BlueFire to MP4
-        run: ffmpeg -y -i output/BlueFire-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/BlueFire.mp4
+      - name: Encode BlueLens to MP4
+        run: ffmpeg -y -i output/BlueLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/BlueLens.mp4
 
-      - name: Encode BlueFireCrimson to MP4
-        run: ffmpeg -y -i output/BlueFireCrimson-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/BlueFireCrimson.mp4
+      - name: Encode EmeraldLens to MP4
+        run: ffmpeg -y -i output/EmeraldLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/EmeraldLens.mp4
 
-      - name: Encode BlueFireToxic to MP4
-        run: ffmpeg -y -i output/BlueFireToxic-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/BlueFireToxic.mp4
+      - name: Encode VioletLens to MP4
+        run: ffmpeg -y -i output/VioletLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/VioletLens.mp4
 
-      - name: Encode BlueFireViolet to MP4
-        run: ffmpeg -y -i output/BlueFireViolet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/BlueFireViolet.mp4
+      - name: Encode SolarLens to MP4
+        run: ffmpeg -y -i output/SolarLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/SolarLens.mp4
 
-      - name: Encode BlueFireSolar to MP4
-        run: ffmpeg -y -i output/BlueFireSolar-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/BlueFireSolar.mp4
+      - name: Encode RoseLens to MP4
+        run: ffmpeg -y -i output/RoseLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RoseLens.mp4
 
       - name: Check final file sizes
         run: ls -lh output/*.mp4
 
-      - name: Upload BlueFire
+      - name: Upload BlueLens
         uses: actions/upload-artifact@v4
         with:
-          name: BlueFire-4K
-          path: output/BlueFire.mp4
+          name: BlueLens-4K
+          path: output/BlueLens.mp4
 
-      - name: Upload BlueFireCrimson
+      - name: Upload EmeraldLens
         uses: actions/upload-artifact@v4
         with:
-          name: BlueFireCrimson-4K
-          path: output/BlueFireCrimson.mp4
+          name: EmeraldLens-4K
+          path: output/EmeraldLens.mp4
 
-      - name: Upload BlueFireToxic
+      - name: Upload VioletLens
         uses: actions/upload-artifact@v4
         with:
-          name: BlueFireToxic-4K
-          path: output/BlueFireToxic.mp4
+          name: VioletLens-4K
+          path: output/VioletLens.mp4
 
-      - name: Upload BlueFireViolet
+      - name: Upload SolarLens
         uses: actions/upload-artifact@v4
         with:
-          name: BlueFireViolet-4K
-          path: output/BlueFireViolet.mp4
+          name: SolarLens-4K
+          path: output/SolarLens.mp4
 
-      - name: Upload BlueFireSolar
+      - name: Upload RoseLens
         uses: actions/upload-artifact@v4
         with:
-          name: BlueFireSolar-4K
-          path: output/BlueFireSolar.mp4
+          name: RoseLens-4K
+          path: output/RoseLens.mp4
 
       - name: Upload ProRes masters
         uses: actions/upload-artifact@v4
         with:
-          name: BlueFire-ProRes
+          name: Lens-ProRes
           path: |
-            output/BlueFire-prores.mov
-            output/BlueFireCrimson-prores.mov
-            output/BlueFireToxic-prores.mov
-            output/BlueFireViolet-prores.mov
-            output/BlueFireSolar-prores.mov
+            output/BlueLens-prores.mov
+            output/EmeraldLens-prores.mov
+            output/VioletLens-prores.mov
+            output/SolarLens-prores.mov
+            output/RoseLens-prores.mov
