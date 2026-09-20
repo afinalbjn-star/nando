@@ -1,4 +1,4 @@
-name: Render Lens Compositions (5 colors)
+name: Render Facet Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,79 +24,79 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render BlueLens (ProRes)
-        run: npx remotion render src/index.tsx BlueLens output/BlueLens-prores.mov --codec prores --prores-profile hq
+      - name: Render FacetedMosaic (ProRes)
+        run: npx remotion render src/index.tsx FacetedMosaic output/FacetedMosaic-prores.mov --codec prores --prores-profile hq
 
-      - name: Render EmeraldLens (ProRes)
-        run: npx remotion render src/index.tsx EmeraldLens output/EmeraldLens-prores.mov --codec prores --prores-profile hq
+      - name: Render GoldFacet (ProRes)
+        run: npx remotion render src/index.tsx GoldFacet output/GoldFacet-prores.mov --codec prores --prores-profile hq
 
-      - name: Render VioletLens (ProRes)
-        run: npx remotion render src/index.tsx VioletLens output/VioletLens-prores.mov --codec prores --prores-profile hq
+      - name: Render RoseFacet (ProRes)
+        run: npx remotion render src/index.tsx RoseFacet output/RoseFacet-prores.mov --codec prores --prores-profile hq
 
-      - name: Render SolarLens (ProRes)
-        run: npx remotion render src/index.tsx SolarLens output/SolarLens-prores.mov --codec prores --prores-profile hq
+      - name: Render EmeraldFacet (ProRes)
+        run: npx remotion render src/index.tsx EmeraldFacet output/EmeraldFacet-prores.mov --codec prores --prores-profile hq
 
-      - name: Render RoseLens (ProRes)
-        run: npx remotion render src/index.tsx RoseLens output/RoseLens-prores.mov --codec prores --prores-profile hq
+      - name: Render VioletFacet (ProRes)
+        run: npx remotion render src/index.tsx VioletFacet output/VioletFacet-prores.mov --codec prores --prores-profile hq
 
       - name: Check ProRes sizes
         run: ls -lh output/*.mov
 
-      - name: Encode BlueLens to MP4
-        run: ffmpeg -y -i output/BlueLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/BlueLens.mp4
+      - name: Encode FacetedMosaic to MP4
+        run: ffmpeg -y -i output/FacetedMosaic-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FacetedMosaic.mp4
 
-      - name: Encode EmeraldLens to MP4
-        run: ffmpeg -y -i output/EmeraldLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/EmeraldLens.mp4
+      - name: Encode GoldFacet to MP4
+        run: ffmpeg -y -i output/GoldFacet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/GoldFacet.mp4
 
-      - name: Encode VioletLens to MP4
-        run: ffmpeg -y -i output/VioletLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/VioletLens.mp4
+      - name: Encode RoseFacet to MP4
+        run: ffmpeg -y -i output/RoseFacet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RoseFacet.mp4
 
-      - name: Encode SolarLens to MP4
-        run: ffmpeg -y -i output/SolarLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/SolarLens.mp4
+      - name: Encode EmeraldFacet to MP4
+        run: ffmpeg -y -i output/EmeraldFacet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/EmeraldFacet.mp4
 
-      - name: Encode RoseLens to MP4
-        run: ffmpeg -y -i output/RoseLens-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RoseLens.mp4
+      - name: Encode VioletFacet to MP4
+        run: ffmpeg -y -i output/VioletFacet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/VioletFacet.mp4
 
       - name: Check final file sizes
         run: ls -lh output/*.mp4
 
-      - name: Upload BlueLens
+      - name: Upload FacetedMosaic
         uses: actions/upload-artifact@v4
         with:
-          name: BlueLens-4K
-          path: output/BlueLens.mp4
+          name: FacetedMosaic-4K
+          path: output/FacetedMosaic.mp4
 
-      - name: Upload EmeraldLens
+      - name: Upload GoldFacet
         uses: actions/upload-artifact@v4
         with:
-          name: EmeraldLens-4K
-          path: output/EmeraldLens.mp4
+          name: GoldFacet-4K
+          path: output/GoldFacet.mp4
 
-      - name: Upload VioletLens
+      - name: Upload RoseFacet
         uses: actions/upload-artifact@v4
         with:
-          name: VioletLens-4K
-          path: output/VioletLens.mp4
+          name: RoseFacet-4K
+          path: output/RoseFacet.mp4
 
-      - name: Upload SolarLens
+      - name: Upload EmeraldFacet
         uses: actions/upload-artifact@v4
         with:
-          name: SolarLens-4K
-          path: output/SolarLens.mp4
+          name: EmeraldFacet-4K
+          path: output/EmeraldFacet.mp4
 
-      - name: Upload RoseLens
+      - name: Upload VioletFacet
         uses: actions/upload-artifact@v4
         with:
-          name: RoseLens-4K
-          path: output/RoseLens.mp4
+          name: VioletFacet-4K
+          path: output/VioletFacet.mp4
 
       - name: Upload ProRes masters
         uses: actions/upload-artifact@v4
         with:
-          name: Lens-ProRes
+          name: Facet-ProRes
           path: |
-            output/BlueLens-prores.mov
-            output/EmeraldLens-prores.mov
-            output/VioletLens-prores.mov
-            output/SolarLens-prores.mov
-            output/RoseLens-prores.mov
+            output/FacetedMosaic-prores.mov
+            output/GoldFacet-prores.mov
+            output/RoseFacet-prores.mov
+            output/EmeraldFacet-prores.mov
+            output/VioletFacet-prores.mov

@@ -63,3 +63,6 @@ export { TitaniumRibs } from './TitaniumRibs';
 export { BlueLens } from './BlueLens';
 export { ConcentricLens } from './ConcentricLens';
 export type { LensScheme } from './ConcentricLens';
+export { FacetedMosaic } from './FacetedMosaic';
+export { ColorFacet } from './ColorFacet';
+export type { FacetScheme } from './ColorFacet';

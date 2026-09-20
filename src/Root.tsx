@@ -63,6 +63,8 @@ import type { FireScheme } from './components/BlueFire';
 import { TitaniumRibs } from './components/TitaniumRibs';
 import { BlueLens } from './components/BlueLens';
 import { ConcentricLens } from './components/ConcentricLens';
+import { FacetedMosaic } from './components/FacetedMosaic';
+import { ColorFacet } from './components/ColorFacet';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1515,6 +1517,56 @@ export const RemotionRoot: React.FC = () => {
         id="RoseLens"
         component={() => (
           <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FacetedMosaic"
+        component={() => (
+          <FacetedMosaic width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GoldFacet"
+        component={() => (
+          <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RoseFacet"
+        component={() => (
+          <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="EmeraldFacet"
+        component={() => (
+          <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VioletFacet"
+        component={() => (
+          <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
