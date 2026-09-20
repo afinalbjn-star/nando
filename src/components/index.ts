@@ -66,3 +66,6 @@ export type { LensScheme } from './ConcentricLens';
 export { FacetedMosaic } from './FacetedMosaic';
 export { ColorFacet } from './ColorFacet';
 export type { FacetScheme } from './ColorFacet';
+export { GoldHexWave } from './GoldHexWave';
+export { HexWave } from './HexWave';
+export type { HexWaveScheme } from './HexWave';

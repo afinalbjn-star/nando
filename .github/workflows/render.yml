@@ -1,4 +1,4 @@
-name: Render Facet Compositions (5 colors)
+name: Render HexWave Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,79 +24,79 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render FacetedMosaic (ProRes)
-        run: npx remotion render src/index.tsx FacetedMosaic output/FacetedMosaic-prores.mov --codec prores --prores-profile hq
+      - name: Render GoldHexWave (ProRes)
+        run: npx remotion render src/index.tsx GoldHexWave output/GoldHexWave-prores.mov --codec prores --prores-profile hq
 
-      - name: Render GoldFacet (ProRes)
-        run: npx remotion render src/index.tsx GoldFacet output/GoldFacet-prores.mov --codec prores --prores-profile hq
+      - name: Render CrimsonHexWave (ProRes)
+        run: npx remotion render src/index.tsx CrimsonHexWave output/CrimsonHexWave-prores.mov --codec prores --prores-profile hq
 
-      - name: Render RoseFacet (ProRes)
-        run: npx remotion render src/index.tsx RoseFacet output/RoseFacet-prores.mov --codec prores --prores-profile hq
+      - name: Render EmeraldHexWave (ProRes)
+        run: npx remotion render src/index.tsx EmeraldHexWave output/EmeraldHexWave-prores.mov --codec prores --prores-profile hq
 
-      - name: Render EmeraldFacet (ProRes)
-        run: npx remotion render src/index.tsx EmeraldFacet output/EmeraldFacet-prores.mov --codec prores --prores-profile hq
+      - name: Render VioletHexWave (ProRes)
+        run: npx remotion render src/index.tsx VioletHexWave output/VioletHexWave-prores.mov --codec prores --prores-profile hq
 
-      - name: Render VioletFacet (ProRes)
-        run: npx remotion render src/index.tsx VioletFacet output/VioletFacet-prores.mov --codec prores --prores-profile hq
+      - name: Render OceanHexWave (ProRes)
+        run: npx remotion render src/index.tsx OceanHexWave output/OceanHexWave-prores.mov --codec prores --prores-profile hq
 
       - name: Check ProRes sizes
         run: ls -lh output/*.mov
 
-      - name: Encode FacetedMosaic to MP4
-        run: ffmpeg -y -i output/FacetedMosaic-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FacetedMosaic.mp4
+      - name: Encode GoldHexWave to MP4
+        run: ffmpeg -y -i output/GoldHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/GoldHexWave.mp4
 
-      - name: Encode GoldFacet to MP4
-        run: ffmpeg -y -i output/GoldFacet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/GoldFacet.mp4
+      - name: Encode CrimsonHexWave to MP4
+        run: ffmpeg -y -i output/CrimsonHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CrimsonHexWave.mp4
 
-      - name: Encode RoseFacet to MP4
-        run: ffmpeg -y -i output/RoseFacet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RoseFacet.mp4
+      - name: Encode EmeraldHexWave to MP4
+        run: ffmpeg -y -i output/EmeraldHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/EmeraldHexWave.mp4
 
-      - name: Encode EmeraldFacet to MP4
-        run: ffmpeg -y -i output/EmeraldFacet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/EmeraldFacet.mp4
+      - name: Encode VioletHexWave to MP4
+        run: ffmpeg -y -i output/VioletHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/VioletHexWave.mp4
 
-      - name: Encode VioletFacet to MP4
-        run: ffmpeg -y -i output/VioletFacet-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/VioletFacet.mp4
+      - name: Encode OceanHexWave to MP4
+        run: ffmpeg -y -i output/OceanHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/OceanHexWave.mp4
 
       - name: Check final file sizes
         run: ls -lh output/*.mp4
 
-      - name: Upload FacetedMosaic
+      - name: Upload GoldHexWave
         uses: actions/upload-artifact@v4
         with:
-          name: FacetedMosaic-4K
-          path: output/FacetedMosaic.mp4
+          name: GoldHexWave-4K
+          path: output/GoldHexWave.mp4
 
-      - name: Upload GoldFacet
+      - name: Upload CrimsonHexWave
         uses: actions/upload-artifact@v4
         with:
-          name: GoldFacet-4K
-          path: output/GoldFacet.mp4
+          name: CrimsonHexWave-4K
+          path: output/CrimsonHexWave.mp4
 
-      - name: Upload RoseFacet
+      - name: Upload EmeraldHexWave
         uses: actions/upload-artifact@v4
         with:
-          name: RoseFacet-4K
-          path: output/RoseFacet.mp4
+          name: EmeraldHexWave-4K
+          path: output/EmeraldHexWave.mp4
 
-      - name: Upload EmeraldFacet
+      - name: Upload VioletHexWave
         uses: actions/upload-artifact@v4
         with:
-          name: EmeraldFacet-4K
-          path: output/EmeraldFacet.mp4
+          name: VioletHexWave-4K
+          path: output/VioletHexWave.mp4
 
-      - name: Upload VioletFacet
+      - name: Upload OceanHexWave
         uses: actions/upload-artifact@v4
         with:
-          name: VioletFacet-4K
-          path: output/VioletFacet.mp4
+          name: OceanHexWave-4K
+          path: output/OceanHexWave.mp4
 
       - name: Upload ProRes masters
         uses: actions/upload-artifact@v4
         with:
-          name: Facet-ProRes
+          name: HexWave-ProRes
           path: |
-            output/FacetedMosaic-prores.mov
-            output/GoldFacet-prores.mov
-            output/RoseFacet-prores.mov
-            output/EmeraldFacet-prores.mov
-            output/VioletFacet-prores.mov
+            output/GoldHexWave-prores.mov
+            output/CrimsonHexWave-prores.mov
+            output/EmeraldHexWave-prores.mov
+            output/VioletHexWave-prores.mov
+            output/OceanHexWave-prores.mov

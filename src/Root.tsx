@@ -65,6 +65,8 @@ import { BlueLens } from './components/BlueLens';
 import { ConcentricLens } from './components/ConcentricLens';
 import { FacetedMosaic } from './components/FacetedMosaic';
 import { ColorFacet } from './components/ColorFacet';
+import { GoldHexWave } from './components/GoldHexWave';
+import { HexWave } from './components/HexWave';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1567,6 +1569,56 @@ export const RemotionRoot: React.FC = () => {
         id="VioletFacet"
         component={() => (
           <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GoldHexWave"
+        component={() => (
+          <GoldHexWave width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CrimsonHexWave"
+        component={() => (
+          <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="EmeraldHexWave"
+        component={() => (
+          <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VioletHexWave"
+        component={() => (
+          <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="OceanHexWave"
+        component={() => (
+          <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
