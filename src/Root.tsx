@@ -70,6 +70,7 @@ import { HexWave } from './components/HexWave';
 import { LiquidGold } from './components/LiquidGold';
 import { LiquidMetal } from './components/LiquidMetal';
 import { RetroPoly } from './components/RetroPoly';
+import { PastelDrift } from './components/PastelDrift';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1732,6 +1733,56 @@ export const RemotionRoot: React.FC = () => {
         id="RetroDusk"
         component={() => (
           <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="dusk" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelPeach"
+        component={() => (
+          <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="peach" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelLavender"
+        component={() => (
+          <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lavender" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelMint"
+        component={() => (
+          <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelSky"
+        component={() => (
+          <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sky" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelRose"
+        component={() => (
+          <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

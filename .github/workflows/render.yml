@@ -1,4 +1,4 @@
-name: Render RetroPoly Compositions (6 colors)
+name: Render Pastel Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,92 +24,79 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render RetroSunset (ProRes)
-        run: npx remotion render src/index.tsx RetroSunset output/RetroSunset-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelPeach (ProRes)
+        run: npx remotion render src/index.tsx PastelPeach output/PastelPeach-prores.mov --codec prores --prores-profile hq
 
-      - name: Render RetroCandy (ProRes)
-        run: npx remotion render src/index.tsx RetroCandy output/RetroCandy-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelLavender (ProRes)
+        run: npx remotion render src/index.tsx PastelLavender output/PastelLavender-prores.mov --codec prores --prores-profile hq
 
-      - name: Render RetroWave (ProRes)
-        run: npx remotion render src/index.tsx RetroWave output/RetroWave-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelMint (ProRes)
+        run: npx remotion render src/index.tsx PastelMint output/PastelMint-prores.mov --codec prores --prores-profile hq
 
-      - name: Render RetroPop (ProRes)
-        run: npx remotion render src/index.tsx RetroPop output/RetroPop-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelSky (ProRes)
+        run: npx remotion render src/index.tsx PastelSky output/PastelSky-prores.mov --codec prores --prores-profile hq
 
-      - name: Render RetroMint (ProRes)
-        run: npx remotion render src/index.tsx RetroMint output/RetroMint-prores.mov --codec prores --prores-profile hq
-
-      - name: Render RetroDusk (ProRes)
-        run: npx remotion render src/index.tsx RetroDusk output/RetroDusk-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelRose (ProRes)
+        run: npx remotion render src/index.tsx PastelRose output/PastelRose-prores.mov --codec prores --prores-profile hq
 
       - name: Check ProRes sizes
         run: ls -lh output/*.mov
 
-      - name: Encode RetroSunset to MP4
-        run: ffmpeg -y -i output/RetroSunset-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RetroSunset.mp4
+      - name: Encode PastelPeach to MP4
+        run: ffmpeg -y -i output/PastelPeach-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelPeach.mp4
 
-      - name: Encode RetroCandy to MP4
-        run: ffmpeg -y -i output/RetroCandy-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RetroCandy.mp4
+      - name: Encode PastelLavender to MP4
+        run: ffmpeg -y -i output/PastelLavender-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelLavender.mp4
 
-      - name: Encode RetroWave to MP4
-        run: ffmpeg -y -i output/RetroWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RetroWave.mp4
+      - name: Encode PastelMint to MP4
+        run: ffmpeg -y -i output/PastelMint-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelMint.mp4
 
-      - name: Encode RetroPop to MP4
-        run: ffmpeg -y -i output/RetroPop-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RetroPop.mp4
+      - name: Encode PastelSky to MP4
+        run: ffmpeg -y -i output/PastelSky-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelSky.mp4
 
-      - name: Encode RetroMint to MP4
-        run: ffmpeg -y -i output/RetroMint-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RetroMint.mp4
-
-      - name: Encode RetroDusk to MP4
-        run: ffmpeg -y -i output/RetroDusk-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/RetroDusk.mp4
+      - name: Encode PastelRose to MP4
+        run: ffmpeg -y -i output/PastelRose-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelRose.mp4
 
       - name: Check final file sizes
         run: ls -lh output/*.mp4
 
-      - name: Upload RetroSunset
+      - name: Upload PastelPeach
         uses: actions/upload-artifact@v4
         with:
-          name: RetroSunset-4K
-          path: output/RetroSunset.mp4
+          name: PastelPeach-4K
+          path: output/PastelPeach.mp4
 
-      - name: Upload RetroCandy
+      - name: Upload PastelLavender
         uses: actions/upload-artifact@v4
         with:
-          name: RetroCandy-4K
-          path: output/RetroCandy.mp4
+          name: PastelLavender-4K
+          path: output/PastelLavender.mp4
 
-      - name: Upload RetroWave
+      - name: Upload PastelMint
         uses: actions/upload-artifact@v4
         with:
-          name: RetroWave-4K
-          path: output/RetroWave.mp4
+          name: PastelMint-4K
+          path: output/PastelMint.mp4
 
-      - name: Upload RetroPop
+      - name: Upload PastelSky
         uses: actions/upload-artifact@v4
         with:
-          name: RetroPop-4K
-          path: output/RetroPop.mp4
+          name: PastelSky-4K
+          path: output/PastelSky.mp4
 
-      - name: Upload RetroMint
+      - name: Upload PastelRose
         uses: actions/upload-artifact@v4
         with:
-          name: RetroMint-4K
-          path: output/RetroMint.mp4
-
-      - name: Upload RetroDusk
-        uses: actions/upload-artifact@v4
-        with:
-          name: RetroDusk-4K
-          path: output/RetroDusk.mp4
+          name: PastelRose-4K
+          path: output/PastelRose.mp4
 
       - name: Upload ProRes masters
         uses: actions/upload-artifact@v4
         with:
-          name: RetroPoly-ProRes
+          name: Pastel-ProRes
           path: |
-            output/RetroSunset-prores.mov
-            output/RetroCandy-prores.mov
-            output/RetroWave-prores.mov
-            output/RetroPop-prores.mov
-            output/RetroMint-prores.mov
-            output/RetroDusk-prores.mov
+            output/PastelPeach-prores.mov
+            output/PastelLavender-prores.mov
+            output/PastelMint-prores.mov
+            output/PastelSky-prores.mov
+            output/PastelRose-prores.mov

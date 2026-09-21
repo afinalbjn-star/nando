@@ -74,3 +74,5 @@ export { LiquidMetal } from './LiquidMetal';
 export type { LiquidScheme } from './LiquidMetal';
 export { RetroPoly } from './RetroPoly';
 export type { PolyScheme } from './RetroPoly';
+export { PastelDrift } from './PastelDrift';
+export type { PastelScheme } from './PastelDrift';
