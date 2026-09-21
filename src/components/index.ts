@@ -72,3 +72,5 @@ export type { HexWaveScheme } from './HexWave';
 export { LiquidGold } from './LiquidGold';
 export { LiquidMetal } from './LiquidMetal';
 export type { LiquidScheme } from './LiquidMetal';
+export { RetroPoly } from './RetroPoly';
+export type { PolyScheme } from './RetroPoly';

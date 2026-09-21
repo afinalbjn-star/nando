@@ -69,6 +69,7 @@ import { GoldHexWave } from './components/GoldHexWave';
 import { HexWave } from './components/HexWave';
 import { LiquidGold } from './components/LiquidGold';
 import { LiquidMetal } from './components/LiquidMetal';
+import { RetroPoly } from './components/RetroPoly';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1671,6 +1672,66 @@ export const RemotionRoot: React.FC = () => {
         id="LiquidRose"
         component={() => (
           <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RetroSunset"
+        component={() => (
+          <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RetroCandy"
+        component={() => (
+          <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="candy" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RetroWave"
+        component={() => (
+          <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="wave" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RetroPop"
+        component={() => (
+          <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="pop" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RetroMint"
+        component={() => (
+          <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RetroDusk"
+        component={() => (
+          <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="dusk" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
