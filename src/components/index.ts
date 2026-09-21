@@ -83,3 +83,7 @@ export type { TilesScheme } from './DiscoTiles';
 export { CubeField } from './CubeField';
 export { CubeBlocks } from './CubeBlocks';
 export type { BlocksScheme } from './CubeBlocks';
+export { RainbowVortex } from './RainbowVortex';
+export { VioletFan } from './VioletFan';
+export { FanBlades } from './FanBlades';
+export type { FanScheme } from './FanBlades';

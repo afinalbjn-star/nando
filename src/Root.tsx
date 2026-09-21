@@ -76,6 +76,9 @@ import { DiscoPixel } from './components/DiscoPixel';
 import { DiscoTiles } from './components/DiscoTiles';
 import { CubeField } from './components/CubeField';
 import { CubeBlocks } from './components/CubeBlocks';
+import { RainbowVortex } from './components/RainbowVortex';
+import { VioletFan } from './components/VioletFan';
+import { FanBlades } from './components/FanBlades';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1898,6 +1901,66 @@ export const RemotionRoot: React.FC = () => {
         id="CubeSunset"
         component={() => (
           <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RainbowVortex"
+        component={() => (
+          <RainbowVortex width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VioletFan"
+        component={() => (
+          <VioletFan width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FanCrimson"
+        component={() => (
+          <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FanOcean"
+        component={() => (
+          <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FanEmerald"
+        component={() => (
+          <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FanAmber"
+        component={() => (
+          <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amber" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

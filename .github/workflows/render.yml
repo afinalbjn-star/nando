@@ -1,4 +1,4 @@
-name: Render Cube Compositions (5 colors)
+name: Render Fan Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,79 +24,79 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render CubeField (ProRes)
-        run: npx remotion render src/index.tsx CubeField output/CubeField-prores.mov --codec prores --prores-profile hq
+      - name: Render VioletFan (ProRes)
+        run: npx remotion render src/index.tsx VioletFan output/VioletFan-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CubeOcean (ProRes)
-        run: npx remotion render src/index.tsx CubeOcean output/CubeOcean-prores.mov --codec prores --prores-profile hq
+      - name: Render FanCrimson (ProRes)
+        run: npx remotion render src/index.tsx FanCrimson output/FanCrimson-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CubeCandy (ProRes)
-        run: npx remotion render src/index.tsx CubeCandy output/CubeCandy-prores.mov --codec prores --prores-profile hq
+      - name: Render FanOcean (ProRes)
+        run: npx remotion render src/index.tsx FanOcean output/FanOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CubeMint (ProRes)
-        run: npx remotion render src/index.tsx CubeMint output/CubeMint-prores.mov --codec prores --prores-profile hq
+      - name: Render FanEmerald (ProRes)
+        run: npx remotion render src/index.tsx FanEmerald output/FanEmerald-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CubeSunset (ProRes)
-        run: npx remotion render src/index.tsx CubeSunset output/CubeSunset-prores.mov --codec prores --prores-profile hq
+      - name: Render FanAmber (ProRes)
+        run: npx remotion render src/index.tsx FanAmber output/FanAmber-prores.mov --codec prores --prores-profile hq
 
       - name: Check ProRes sizes
         run: ls -lh output/*.mov
 
-      - name: Encode CubeField to MP4
-        run: ffmpeg -y -i output/CubeField-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeField.mp4
+      - name: Encode VioletFan to MP4
+        run: ffmpeg -y -i output/VioletFan-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/VioletFan.mp4
 
-      - name: Encode CubeOcean to MP4
-        run: ffmpeg -y -i output/CubeOcean-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeOcean.mp4
+      - name: Encode FanCrimson to MP4
+        run: ffmpeg -y -i output/FanCrimson-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FanCrimson.mp4
 
-      - name: Encode CubeCandy to MP4
-        run: ffmpeg -y -i output/CubeCandy-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeCandy.mp4
+      - name: Encode FanOcean to MP4
+        run: ffmpeg -y -i output/FanOcean-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FanOcean.mp4
 
-      - name: Encode CubeMint to MP4
-        run: ffmpeg -y -i output/CubeMint-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeMint.mp4
+      - name: Encode FanEmerald to MP4
+        run: ffmpeg -y -i output/FanEmerald-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FanEmerald.mp4
 
-      - name: Encode CubeSunset to MP4
-        run: ffmpeg -y -i output/CubeSunset-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeSunset.mp4
+      - name: Encode FanAmber to MP4
+        run: ffmpeg -y -i output/FanAmber-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FanAmber.mp4
 
       - name: Check final file sizes
         run: ls -lh output/*.mp4
 
-      - name: Upload CubeField
+      - name: Upload VioletFan
         uses: actions/upload-artifact@v4
         with:
-          name: CubeField-4K
-          path: output/CubeField.mp4
+          name: VioletFan-4K
+          path: output/VioletFan.mp4
 
-      - name: Upload CubeOcean
+      - name: Upload FanCrimson
         uses: actions/upload-artifact@v4
         with:
-          name: CubeOcean-4K
-          path: output/CubeOcean.mp4
+          name: FanCrimson-4K
+          path: output/FanCrimson.mp4
 
-      - name: Upload CubeCandy
+      - name: Upload FanOcean
         uses: actions/upload-artifact@v4
         with:
-          name: CubeCandy-4K
-          path: output/CubeCandy.mp4
+          name: FanOcean-4K
+          path: output/FanOcean.mp4
 
-      - name: Upload CubeMint
+      - name: Upload FanEmerald
         uses: actions/upload-artifact@v4
         with:
-          name: CubeMint-4K
-          path: output/CubeMint.mp4
+          name: FanEmerald-4K
+          path: output/FanEmerald.mp4
 
-      - name: Upload CubeSunset
+      - name: Upload FanAmber
         uses: actions/upload-artifact@v4
         with:
-          name: CubeSunset-4K
-          path: output/CubeSunset.mp4
+          name: FanAmber-4K
+          path: output/FanAmber.mp4
 
       - name: Upload ProRes masters
         uses: actions/upload-artifact@v4
         with:
-          name: Cube-ProRes
+          name: Fan-ProRes
           path: |
-            output/CubeField-prores.mov
-            output/CubeOcean-prores.mov
-            output/CubeCandy-prores.mov
-            output/CubeMint-prores.mov
-            output/CubeSunset-prores.mov
+            output/VioletFan-prores.mov
+            output/FanCrimson-prores.mov
+            output/FanOcean-prores.mov
+            output/FanEmerald-prores.mov
+            output/FanAmber-prores.mov
