@@ -1,4 +1,4 @@
-name: Render Disco Compositions (5 colors)
+name: Render Cube Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,79 +24,79 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render DiscoPixel (ProRes)
-        run: npx remotion render src/index.tsx DiscoPixel output/DiscoPixel-prores.mov --codec prores --prores-profile hq
+      - name: Render CubeField (ProRes)
+        run: npx remotion render src/index.tsx CubeField output/CubeField-prores.mov --codec prores --prores-profile hq
 
-      - name: Render DiscoOcean (ProRes)
-        run: npx remotion render src/index.tsx DiscoOcean output/DiscoOcean-prores.mov --codec prores --prores-profile hq
+      - name: Render CubeOcean (ProRes)
+        run: npx remotion render src/index.tsx CubeOcean output/CubeOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render DiscoCrimson (ProRes)
-        run: npx remotion render src/index.tsx DiscoCrimson output/DiscoCrimson-prores.mov --codec prores --prores-profile hq
+      - name: Render CubeCandy (ProRes)
+        run: npx remotion render src/index.tsx CubeCandy output/CubeCandy-prores.mov --codec prores --prores-profile hq
 
-      - name: Render DiscoEmerald (ProRes)
-        run: npx remotion render src/index.tsx DiscoEmerald output/DiscoEmerald-prores.mov --codec prores --prores-profile hq
+      - name: Render CubeMint (ProRes)
+        run: npx remotion render src/index.tsx CubeMint output/CubeMint-prores.mov --codec prores --prores-profile hq
 
-      - name: Render DiscoSunset (ProRes)
-        run: npx remotion render src/index.tsx DiscoSunset output/DiscoSunset-prores.mov --codec prores --prores-profile hq
+      - name: Render CubeSunset (ProRes)
+        run: npx remotion render src/index.tsx CubeSunset output/CubeSunset-prores.mov --codec prores --prores-profile hq
 
       - name: Check ProRes sizes
         run: ls -lh output/*.mov
 
-      - name: Encode DiscoPixel to MP4
-        run: ffmpeg -y -i output/DiscoPixel-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoPixel.mp4
+      - name: Encode CubeField to MP4
+        run: ffmpeg -y -i output/CubeField-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeField.mp4
 
-      - name: Encode DiscoOcean to MP4
-        run: ffmpeg -y -i output/DiscoOcean-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoOcean.mp4
+      - name: Encode CubeOcean to MP4
+        run: ffmpeg -y -i output/CubeOcean-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeOcean.mp4
 
-      - name: Encode DiscoCrimson to MP4
-        run: ffmpeg -y -i output/DiscoCrimson-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoCrimson.mp4
+      - name: Encode CubeCandy to MP4
+        run: ffmpeg -y -i output/CubeCandy-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeCandy.mp4
 
-      - name: Encode DiscoEmerald to MP4
-        run: ffmpeg -y -i output/DiscoEmerald-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoEmerald.mp4
+      - name: Encode CubeMint to MP4
+        run: ffmpeg -y -i output/CubeMint-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeMint.mp4
 
-      - name: Encode DiscoSunset to MP4
-        run: ffmpeg -y -i output/DiscoSunset-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoSunset.mp4
+      - name: Encode CubeSunset to MP4
+        run: ffmpeg -y -i output/CubeSunset-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CubeSunset.mp4
 
       - name: Check final file sizes
         run: ls -lh output/*.mp4
 
-      - name: Upload DiscoPixel
+      - name: Upload CubeField
         uses: actions/upload-artifact@v4
         with:
-          name: DiscoPixel-4K
-          path: output/DiscoPixel.mp4
+          name: CubeField-4K
+          path: output/CubeField.mp4
 
-      - name: Upload DiscoOcean
+      - name: Upload CubeOcean
         uses: actions/upload-artifact@v4
         with:
-          name: DiscoOcean-4K
-          path: output/DiscoOcean.mp4
+          name: CubeOcean-4K
+          path: output/CubeOcean.mp4
 
-      - name: Upload DiscoCrimson
+      - name: Upload CubeCandy
         uses: actions/upload-artifact@v4
         with:
-          name: DiscoCrimson-4K
-          path: output/DiscoCrimson.mp4
+          name: CubeCandy-4K
+          path: output/CubeCandy.mp4
 
-      - name: Upload DiscoEmerald
+      - name: Upload CubeMint
         uses: actions/upload-artifact@v4
         with:
-          name: DiscoEmerald-4K
-          path: output/DiscoEmerald.mp4
+          name: CubeMint-4K
+          path: output/CubeMint.mp4
 
-      - name: Upload DiscoSunset
+      - name: Upload CubeSunset
         uses: actions/upload-artifact@v4
         with:
-          name: DiscoSunset-4K
-          path: output/DiscoSunset.mp4
+          name: CubeSunset-4K
+          path: output/CubeSunset.mp4
 
       - name: Upload ProRes masters
         uses: actions/upload-artifact@v4
         with:
-          name: Disco-ProRes
+          name: Cube-ProRes
           path: |
-            output/DiscoPixel-prores.mov
-            output/DiscoOcean-prores.mov
-            output/DiscoCrimson-prores.mov
-            output/DiscoEmerald-prores.mov
-            output/DiscoSunset-prores.mov
+            output/CubeField-prores.mov
+            output/CubeOcean-prores.mov
+            output/CubeCandy-prores.mov
+            output/CubeMint-prores.mov
+            output/CubeSunset-prores.mov

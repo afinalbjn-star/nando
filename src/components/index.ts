@@ -80,3 +80,6 @@ export { InkBloom } from './InkBloom';
 export { DiscoPixel } from './DiscoPixel';
 export { DiscoTiles } from './DiscoTiles';
 export type { TilesScheme } from './DiscoTiles';
+export { CubeField } from './CubeField';
+export { CubeBlocks } from './CubeBlocks';
+export type { BlocksScheme } from './CubeBlocks';

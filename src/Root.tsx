@@ -74,6 +74,8 @@ import { PastelDrift } from './components/PastelDrift';
 import { InkBloom } from './components/InkBloom';
 import { DiscoPixel } from './components/DiscoPixel';
 import { DiscoTiles } from './components/DiscoTiles';
+import { CubeField } from './components/CubeField';
+import { CubeBlocks } from './components/CubeBlocks';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1846,6 +1848,56 @@ export const RemotionRoot: React.FC = () => {
         id="DiscoSunset"
         component={() => (
           <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CubeField"
+        component={() => (
+          <CubeField width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CubeOcean"
+        component={() => (
+          <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CubeCandy"
+        component={() => (
+          <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="candy" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CubeMint"
+        component={() => (
+          <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CubeSunset"
+        component={() => (
+          <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
