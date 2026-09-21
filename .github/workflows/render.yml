@@ -1,4 +1,4 @@
-name: Render HexWave Compositions (5 colors)
+name: Render Liquid Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,79 +24,79 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render GoldHexWave (ProRes)
-        run: npx remotion render src/index.tsx GoldHexWave output/GoldHexWave-prores.mov --codec prores --prores-profile hq
+      - name: Render LiquidGold (ProRes)
+        run: npx remotion render src/index.tsx LiquidGold output/LiquidGold-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CrimsonHexWave (ProRes)
-        run: npx remotion render src/index.tsx CrimsonHexWave output/CrimsonHexWave-prores.mov --codec prores --prores-profile hq
+      - name: Render LiquidSilver (ProRes)
+        run: npx remotion render src/index.tsx LiquidSilver output/LiquidSilver-prores.mov --codec prores --prores-profile hq
 
-      - name: Render EmeraldHexWave (ProRes)
-        run: npx remotion render src/index.tsx EmeraldHexWave output/EmeraldHexWave-prores.mov --codec prores --prores-profile hq
+      - name: Render LiquidCopper (ProRes)
+        run: npx remotion render src/index.tsx LiquidCopper output/LiquidCopper-prores.mov --codec prores --prores-profile hq
 
-      - name: Render VioletHexWave (ProRes)
-        run: npx remotion render src/index.tsx VioletHexWave output/VioletHexWave-prores.mov --codec prores --prores-profile hq
+      - name: Render LiquidOcean (ProRes)
+        run: npx remotion render src/index.tsx LiquidOcean output/LiquidOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render OceanHexWave (ProRes)
-        run: npx remotion render src/index.tsx OceanHexWave output/OceanHexWave-prores.mov --codec prores --prores-profile hq
+      - name: Render LiquidRose (ProRes)
+        run: npx remotion render src/index.tsx LiquidRose output/LiquidRose-prores.mov --codec prores --prores-profile hq
 
       - name: Check ProRes sizes
         run: ls -lh output/*.mov
 
-      - name: Encode GoldHexWave to MP4
-        run: ffmpeg -y -i output/GoldHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/GoldHexWave.mp4
+      - name: Encode LiquidGold to MP4
+        run: ffmpeg -y -i output/LiquidGold-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/LiquidGold.mp4
 
-      - name: Encode CrimsonHexWave to MP4
-        run: ffmpeg -y -i output/CrimsonHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/CrimsonHexWave.mp4
+      - name: Encode LiquidSilver to MP4
+        run: ffmpeg -y -i output/LiquidSilver-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/LiquidSilver.mp4
 
-      - name: Encode EmeraldHexWave to MP4
-        run: ffmpeg -y -i output/EmeraldHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/EmeraldHexWave.mp4
+      - name: Encode LiquidCopper to MP4
+        run: ffmpeg -y -i output/LiquidCopper-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/LiquidCopper.mp4
 
-      - name: Encode VioletHexWave to MP4
-        run: ffmpeg -y -i output/VioletHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/VioletHexWave.mp4
+      - name: Encode LiquidOcean to MP4
+        run: ffmpeg -y -i output/LiquidOcean-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/LiquidOcean.mp4
 
-      - name: Encode OceanHexWave to MP4
-        run: ffmpeg -y -i output/OceanHexWave-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/OceanHexWave.mp4
+      - name: Encode LiquidRose to MP4
+        run: ffmpeg -y -i output/LiquidRose-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/LiquidRose.mp4
 
       - name: Check final file sizes
         run: ls -lh output/*.mp4
 
-      - name: Upload GoldHexWave
+      - name: Upload LiquidGold
         uses: actions/upload-artifact@v4
         with:
-          name: GoldHexWave-4K
-          path: output/GoldHexWave.mp4
+          name: LiquidGold-4K
+          path: output/LiquidGold.mp4
 
-      - name: Upload CrimsonHexWave
+      - name: Upload LiquidSilver
         uses: actions/upload-artifact@v4
         with:
-          name: CrimsonHexWave-4K
-          path: output/CrimsonHexWave.mp4
+          name: LiquidSilver-4K
+          path: output/LiquidSilver.mp4
 
-      - name: Upload EmeraldHexWave
+      - name: Upload LiquidCopper
         uses: actions/upload-artifact@v4
         with:
-          name: EmeraldHexWave-4K
-          path: output/EmeraldHexWave.mp4
+          name: LiquidCopper-4K
+          path: output/LiquidCopper.mp4
 
-      - name: Upload VioletHexWave
+      - name: Upload LiquidOcean
         uses: actions/upload-artifact@v4
         with:
-          name: VioletHexWave-4K
-          path: output/VioletHexWave.mp4
+          name: LiquidOcean-4K
+          path: output/LiquidOcean.mp4
 
-      - name: Upload OceanHexWave
+      - name: Upload LiquidRose
         uses: actions/upload-artifact@v4
         with:
-          name: OceanHexWave-4K
-          path: output/OceanHexWave.mp4
+          name: LiquidRose-4K
+          path: output/LiquidRose.mp4
 
       - name: Upload ProRes masters
         uses: actions/upload-artifact@v4
         with:
-          name: HexWave-ProRes
+          name: Liquid-ProRes
           path: |
-            output/GoldHexWave-prores.mov
-            output/CrimsonHexWave-prores.mov
-            output/EmeraldHexWave-prores.mov
-            output/VioletHexWave-prores.mov
-            output/OceanHexWave-prores.mov
+            output/LiquidGold-prores.mov
+            output/LiquidSilver-prores.mov
+            output/LiquidCopper-prores.mov
+            output/LiquidOcean-prores.mov
+            output/LiquidRose-prores.mov

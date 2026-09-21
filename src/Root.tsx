@@ -67,6 +67,8 @@ import { FacetedMosaic } from './components/FacetedMosaic';
 import { ColorFacet } from './components/ColorFacet';
 import { GoldHexWave } from './components/GoldHexWave';
 import { HexWave } from './components/HexWave';
+import { LiquidGold } from './components/LiquidGold';
+import { LiquidMetal } from './components/LiquidMetal';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1619,6 +1621,56 @@ export const RemotionRoot: React.FC = () => {
         id="OceanHexWave"
         component={() => (
           <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidGold"
+        component={() => (
+          <LiquidGold width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidSilver"
+        component={() => (
+          <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="silver" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidCopper"
+        component={() => (
+          <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="copper" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidOcean"
+        component={() => (
+          <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidRose"
+        component={() => (
+          <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

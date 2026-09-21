@@ -69,3 +69,6 @@ export type { FacetScheme } from './ColorFacet';
 export { GoldHexWave } from './GoldHexWave';
 export { HexWave } from './HexWave';
 export type { HexWaveScheme } from './HexWave';
+export { LiquidGold } from './LiquidGold';
+export { LiquidMetal } from './LiquidMetal';
+export type { LiquidScheme } from './LiquidMetal';
