@@ -1,4 +1,4 @@
-name: Render Pastel Compositions (5 colors)
+name: Render Disco Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,79 +24,79 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render PastelPeach (ProRes)
-        run: npx remotion render src/index.tsx PastelPeach output/PastelPeach-prores.mov --codec prores --prores-profile hq
+      - name: Render DiscoPixel (ProRes)
+        run: npx remotion render src/index.tsx DiscoPixel output/DiscoPixel-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PastelLavender (ProRes)
-        run: npx remotion render src/index.tsx PastelLavender output/PastelLavender-prores.mov --codec prores --prores-profile hq
+      - name: Render DiscoOcean (ProRes)
+        run: npx remotion render src/index.tsx DiscoOcean output/DiscoOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PastelMint (ProRes)
-        run: npx remotion render src/index.tsx PastelMint output/PastelMint-prores.mov --codec prores --prores-profile hq
+      - name: Render DiscoCrimson (ProRes)
+        run: npx remotion render src/index.tsx DiscoCrimson output/DiscoCrimson-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PastelSky (ProRes)
-        run: npx remotion render src/index.tsx PastelSky output/PastelSky-prores.mov --codec prores --prores-profile hq
+      - name: Render DiscoEmerald (ProRes)
+        run: npx remotion render src/index.tsx DiscoEmerald output/DiscoEmerald-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PastelRose (ProRes)
-        run: npx remotion render src/index.tsx PastelRose output/PastelRose-prores.mov --codec prores --prores-profile hq
+      - name: Render DiscoSunset (ProRes)
+        run: npx remotion render src/index.tsx DiscoSunset output/DiscoSunset-prores.mov --codec prores --prores-profile hq
 
       - name: Check ProRes sizes
         run: ls -lh output/*.mov
 
-      - name: Encode PastelPeach to MP4
-        run: ffmpeg -y -i output/PastelPeach-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelPeach.mp4
+      - name: Encode DiscoPixel to MP4
+        run: ffmpeg -y -i output/DiscoPixel-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoPixel.mp4
 
-      - name: Encode PastelLavender to MP4
-        run: ffmpeg -y -i output/PastelLavender-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelLavender.mp4
+      - name: Encode DiscoOcean to MP4
+        run: ffmpeg -y -i output/DiscoOcean-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoOcean.mp4
 
-      - name: Encode PastelMint to MP4
-        run: ffmpeg -y -i output/PastelMint-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelMint.mp4
+      - name: Encode DiscoCrimson to MP4
+        run: ffmpeg -y -i output/DiscoCrimson-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoCrimson.mp4
 
-      - name: Encode PastelSky to MP4
-        run: ffmpeg -y -i output/PastelSky-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelSky.mp4
+      - name: Encode DiscoEmerald to MP4
+        run: ffmpeg -y -i output/DiscoEmerald-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoEmerald.mp4
 
-      - name: Encode PastelRose to MP4
-        run: ffmpeg -y -i output/PastelRose-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/PastelRose.mp4
+      - name: Encode DiscoSunset to MP4
+        run: ffmpeg -y -i output/DiscoSunset-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/DiscoSunset.mp4
 
       - name: Check final file sizes
         run: ls -lh output/*.mp4
 
-      - name: Upload PastelPeach
+      - name: Upload DiscoPixel
         uses: actions/upload-artifact@v4
         with:
-          name: PastelPeach-4K
-          path: output/PastelPeach.mp4
+          name: DiscoPixel-4K
+          path: output/DiscoPixel.mp4
 
-      - name: Upload PastelLavender
+      - name: Upload DiscoOcean
         uses: actions/upload-artifact@v4
         with:
-          name: PastelLavender-4K
-          path: output/PastelLavender.mp4
+          name: DiscoOcean-4K
+          path: output/DiscoOcean.mp4
 
-      - name: Upload PastelMint
+      - name: Upload DiscoCrimson
         uses: actions/upload-artifact@v4
         with:
-          name: PastelMint-4K
-          path: output/PastelMint.mp4
+          name: DiscoCrimson-4K
+          path: output/DiscoCrimson.mp4
 
-      - name: Upload PastelSky
+      - name: Upload DiscoEmerald
         uses: actions/upload-artifact@v4
         with:
-          name: PastelSky-4K
-          path: output/PastelSky.mp4
+          name: DiscoEmerald-4K
+          path: output/DiscoEmerald.mp4
 
-      - name: Upload PastelRose
+      - name: Upload DiscoSunset
         uses: actions/upload-artifact@v4
         with:
-          name: PastelRose-4K
-          path: output/PastelRose.mp4
+          name: DiscoSunset-4K
+          path: output/DiscoSunset.mp4
 
       - name: Upload ProRes masters
         uses: actions/upload-artifact@v4
         with:
-          name: Pastel-ProRes
+          name: Disco-ProRes
           path: |
-            output/PastelPeach-prores.mov
-            output/PastelLavender-prores.mov
-            output/PastelMint-prores.mov
-            output/PastelSky-prores.mov
-            output/PastelRose-prores.mov
+            output/DiscoPixel-prores.mov
+            output/DiscoOcean-prores.mov
+            output/DiscoCrimson-prores.mov
+            output/DiscoEmerald-prores.mov
+            output/DiscoSunset-prores.mov

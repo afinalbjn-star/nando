@@ -71,6 +71,9 @@ import { LiquidGold } from './components/LiquidGold';
 import { LiquidMetal } from './components/LiquidMetal';
 import { RetroPoly } from './components/RetroPoly';
 import { PastelDrift } from './components/PastelDrift';
+import { InkBloom } from './components/InkBloom';
+import { DiscoPixel } from './components/DiscoPixel';
+import { DiscoTiles } from './components/DiscoTiles';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1783,6 +1786,66 @@ export const RemotionRoot: React.FC = () => {
         id="PastelRose"
         component={() => (
           <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="InkBloom"
+        component={() => (
+          <InkBloom width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="DiscoPixel"
+        component={() => (
+          <DiscoPixel width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="DiscoOcean"
+        component={() => (
+          <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="DiscoCrimson"
+        component={() => (
+          <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="DiscoEmerald"
+        component={() => (
+          <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="DiscoSunset"
+        component={() => (
+          <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

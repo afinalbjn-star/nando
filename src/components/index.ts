@@ -76,3 +76,7 @@ export { RetroPoly } from './RetroPoly';
 export type { PolyScheme } from './RetroPoly';
 export { PastelDrift } from './PastelDrift';
 export type { PastelScheme } from './PastelDrift';
+export { InkBloom } from './InkBloom';
+export { DiscoPixel } from './DiscoPixel';
+export { DiscoTiles } from './DiscoTiles';
+export type { TilesScheme } from './DiscoTiles';
