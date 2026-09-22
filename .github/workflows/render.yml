@@ -1,4 +1,4 @@
-name: Render Holo Compositions (5 colors)
+name: Render Holo + LiquidChrome (10 compositions)
 
 on:
   workflow_dispatch:
@@ -24,35 +24,65 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render HoloMarble (ProRes)
-        run: npx remotion render src/index.tsx HoloMarble output/HoloMarble-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloMarble
+        run: npx remotion render src/index.tsx HoloMarble output/HoloMarble-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Render HoloAurora (ProRes)
-        run: npx remotion render src/index.tsx HoloAurora output/HoloAurora-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloAurora
+        run: npx remotion render src/index.tsx HoloAurora output/HoloAurora-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Render HoloSunset (ProRes)
-        run: npx remotion render src/index.tsx HoloSunset output/HoloSunset-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloSunset
+        run: npx remotion render src/index.tsx HoloSunset output/HoloSunset-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Render HoloOcean (ProRes)
-        run: npx remotion render src/index.tsx HoloOcean output/HoloOcean-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloOcean
+        run: npx remotion render src/index.tsx HoloOcean output/HoloOcean-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Render HoloForest (ProRes)
-        run: npx remotion render src/index.tsx HoloForest output/HoloForest-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloForest
+        run: npx remotion render src/index.tsx HoloForest output/HoloForest-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Encode HoloMarble to MP4
-        run: ffmpeg -i output/HoloMarble-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloMarble.mp4
+      - name: Render LiquidChrome
+        run: npx remotion render src/index.tsx LiquidChrome output/LiquidChrome-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Encode HoloAurora to MP4
-        run: ffmpeg -i output/HoloAurora-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloAurora.mp4
+      - name: Render LiquidGold
+        run: npx remotion render src/index.tsx LiquidGold output/LiquidGold-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Encode HoloSunset to MP4
-        run: ffmpeg -i output/HoloSunset-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloSunset.mp4
+      - name: Render LiquidRose
+        run: npx remotion render src/index.tsx LiquidRose output/LiquidRose-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Encode HoloOcean to MP4
-        run: ffmpeg -i output/HoloOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloOcean.mp4
+      - name: Render LiquidOcean
+        run: npx remotion render src/index.tsx LiquidOcean output/LiquidOcean-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Encode HoloForest to MP4
-        run: ffmpeg -i output/HoloForest-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloForest.mp4
+      - name: Render LiquidEmerald
+        run: npx remotion render src/index.tsx LiquidEmerald output/LiquidEmerald-prores.mov --codec prores --prores-profile hq --scale 0.5
+
+      - name: Encode HoloMarble
+        run: ffmpeg -i output/HoloMarble-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/HoloMarble.mp4
+
+      - name: Encode HoloAurora
+        run: ffmpeg -i output/HoloAurora-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/HoloAurora.mp4
+
+      - name: Encode HoloSunset
+        run: ffmpeg -i output/HoloSunset-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/HoloSunset.mp4
+
+      - name: Encode HoloOcean
+        run: ffmpeg -i output/HoloOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/HoloOcean.mp4
+
+      - name: Encode HoloForest
+        run: ffmpeg -i output/HoloForest-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/HoloForest.mp4
+
+      - name: Encode LiquidChrome
+        run: ffmpeg -i output/LiquidChrome-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/LiquidChrome.mp4
+
+      - name: Encode LiquidGold
+        run: ffmpeg -i output/LiquidGold-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/LiquidGold.mp4
+
+      - name: Encode LiquidRose
+        run: ffmpeg -i output/LiquidRose-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/LiquidRose.mp4
+
+      - name: Encode LiquidOcean
+        run: ffmpeg -i output/LiquidOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/LiquidOcean.mp4
+
+      - name: Encode LiquidEmerald
+        run: ffmpeg -i output/LiquidEmerald-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/LiquidEmerald.mp4
 
       - name: Upload HoloMarble
         uses: actions/upload-artifact@v4
@@ -83,3 +113,33 @@ jobs:
         with:
           name: HoloForest
           path: output/HoloForest.mp4
+
+      - name: Upload LiquidChrome
+        uses: actions/upload-artifact@v4
+        with:
+          name: LiquidChrome
+          path: output/LiquidChrome.mp4
+
+      - name: Upload LiquidGold
+        uses: actions/upload-artifact@v4
+        with:
+          name: LiquidGold
+          path: output/LiquidGold.mp4
+
+      - name: Upload LiquidRose
+        uses: actions/upload-artifact@v4
+        with:
+          name: LiquidRose
+          path: output/LiquidRose.mp4
+
+      - name: Upload LiquidOcean
+        uses: actions/upload-artifact@v4
+        with:
+          name: LiquidOcean
+          path: output/LiquidOcean.mp4
+
+      - name: Upload LiquidEmerald
+        uses: actions/upload-artifact@v4
+        with:
+          name: LiquidEmerald
+          path: output/LiquidEmerald.mp4

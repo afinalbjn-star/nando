@@ -86,6 +86,8 @@ import { MoltenGold } from './components/MoltenGold';
 import type { MoltenScheme } from './components/MoltenGold';
 import { HoloMarble } from './components/HoloMarble';
 import type { HoloScheme } from './components/HoloMarble';
+import { LiquidChrome } from './components/LiquidChrome';
+import type { ChromeScheme } from './components/LiquidChrome';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -618,56 +620,6 @@ export const RemotionRoot: React.FC = () => {
         id="GlitterFlow"
         component={() => (
           <GlitterFlow width={3840} height={2160} totalFrames={DURATION} speed={1} />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidChrome"
-        component={() => (
-          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="chrome" />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidChromeGold"
-        component={() => (
-          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidChromeRose"
-        component={() => (
-          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidChromeEmerald"
-        component={() => (
-          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidChromeObsidian"
-        component={() => (
-          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="obsidian" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
@@ -1645,56 +1597,6 @@ export const RemotionRoot: React.FC = () => {
         height={2160}
       />
       <Composition
-        id="LiquidGold"
-        component={() => (
-          <LiquidGold width={3840} height={2160} totalFrames={DURATION} speed={1} />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidSilver"
-        component={() => (
-          <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="silver" />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidCopper"
-        component={() => (
-          <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="copper" />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidOcean"
-        component={() => (
-          <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="LiquidRose"
-        component={() => (
-          <LiquidMetal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
-        )}
-        durationInFrames={DURATION + 1}
-        fps={FPS}
-        width={3840}
-        height={2160}
-      />
-      <Composition
         id="RetroSunset"
         component={() => (
           <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
@@ -2128,6 +2030,56 @@ export const RemotionRoot: React.FC = () => {
         id="HoloForest"
         component={() => (
           <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidChrome"
+        component={() => (
+          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidGold"
+        component={() => (
+          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidRose"
+        component={() => (
+          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidOcean"
+        component={() => (
+          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LiquidEmerald"
+        component={() => (
+          <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
