@@ -84,6 +84,8 @@ import type { StringScheme } from './components/NeonStrings';
 import { NeonTerrain } from './components/NeonTerrain';
 import { MoltenGold } from './components/MoltenGold';
 import type { MoltenScheme } from './components/MoltenGold';
+import { HoloMarble } from './components/HoloMarble';
+import type { HoloScheme } from './components/HoloMarble';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2076,6 +2078,56 @@ export const RemotionRoot: React.FC = () => {
         id="MoltenCrimson"
         component={() => (
           <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HoloMarble"
+        component={() => (
+          <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HoloAurora"
+        component={() => (
+          <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HoloSunset"
+        component={() => (
+          <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HoloOcean"
+        component={() => (
+          <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HoloForest"
+        component={() => (
+          <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

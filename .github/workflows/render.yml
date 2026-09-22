@@ -1,4 +1,4 @@
-name: Render Molten Compositions (5 colors)
+name: Render Holo Compositions (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,62 +24,62 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render MoltenGold (ProRes)
-        run: npx remotion render src/index.tsx MoltenGold output/MoltenGold-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloMarble (ProRes)
+        run: npx remotion render src/index.tsx HoloMarble output/HoloMarble-prores.mov --codec prores --prores-profile hq
 
-      - name: Render MoltenSilver (ProRes)
-        run: npx remotion render src/index.tsx MoltenSilver output/MoltenSilver-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloAurora (ProRes)
+        run: npx remotion render src/index.tsx HoloAurora output/HoloAurora-prores.mov --codec prores --prores-profile hq
 
-      - name: Render MoltenCopper (ProRes)
-        run: npx remotion render src/index.tsx MoltenCopper output/MoltenCopper-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloSunset (ProRes)
+        run: npx remotion render src/index.tsx HoloSunset output/HoloSunset-prores.mov --codec prores --prores-profile hq
 
-      - name: Render MoltenOcean (ProRes)
-        run: npx remotion render src/index.tsx MoltenOcean output/MoltenOcean-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloOcean (ProRes)
+        run: npx remotion render src/index.tsx HoloOcean output/HoloOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render MoltenCrimson (ProRes)
-        run: npx remotion render src/index.tsx MoltenCrimson output/MoltenCrimson-prores.mov --codec prores --prores-profile hq
+      - name: Render HoloForest (ProRes)
+        run: npx remotion render src/index.tsx HoloForest output/HoloForest-prores.mov --codec prores --prores-profile hq
 
-      - name: Encode MoltenGold to MP4
-        run: ffmpeg -i output/MoltenGold-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/MoltenGold.mp4
+      - name: Encode HoloMarble to MP4
+        run: ffmpeg -i output/HoloMarble-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloMarble.mp4
 
-      - name: Encode MoltenSilver to MP4
-        run: ffmpeg -i output/MoltenSilver-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/MoltenSilver.mp4
+      - name: Encode HoloAurora to MP4
+        run: ffmpeg -i output/HoloAurora-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloAurora.mp4
 
-      - name: Encode MoltenCopper to MP4
-        run: ffmpeg -i output/MoltenCopper-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/MoltenCopper.mp4
+      - name: Encode HoloSunset to MP4
+        run: ffmpeg -i output/HoloSunset-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloSunset.mp4
 
-      - name: Encode MoltenOcean to MP4
-        run: ffmpeg -i output/MoltenOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/MoltenOcean.mp4
+      - name: Encode HoloOcean to MP4
+        run: ffmpeg -i output/HoloOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloOcean.mp4
 
-      - name: Encode MoltenCrimson to MP4
-        run: ffmpeg -i output/MoltenCrimson-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/MoltenCrimson.mp4
+      - name: Encode HoloForest to MP4
+        run: ffmpeg -i output/HoloForest-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HoloForest.mp4
 
-      - name: Upload MoltenGold
+      - name: Upload HoloMarble
         uses: actions/upload-artifact@v4
         with:
-          name: MoltenGold
-          path: output/MoltenGold.mp4
+          name: HoloMarble
+          path: output/HoloMarble.mp4
 
-      - name: Upload MoltenSilver
+      - name: Upload HoloAurora
         uses: actions/upload-artifact@v4
         with:
-          name: MoltenSilver
-          path: output/MoltenSilver.mp4
+          name: HoloAurora
+          path: output/HoloAurora.mp4
 
-      - name: Upload MoltenCopper
+      - name: Upload HoloSunset
         uses: actions/upload-artifact@v4
         with:
-          name: MoltenCopper
-          path: output/MoltenCopper.mp4
+          name: HoloSunset
+          path: output/HoloSunset.mp4
 
-      - name: Upload MoltenOcean
+      - name: Upload HoloOcean
         uses: actions/upload-artifact@v4
         with:
-          name: MoltenOcean
-          path: output/MoltenOcean.mp4
+          name: HoloOcean
+          path: output/HoloOcean.mp4
 
-      - name: Upload MoltenCrimson
+      - name: Upload HoloForest
         uses: actions/upload-artifact@v4
         with:
-          name: MoltenCrimson
-          path: output/MoltenCrimson.mp4
+          name: HoloForest
+          path: output/HoloForest.mp4

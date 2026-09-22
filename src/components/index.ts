@@ -92,4 +92,6 @@ export type { StringScheme } from './NeonStrings';
 export { NeonTerrain } from './NeonTerrain';
 export { MoltenGold } from './MoltenGold';
 export type { MoltenScheme } from './MoltenGold';
+export { HoloMarble } from './HoloMarble';
+export type { HoloScheme } from './HoloMarble';
 export { ChromeRibs } from './ChromeRibs';
