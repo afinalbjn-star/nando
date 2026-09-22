@@ -89,3 +89,7 @@ export { FanBlades } from './FanBlades';
 export type { FanScheme } from './FanBlades';
 export { NeonStrings } from './NeonStrings';
 export type { StringScheme } from './NeonStrings';
+export { NeonTerrain } from './NeonTerrain';
+export { MoltenGold } from './MoltenGold';
+export type { MoltenScheme } from './MoltenGold';
+export { ChromeRibs } from './ChromeRibs';

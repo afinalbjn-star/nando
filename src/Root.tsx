@@ -81,6 +81,9 @@ import { VioletFan } from './components/VioletFan';
 import { FanBlades } from './components/FanBlades';
 import { NeonStrings } from './components/NeonStrings';
 import type { StringScheme } from './components/NeonStrings';
+import { NeonTerrain } from './components/NeonTerrain';
+import { MoltenGold } from './components/MoltenGold';
+import type { MoltenScheme } from './components/MoltenGold';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2013,6 +2016,66 @@ export const RemotionRoot: React.FC = () => {
         id="NeonStringsSunset"
         component={() => (
           <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonTerrain"
+        component={() => (
+          <NeonTerrain width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="MoltenGold"
+        component={() => (
+          <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="MoltenSilver"
+        component={() => (
+          <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="silver" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="MoltenCopper"
+        component={() => (
+          <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="copper" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="MoltenOcean"
+        component={() => (
+          <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="MoltenCrimson"
+        component={() => (
+          <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
