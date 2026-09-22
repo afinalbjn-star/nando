@@ -1,4 +1,4 @@
-name: Render Fan Compositions (5 colors)
+name: Render NeonStrings (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,79 +24,62 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render VioletFan (ProRes)
-        run: npx remotion render src/index.tsx VioletFan output/VioletFan-prores.mov --codec prores --prores-profile hq
+      - name: Render NeonStrings (ProRes)
+        run: npx remotion render src/index.tsx NeonStrings output/NeonStrings-prores.mov --codec prores --prores-profile hq
 
-      - name: Render FanCrimson (ProRes)
-        run: npx remotion render src/index.tsx FanCrimson output/FanCrimson-prores.mov --codec prores --prores-profile hq
+      - name: Render NeonStringsCrimson (ProRes)
+        run: npx remotion render src/index.tsx NeonStringsCrimson output/NeonStringsCrimson-prores.mov --codec prores --prores-profile hq
 
-      - name: Render FanOcean (ProRes)
-        run: npx remotion render src/index.tsx FanOcean output/FanOcean-prores.mov --codec prores --prores-profile hq
+      - name: Render NeonStringsOcean (ProRes)
+        run: npx remotion render src/index.tsx NeonStringsOcean output/NeonStringsOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render FanEmerald (ProRes)
-        run: npx remotion render src/index.tsx FanEmerald output/FanEmerald-prores.mov --codec prores --prores-profile hq
+      - name: Render NeonStringsEmerald (ProRes)
+        run: npx remotion render src/index.tsx NeonStringsEmerald output/NeonStringsEmerald-prores.mov --codec prores --prores-profile hq
 
-      - name: Render FanAmber (ProRes)
-        run: npx remotion render src/index.tsx FanAmber output/FanAmber-prores.mov --codec prores --prores-profile hq
+      - name: Render NeonStringsSunset (ProRes)
+        run: npx remotion render src/index.tsx NeonStringsSunset output/NeonStringsSunset-prores.mov --codec prores --prores-profile hq
 
-      - name: Check ProRes sizes
-        run: ls -lh output/*.mov
+      - name: Encode NeonStrings to MP4
+        run: ffmpeg -i output/NeonStrings-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/NeonStrings.mp4
 
-      - name: Encode VioletFan to MP4
-        run: ffmpeg -y -i output/VioletFan-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/VioletFan.mp4
+      - name: Encode NeonStringsCrimson to MP4
+        run: ffmpeg -i output/NeonStringsCrimson-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/NeonStringsCrimson.mp4
 
-      - name: Encode FanCrimson to MP4
-        run: ffmpeg -y -i output/FanCrimson-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FanCrimson.mp4
+      - name: Encode NeonStringsOcean to MP4
+        run: ffmpeg -i output/NeonStringsOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/NeonStringsOcean.mp4
 
-      - name: Encode FanOcean to MP4
-        run: ffmpeg -y -i output/FanOcean-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FanOcean.mp4
+      - name: Encode NeonStringsEmerald to MP4
+        run: ffmpeg -i output/NeonStringsEmerald-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/NeonStringsEmerald.mp4
 
-      - name: Encode FanEmerald to MP4
-        run: ffmpeg -y -i output/FanEmerald-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FanEmerald.mp4
+      - name: Encode NeonStringsSunset to MP4
+        run: ffmpeg -i output/NeonStringsSunset-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/NeonStringsSunset.mp4
 
-      - name: Encode FanAmber to MP4
-        run: ffmpeg -y -i output/FanAmber-prores.mov -vf "noise=alls=8:allf=t" -c:v libx264 -preset slow -b:v 100M -maxrate 130M -bufsize 200M -pix_fmt yuv420p output/FanAmber.mp4
-
-      - name: Check final file sizes
-        run: ls -lh output/*.mp4
-
-      - name: Upload VioletFan
+      - name: Upload NeonStrings
         uses: actions/upload-artifact@v4
         with:
-          name: VioletFan-4K
-          path: output/VioletFan.mp4
+          name: NeonStrings
+          path: output/NeonStrings.mp4
 
-      - name: Upload FanCrimson
+      - name: Upload NeonStringsCrimson
         uses: actions/upload-artifact@v4
         with:
-          name: FanCrimson-4K
-          path: output/FanCrimson.mp4
+          name: NeonStringsCrimson
+          path: output/NeonStringsCrimson.mp4
 
-      - name: Upload FanOcean
+      - name: Upload NeonStringsOcean
         uses: actions/upload-artifact@v4
         with:
-          name: FanOcean-4K
-          path: output/FanOcean.mp4
+          name: NeonStringsOcean
+          path: output/NeonStringsOcean.mp4
 
-      - name: Upload FanEmerald
+      - name: Upload NeonStringsEmerald
         uses: actions/upload-artifact@v4
         with:
-          name: FanEmerald-4K
-          path: output/FanEmerald.mp4
+          name: NeonStringsEmerald
+          path: output/NeonStringsEmerald.mp4
 
-      - name: Upload FanAmber
+      - name: Upload NeonStringsSunset
         uses: actions/upload-artifact@v4
         with:
-          name: FanAmber-4K
-          path: output/FanAmber.mp4
-
-      - name: Upload ProRes masters
-        uses: actions/upload-artifact@v4
-        with:
-          name: Fan-ProRes
-          path: |
-            output/VioletFan-prores.mov
-            output/FanCrimson-prores.mov
-            output/FanOcean-prores.mov
-            output/FanEmerald-prores.mov
-            output/FanAmber-prores.mov
+          name: NeonStringsSunset
+          path: output/NeonStringsSunset.mp4

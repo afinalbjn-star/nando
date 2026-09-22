@@ -87,3 +87,5 @@ export { RainbowVortex } from './RainbowVortex';
 export { VioletFan } from './VioletFan';
 export { FanBlades } from './FanBlades';
 export type { FanScheme } from './FanBlades';
+export { NeonStrings } from './NeonStrings';
+export type { StringScheme } from './NeonStrings';

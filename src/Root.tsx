@@ -79,6 +79,8 @@ import { CubeBlocks } from './components/CubeBlocks';
 import { RainbowVortex } from './components/RainbowVortex';
 import { VioletFan } from './components/VioletFan';
 import { FanBlades } from './components/FanBlades';
+import { NeonStrings } from './components/NeonStrings';
+import type { StringScheme } from './components/NeonStrings';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -1961,6 +1963,56 @@ export const RemotionRoot: React.FC = () => {
         id="FanAmber"
         component={() => (
           <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amber" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonStrings"
+        component={() => (
+          <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonStringsCrimson"
+        component={() => (
+          <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonStringsOcean"
+        component={() => (
+          <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonStringsEmerald"
+        component={() => (
+          <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonStringsSunset"
+        component={() => (
+          <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
