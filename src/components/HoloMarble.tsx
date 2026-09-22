@@ -89,16 +89,19 @@ const HoloMarble: React.FC<HoloMarbleProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const imgData = ctx.createImageData(width, height);
+    const S = 0.25;
+    const iw = Math.floor(width * S);
+    const ih = Math.floor(height * S);
+    const imgData = ctx.createImageData(iw, ih);
     const data = imgData.data;
 
     const tc1 = Math.cos(t);
     const tc2 = Math.sin(t);
 
-    for (let py = 0; py < height; py++) {
-      for (let px = 0; px < width; px++) {
-        const nx = px / width * 5;
-        const ny = py / height * 5;
+    for (let py = 0; py < ih; py++) {
+      for (let px = 0; px < iw; px++) {
+        const nx = px / iw * 5;
+        const ny = py / ih * 5;
 
         const warp1 = domainWarp(nx, ny, tc1);
         const warp2 = domainWarp(nx + 50, ny + 50, tc2);
@@ -129,7 +132,7 @@ const HoloMarble: React.FC<HoloMarbleProps> = ({
         const sparkle = Math.pow(Math.max(0, noise2d(px * 0.5 + tc1 * 10, py * 0.5 + tc2 * 10) - 0.85), 3) * 15;
         const edgeHL = Math.pow(edge, 8) * 0.3 * darkMask;
 
-        const idx = (py * width + px) * 4;
+        const idx = (py * iw + px) * 4;
         data[idx] = Math.min(255, r + edgeHL * 180 + sparkle);
         data[idx + 1] = Math.min(255, g + edgeHL * 200 + sparkle);
         data[idx + 2] = Math.min(255, b + edgeHL * 220 + sparkle);
@@ -138,6 +141,7 @@ const HoloMarble: React.FC<HoloMarbleProps> = ({
     }
 
     ctx.putImageData(imgData, 0, 0);
+    ctx.drawImage(canvas, 0, 0, iw, ih, 0, 0, width, height);
 
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
