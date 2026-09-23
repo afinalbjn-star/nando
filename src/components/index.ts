@@ -97,3 +97,5 @@ export type { ChromeScheme } from './LiquidChrome';
 export { GlassBlocks } from './GlassBlocks';
 export { HexSphere } from './HexSphere';
 export type { HexScheme } from './HexSphere';
+export { PastelCubes } from './PastelCubes';
+export type { CubeScheme } from './PastelCubes';

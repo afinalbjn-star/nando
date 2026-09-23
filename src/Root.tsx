@@ -91,6 +91,8 @@ import type { ChromeScheme } from './components/LiquidChrome';
 import { GlassBlocks } from './components/GlassBlocks';
 import { HexSphere } from './components/HexSphere';
 import type { HexScheme } from './components/HexSphere';
+import { PastelCubes } from './components/PastelCubes';
+import type { CubeScheme } from './components/PastelCubes';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2143,6 +2145,56 @@ export const RemotionRoot: React.FC = () => {
         id="HexRose"
         component={() => (
           <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelCubes"
+        component={() => (
+          <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelSunset"
+        component={() => (
+          <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelOcean"
+        component={() => (
+          <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelCandy"
+        component={() => (
+          <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="candy" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelForest"
+        component={() => (
+          <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

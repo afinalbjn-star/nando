@@ -1,4 +1,4 @@
-name: Render HexSphere (5 colors)
+name: Render PastelCubes (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,62 +24,62 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render HexSphere (ProRes)
-        run: npx remotion render src/index.tsx HexSphere output/HexSphere-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelCubes (ProRes)
+        run: npx remotion render src/index.tsx PastelCubes output/PastelCubes-prores.mov --codec prores --prores-profile hq
 
-      - name: Render HexTeal (ProRes)
-        run: npx remotion render src/index.tsx HexTeal output/HexTeal-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelSunset (ProRes)
+        run: npx remotion render src/index.tsx PastelSunset output/PastelSunset-prores.mov --codec prores --prores-profile hq
 
-      - name: Render HexViolet (ProRes)
-        run: npx remotion render src/index.tsx HexViolet output/HexViolet-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelOcean (ProRes)
+        run: npx remotion render src/index.tsx PastelOcean output/PastelOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render HexAmber (ProRes)
-        run: npx remotion render src/index.tsx HexAmber output/HexAmber-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelCandy (ProRes)
+        run: npx remotion render src/index.tsx PastelCandy output/PastelCandy-prores.mov --codec prores --prores-profile hq
 
-      - name: Render HexRose (ProRes)
-        run: npx remotion render src/index.tsx HexRose output/HexRose-prores.mov --codec prores --prores-profile hq
+      - name: Render PastelForest (ProRes)
+        run: npx remotion render src/index.tsx PastelForest output/PastelForest-prores.mov --codec prores --prores-profile hq
 
-      - name: Encode HexSphere to MP4
-        run: ffmpeg -i output/HexSphere-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HexSphere.mp4
+      - name: Encode PastelCubes to MP4
+        run: ffmpeg -i output/PastelCubes-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelCubes.mp4
 
-      - name: Encode HexTeal to MP4
-        run: ffmpeg -i output/HexTeal-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HexTeal.mp4
+      - name: Encode PastelSunset to MP4
+        run: ffmpeg -i output/PastelSunset-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelSunset.mp4
 
-      - name: Encode HexViolet to MP4
-        run: ffmpeg -i output/HexViolet-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HexViolet.mp4
+      - name: Encode PastelOcean to MP4
+        run: ffmpeg -i output/PastelOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelOcean.mp4
 
-      - name: Encode HexAmber to MP4
-        run: ffmpeg -i output/HexAmber-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HexAmber.mp4
+      - name: Encode PastelCandy to MP4
+        run: ffmpeg -i output/PastelCandy-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelCandy.mp4
 
-      - name: Encode HexRose to MP4
-        run: ffmpeg -i output/HexRose-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/HexRose.mp4
+      - name: Encode PastelForest to MP4
+        run: ffmpeg -i output/PastelForest-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelForest.mp4
 
-      - name: Upload HexSphere
+      - name: Upload PastelCubes
         uses: actions/upload-artifact@v4
         with:
-          name: HexSphere
-          path: output/HexSphere.mp4
+          name: PastelCubes
+          path: output/PastelCubes.mp4
 
-      - name: Upload HexTeal
+      - name: Upload PastelSunset
         uses: actions/upload-artifact@v4
         with:
-          name: HexTeal
-          path: output/HexTeal.mp4
+          name: PastelSunset
+          path: output/PastelSunset.mp4
 
-      - name: Upload HexViolet
+      - name: Upload PastelOcean
         uses: actions/upload-artifact@v4
         with:
-          name: HexViolet
-          path: output/HexViolet.mp4
+          name: PastelOcean
+          path: output/PastelOcean.mp4
 
-      - name: Upload HexAmber
+      - name: Upload PastelCandy
         uses: actions/upload-artifact@v4
         with:
-          name: HexAmber
-          path: output/HexAmber.mp4
+          name: PastelCandy
+          path: output/PastelCandy.mp4
 
-      - name: Upload HexRose
+      - name: Upload PastelForest
         uses: actions/upload-artifact@v4
         with:
-          name: HexRose
-          path: output/HexRose.mp4
+          name: PastelForest
+          path: output/PastelForest.mp4
