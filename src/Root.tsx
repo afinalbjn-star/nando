@@ -88,6 +88,9 @@ import { HoloMarble } from './components/HoloMarble';
 import type { HoloScheme } from './components/HoloMarble';
 import { LiquidChrome } from './components/LiquidChrome';
 import type { ChromeScheme } from './components/LiquidChrome';
+import { GlassBlocks } from './components/GlassBlocks';
+import { HexSphere } from './components/HexSphere';
+import type { HexScheme } from './components/HexSphere';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2080,6 +2083,66 @@ export const RemotionRoot: React.FC = () => {
         id="LiquidEmerald"
         component={() => (
           <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GlassBlocks"
+        component={() => (
+          <GlassBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HexSphere"
+        component={() => (
+          <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HexTeal"
+        component={() => (
+          <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HexViolet"
+        component={() => (
+          <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HexAmber"
+        component={() => (
+          <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amber" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HexRose"
+        component={() => (
+          <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

@@ -94,3 +94,6 @@ export { HoloMarble } from './HoloMarble';
 export type { HoloScheme } from './HoloMarble';
 export { LiquidChrome } from './LiquidChrome';
 export type { ChromeScheme } from './LiquidChrome';
+export { GlassBlocks } from './GlassBlocks';
+export { HexSphere } from './HexSphere';
+export type { HexScheme } from './HexSphere';
