@@ -93,6 +93,8 @@ import { HexSphere } from './components/HexSphere';
 import type { HexScheme } from './components/HexSphere';
 import { PastelCubes } from './components/PastelCubes';
 import type { CubeScheme } from './components/PastelCubes';
+import { PolyPlates } from './components/PolyPlates';
+import type { PlateScheme } from './components/PolyPlates';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2195,6 +2197,56 @@ export const RemotionRoot: React.FC = () => {
         id="PastelForest"
         component={() => (
           <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PolyPlates"
+        component={() => (
+          <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PlateWarm"
+        component={() => (
+          <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="warm" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PlateCool"
+        component={() => (
+          <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cool" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PlateRose"
+        component={() => (
+          <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PlateSage"
+        component={() => (
+          <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sage" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

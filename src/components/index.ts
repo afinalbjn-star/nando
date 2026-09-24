@@ -99,3 +99,5 @@ export { HexSphere } from './HexSphere';
 export type { HexScheme } from './HexSphere';
 export { PastelCubes } from './PastelCubes';
 export type { CubeScheme } from './PastelCubes';
+export { PolyPlates } from './PolyPlates';
+export type { PlateScheme } from './PolyPlates';

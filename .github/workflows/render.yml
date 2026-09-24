@@ -1,4 +1,4 @@
-name: Render PastelCubes (5 colors)
+name: Render PolyPlates (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,62 +24,62 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render PastelCubes (ProRes)
-        run: npx remotion render src/index.tsx PastelCubes output/PastelCubes-prores.mov --codec prores --prores-profile hq
+      - name: Render PolyPlates (ProRes)
+        run: npx remotion render src/index.tsx PolyPlates output/PolyPlates-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PastelSunset (ProRes)
-        run: npx remotion render src/index.tsx PastelSunset output/PastelSunset-prores.mov --codec prores --prores-profile hq
+      - name: Render PlateWarm (ProRes)
+        run: npx remotion render src/index.tsx PlateWarm output/PlateWarm-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PastelOcean (ProRes)
-        run: npx remotion render src/index.tsx PastelOcean output/PastelOcean-prores.mov --codec prores --prores-profile hq
+      - name: Render PlateCool (ProRes)
+        run: npx remotion render src/index.tsx PlateCool output/PlateCool-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PastelCandy (ProRes)
-        run: npx remotion render src/index.tsx PastelCandy output/PastelCandy-prores.mov --codec prores --prores-profile hq
+      - name: Render PlateRose (ProRes)
+        run: npx remotion render src/index.tsx PlateRose output/PlateRose-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PastelForest (ProRes)
-        run: npx remotion render src/index.tsx PastelForest output/PastelForest-prores.mov --codec prores --prores-profile hq
+      - name: Render PlateSage (ProRes)
+        run: npx remotion render src/index.tsx PlateSage output/PlateSage-prores.mov --codec prores --prores-profile hq
 
-      - name: Encode PastelCubes to MP4
-        run: ffmpeg -i output/PastelCubes-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelCubes.mp4
+      - name: Encode PolyPlates to MP4
+        run: ffmpeg -i output/PolyPlates-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolyPlates.mp4
 
-      - name: Encode PastelSunset to MP4
-        run: ffmpeg -i output/PastelSunset-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelSunset.mp4
+      - name: Encode PlateWarm to MP4
+        run: ffmpeg -i output/PlateWarm-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PlateWarm.mp4
 
-      - name: Encode PastelOcean to MP4
-        run: ffmpeg -i output/PastelOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelOcean.mp4
+      - name: Encode PlateCool to MP4
+        run: ffmpeg -i output/PlateCool-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PlateCool.mp4
 
-      - name: Encode PastelCandy to MP4
-        run: ffmpeg -i output/PastelCandy-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelCandy.mp4
+      - name: Encode PlateRose to MP4
+        run: ffmpeg -i output/PlateRose-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PlateRose.mp4
 
-      - name: Encode PastelForest to MP4
-        run: ffmpeg -i output/PastelForest-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelForest.mp4
+      - name: Encode PlateSage to MP4
+        run: ffmpeg -i output/PlateSage-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PlateSage.mp4
 
-      - name: Upload PastelCubes
+      - name: Upload PolyPlates
         uses: actions/upload-artifact@v4
         with:
-          name: PastelCubes
-          path: output/PastelCubes.mp4
+          name: PolyPlates
+          path: output/PolyPlates.mp4
 
-      - name: Upload PastelSunset
+      - name: Upload PlateWarm
         uses: actions/upload-artifact@v4
         with:
-          name: PastelSunset
-          path: output/PastelSunset.mp4
+          name: PlateWarm
+          path: output/PlateWarm.mp4
 
-      - name: Upload PastelOcean
+      - name: Upload PlateCool
         uses: actions/upload-artifact@v4
         with:
-          name: PastelOcean
-          path: output/PastelOcean.mp4
+          name: PlateCool
+          path: output/PlateCool.mp4
 
-      - name: Upload PastelCandy
+      - name: Upload PlateRose
         uses: actions/upload-artifact@v4
         with:
-          name: PastelCandy
-          path: output/PastelCandy.mp4
+          name: PlateRose
+          path: output/PlateRose.mp4
 
-      - name: Upload PastelForest
+      - name: Upload PlateSage
         uses: actions/upload-artifact@v4
         with:
-          name: PastelForest
-          path: output/PastelForest.mp4
+          name: PlateSage
+          path: output/PlateSage.mp4
