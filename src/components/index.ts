@@ -101,3 +101,5 @@ export { PastelCubes } from './PastelCubes';
 export type { CubeScheme } from './PastelCubes';
 export { PolyPlates } from './PolyPlates';
 export type { PlateScheme } from './PolyPlates';
+export { CrystalShards } from './CrystalShards';
+export type { ShardScheme } from './CrystalShards';

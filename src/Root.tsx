@@ -95,6 +95,8 @@ import { PastelCubes } from './components/PastelCubes';
 import type { CubeScheme } from './components/PastelCubes';
 import { PolyPlates } from './components/PolyPlates';
 import type { PlateScheme } from './components/PolyPlates';
+import { CrystalShards } from './components/CrystalShards';
+import type { ShardScheme } from './components/CrystalShards';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2247,6 +2249,56 @@ export const RemotionRoot: React.FC = () => {
         id="PlateSage"
         component={() => (
           <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sage" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CrystalShards"
+        component={() => (
+          <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ShardGold"
+        component={() => (
+          <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ShardIce"
+        component={() => (
+          <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ShardRose"
+        component={() => (
+          <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ShardEmerald"
+        component={() => (
+          <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

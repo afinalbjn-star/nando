@@ -1,4 +1,4 @@
-name: Render PolyPlates (5 colors)
+name: Render CrystalShards (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,62 +24,62 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render PolyPlates (ProRes)
-        run: npx remotion render src/index.tsx PolyPlates output/PolyPlates-prores.mov --codec prores --prores-profile hq
+      - name: Render CrystalShards (ProRes)
+        run: npx remotion render src/index.tsx CrystalShards output/CrystalShards-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PlateWarm (ProRes)
-        run: npx remotion render src/index.tsx PlateWarm output/PlateWarm-prores.mov --codec prores --prores-profile hq
+      - name: Render ShardGold (ProRes)
+        run: npx remotion render src/index.tsx ShardGold output/ShardGold-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PlateCool (ProRes)
-        run: npx remotion render src/index.tsx PlateCool output/PlateCool-prores.mov --codec prores --prores-profile hq
+      - name: Render ShardIce (ProRes)
+        run: npx remotion render src/index.tsx ShardIce output/ShardIce-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PlateRose (ProRes)
-        run: npx remotion render src/index.tsx PlateRose output/PlateRose-prores.mov --codec prores --prores-profile hq
+      - name: Render ShardRose (ProRes)
+        run: npx remotion render src/index.tsx ShardRose output/ShardRose-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PlateSage (ProRes)
-        run: npx remotion render src/index.tsx PlateSage output/PlateSage-prores.mov --codec prores --prores-profile hq
+      - name: Render ShardEmerald (ProRes)
+        run: npx remotion render src/index.tsx ShardEmerald output/ShardEmerald-prores.mov --codec prores --prores-profile hq
 
-      - name: Encode PolyPlates to MP4
-        run: ffmpeg -i output/PolyPlates-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolyPlates.mp4
+      - name: Encode CrystalShards to MP4
+        run: ffmpeg -i output/CrystalShards-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/CrystalShards.mp4
 
-      - name: Encode PlateWarm to MP4
-        run: ffmpeg -i output/PlateWarm-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PlateWarm.mp4
+      - name: Encode ShardGold to MP4
+        run: ffmpeg -i output/ShardGold-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/ShardGold.mp4
 
-      - name: Encode PlateCool to MP4
-        run: ffmpeg -i output/PlateCool-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PlateCool.mp4
+      - name: Encode ShardIce to MP4
+        run: ffmpeg -i output/ShardIce-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/ShardIce.mp4
 
-      - name: Encode PlateRose to MP4
-        run: ffmpeg -i output/PlateRose-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PlateRose.mp4
+      - name: Encode ShardRose to MP4
+        run: ffmpeg -i output/ShardRose-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/ShardRose.mp4
 
-      - name: Encode PlateSage to MP4
-        run: ffmpeg -i output/PlateSage-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PlateSage.mp4
+      - name: Encode ShardEmerald to MP4
+        run: ffmpeg -i output/ShardEmerald-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/ShardEmerald.mp4
 
-      - name: Upload PolyPlates
+      - name: Upload CrystalShards
         uses: actions/upload-artifact@v4
         with:
-          name: PolyPlates
-          path: output/PolyPlates.mp4
+          name: CrystalShards
+          path: output/CrystalShards.mp4
 
-      - name: Upload PlateWarm
+      - name: Upload ShardGold
         uses: actions/upload-artifact@v4
         with:
-          name: PlateWarm
-          path: output/PlateWarm.mp4
+          name: ShardGold
+          path: output/ShardGold.mp4
 
-      - name: Upload PlateCool
+      - name: Upload ShardIce
         uses: actions/upload-artifact@v4
         with:
-          name: PlateCool
-          path: output/PlateCool.mp4
+          name: ShardIce
+          path: output/ShardIce.mp4
 
-      - name: Upload PlateRose
+      - name: Upload ShardRose
         uses: actions/upload-artifact@v4
         with:
-          name: PlateRose
-          path: output/PlateRose.mp4
+          name: ShardRose
+          path: output/ShardRose.mp4
 
-      - name: Upload PlateSage
+      - name: Upload ShardEmerald
         uses: actions/upload-artifact@v4
         with:
-          name: PlateSage
-          path: output/PlateSage.mp4
+          name: ShardEmerald
+          path: output/ShardEmerald.mp4
