@@ -1,4 +1,4 @@
-name: Render CrystalShards (5 colors)
+name: Render WaveFins (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,62 +24,65 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render CrystalShards (ProRes)
-        run: npx remotion render src/index.tsx CrystalShards output/CrystalShards-prores.mov --codec prores --prores-profile hq
+      - name: Render WaveFins (ProRes)
+        run: npx remotion render src/index.tsx WaveFins output/WaveFins-prores.mov --codec prores --prores-profile hq
 
-      - name: Render ShardGold (ProRes)
-        run: npx remotion render src/index.tsx ShardGold output/ShardGold-prores.mov --codec prores --prores-profile hq
+      - name: Render FinEmber (ProRes)
+        run: npx remotion render src/index.tsx FinEmber output/FinEmber-prores.mov --codec prores --prores-profile hq
 
-      - name: Render ShardIce (ProRes)
-        run: npx remotion render src/index.tsx ShardIce output/ShardIce-prores.mov --codec prores --prores-profile hq
+      - name: Render FinOcean (ProRes)
+        run: npx remotion render src/index.tsx FinOcean output/FinOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render ShardRose (ProRes)
-        run: npx remotion render src/index.tsx ShardRose output/ShardRose-prores.mov --codec prores --prores-profile hq
+      - name: Render FinViolet (ProRes)
+        run: npx remotion render src/index.tsx FinViolet output/FinViolet-prores.mov --codec prores --prores-profile hq
 
-      - name: Render ShardEmerald (ProRes)
-        run: npx remotion render src/index.tsx ShardEmerald output/ShardEmerald-prores.mov --codec prores --prores-profile hq
+      - name: Render FinEmerald (ProRes)
+        run: npx remotion render src/index.tsx FinEmerald output/FinEmerald-prores.mov --codec prores --prores-profile hq
 
-      - name: Encode CrystalShards to MP4
-        run: ffmpeg -i output/CrystalShards-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/CrystalShards.mp4
+      - name: Encode WaveFins to MP4 (~150MB)
+        run: ffmpeg -i output/WaveFins-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/WaveFins.mp4
 
-      - name: Encode ShardGold to MP4
-        run: ffmpeg -i output/ShardGold-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/ShardGold.mp4
+      - name: Encode FinEmber to MP4 (~150MB)
+        run: ffmpeg -i output/FinEmber-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/FinEmber.mp4
 
-      - name: Encode ShardIce to MP4
-        run: ffmpeg -i output/ShardIce-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/ShardIce.mp4
+      - name: Encode FinOcean to MP4 (~150MB)
+        run: ffmpeg -i output/FinOcean-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/FinOcean.mp4
 
-      - name: Encode ShardRose to MP4
-        run: ffmpeg -i output/ShardRose-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/ShardRose.mp4
+      - name: Encode FinViolet to MP4 (~150MB)
+        run: ffmpeg -i output/FinViolet-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/FinViolet.mp4
 
-      - name: Encode ShardEmerald to MP4
-        run: ffmpeg -i output/ShardEmerald-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/ShardEmerald.mp4
+      - name: Encode FinEmerald to MP4 (~150MB)
+        run: ffmpeg -i output/FinEmerald-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/FinEmerald.mp4
 
-      - name: Upload CrystalShards
+      - name: Check file sizes
+        run: ls -la output/*.mp4 && du -h output/*.mp4
+
+      - name: Upload WaveFins
         uses: actions/upload-artifact@v4
         with:
-          name: CrystalShards
-          path: output/CrystalShards.mp4
+          name: WaveFins
+          path: output/WaveFins.mp4
 
-      - name: Upload ShardGold
+      - name: Upload FinEmber
         uses: actions/upload-artifact@v4
         with:
-          name: ShardGold
-          path: output/ShardGold.mp4
+          name: FinEmber
+          path: output/FinEmber.mp4
 
-      - name: Upload ShardIce
+      - name: Upload FinOcean
         uses: actions/upload-artifact@v4
         with:
-          name: ShardIce
-          path: output/ShardIce.mp4
+          name: FinOcean
+          path: output/FinOcean.mp4
 
-      - name: Upload ShardRose
+      - name: Upload FinViolet
         uses: actions/upload-artifact@v4
         with:
-          name: ShardRose
-          path: output/ShardRose.mp4
+          name: FinViolet
+          path: output/FinViolet.mp4
 
-      - name: Upload ShardEmerald
+      - name: Upload FinEmerald
         uses: actions/upload-artifact@v4
         with:
-          name: ShardEmerald
-          path: output/ShardEmerald.mp4
+          name: FinEmerald
+          path: output/FinEmerald.mp4

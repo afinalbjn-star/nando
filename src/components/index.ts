@@ -103,3 +103,5 @@ export { PolyPlates } from './PolyPlates';
 export type { PlateScheme } from './PolyPlates';
 export { CrystalShards } from './CrystalShards';
 export type { ShardScheme } from './CrystalShards';
+export { WaveFins } from './WaveFins';
+export type { FinScheme } from './WaveFins';

@@ -97,6 +97,8 @@ import { PolyPlates } from './components/PolyPlates';
 import type { PlateScheme } from './components/PolyPlates';
 import { CrystalShards } from './components/CrystalShards';
 import type { ShardScheme } from './components/CrystalShards';
+import { WaveFins } from './components/WaveFins';
+import type { FinScheme } from './components/WaveFins';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2299,6 +2301,56 @@ export const RemotionRoot: React.FC = () => {
         id="ShardEmerald"
         component={() => (
           <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="WaveFins"
+        component={() => (
+          <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FinEmber"
+        component={() => (
+          <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FinOcean"
+        component={() => (
+          <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FinViolet"
+        component={() => (
+          <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="FinEmerald"
+        component={() => (
+          <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
