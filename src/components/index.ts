@@ -105,3 +105,7 @@ export { CrystalShards } from './CrystalShards';
 export type { ShardScheme } from './CrystalShards';
 export { WaveFins } from './WaveFins';
 export type { FinScheme } from './WaveFins';
+export { NavyGrunge } from './NavyGrunge';
+export type { GrungeScheme } from './NavyGrunge';
+export { CandyCheck } from './CandyCheck';
+export type { CheckScheme } from './CandyCheck';

@@ -99,6 +99,10 @@ import { CrystalShards } from './components/CrystalShards';
 import type { ShardScheme } from './components/CrystalShards';
 import { WaveFins } from './components/WaveFins';
 import type { FinScheme } from './components/WaveFins';
+import { NavyGrunge } from './components/NavyGrunge';
+import type { GrungeScheme } from './components/NavyGrunge';
+import { CandyCheck } from './components/CandyCheck';
+import type { CheckScheme } from './components/CandyCheck';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2351,6 +2355,106 @@ export const RemotionRoot: React.FC = () => {
         id="FinEmerald"
         component={() => (
           <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NavyGrunge"
+        component={() => (
+          <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GrungeCharcoal"
+        component={() => (
+          <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="charcoal" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GrungeWine"
+        component={() => (
+          <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="wine" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GrungeForest"
+        component={() => (
+          <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GrungeEspresso"
+        component={() => (
+          <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="espresso" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CandyCheck"
+        component={() => (
+          <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CheckOcean"
+        component={() => (
+          <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CheckGrape"
+        component={() => (
+          <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="grape" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CheckTangerine"
+        component={() => (
+          <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="tangerine" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CheckMint"
+        component={() => (
+          <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

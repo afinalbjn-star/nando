@@ -1,4 +1,4 @@
-name: Render WaveFins (5 colors)
+name: Render CandyCheck (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,65 +24,62 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render WaveFins (ProRes)
-        run: npx remotion render src/index.tsx WaveFins output/WaveFins-prores.mov --codec prores --prores-profile hq
+      - name: Render CandyCheck (ProRes)
+        run: npx remotion render src/index.tsx CandyCheck output/CandyCheck-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Render FinEmber (ProRes)
-        run: npx remotion render src/index.tsx FinEmber output/FinEmber-prores.mov --codec prores --prores-profile hq
+      - name: Render CheckOcean (ProRes)
+        run: npx remotion render src/index.tsx CheckOcean output/CheckOcean-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Render FinOcean (ProRes)
-        run: npx remotion render src/index.tsx FinOcean output/FinOcean-prores.mov --codec prores --prores-profile hq
+      - name: Render CheckGrape (ProRes)
+        run: npx remotion render src/index.tsx CheckGrape output/CheckGrape-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Render FinViolet (ProRes)
-        run: npx remotion render src/index.tsx FinViolet output/FinViolet-prores.mov --codec prores --prores-profile hq
+      - name: Render CheckTangerine (ProRes)
+        run: npx remotion render src/index.tsx CheckTangerine output/CheckTangerine-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Render FinEmerald (ProRes)
-        run: npx remotion render src/index.tsx FinEmerald output/FinEmerald-prores.mov --codec prores --prores-profile hq
+      - name: Render CheckMint (ProRes)
+        run: npx remotion render src/index.tsx CheckMint output/CheckMint-prores.mov --codec prores --prores-profile hq --scale 0.5
 
-      - name: Encode WaveFins to MP4 (~150MB)
-        run: ffmpeg -i output/WaveFins-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/WaveFins.mp4
+      - name: Encode CandyCheck to MP4
+        run: ffmpeg -i output/CandyCheck-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CandyCheck.mp4
 
-      - name: Encode FinEmber to MP4 (~150MB)
-        run: ffmpeg -i output/FinEmber-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/FinEmber.mp4
+      - name: Encode CheckOcean to MP4
+        run: ffmpeg -i output/CheckOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CheckOcean.mp4
 
-      - name: Encode FinOcean to MP4 (~150MB)
-        run: ffmpeg -i output/FinOcean-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/FinOcean.mp4
+      - name: Encode CheckGrape to MP4
+        run: ffmpeg -i output/CheckGrape-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CheckGrape.mp4
 
-      - name: Encode FinViolet to MP4 (~150MB)
-        run: ffmpeg -i output/FinViolet-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/FinViolet.mp4
+      - name: Encode CheckTangerine to MP4
+        run: ffmpeg -i output/CheckTangerine-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CheckTangerine.mp4
 
-      - name: Encode FinEmerald to MP4 (~150MB)
-        run: ffmpeg -i output/FinEmerald-prores.mov -c:v libx264 -b:v 80M -maxrate 120M -bufsize 120M -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/FinEmerald.mp4
+      - name: Encode CheckMint to MP4
+        run: ffmpeg -i output/CheckMint-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CheckMint.mp4
 
-      - name: Check file sizes
-        run: ls -la output/*.mp4 && du -h output/*.mp4
-
-      - name: Upload WaveFins
+      - name: Upload CandyCheck
         uses: actions/upload-artifact@v4
         with:
-          name: WaveFins
-          path: output/WaveFins.mp4
+          name: CandyCheck
+          path: output/CandyCheck.mp4
 
-      - name: Upload FinEmber
+      - name: Upload CheckOcean
         uses: actions/upload-artifact@v4
         with:
-          name: FinEmber
-          path: output/FinEmber.mp4
+          name: CheckOcean
+          path: output/CheckOcean.mp4
 
-      - name: Upload FinOcean
+      - name: Upload CheckGrape
         uses: actions/upload-artifact@v4
         with:
-          name: FinOcean
-          path: output/FinOcean.mp4
+          name: CheckGrape
+          path: output/CheckGrape.mp4
 
-      - name: Upload FinViolet
+      - name: Upload CheckTangerine
         uses: actions/upload-artifact@v4
         with:
-          name: FinViolet
-          path: output/FinViolet.mp4
+          name: CheckTangerine
+          path: output/CheckTangerine.mp4
 
-      - name: Upload FinEmerald
+      - name: Upload CheckMint
         uses: actions/upload-artifact@v4
         with:
-          name: FinEmerald
-          path: output/FinEmerald.mp4
+          name: CheckMint
+          path: output/CheckMint.mp4
