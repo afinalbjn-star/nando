@@ -109,3 +109,5 @@ export { NavyGrunge } from './NavyGrunge';
 export type { GrungeScheme } from './NavyGrunge';
 export { CandyCheck } from './CandyCheck';
 export type { CheckScheme } from './CandyCheck';
+export { PastelPoly } from './PastelPoly';
+export type { PolyScheme } from './PastelPoly';

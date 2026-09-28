@@ -103,6 +103,8 @@ import { NavyGrunge } from './components/NavyGrunge';
 import type { GrungeScheme } from './components/NavyGrunge';
 import { CandyCheck } from './components/CandyCheck';
 import type { CheckScheme } from './components/CandyCheck';
+import { PastelPoly } from './components/PastelPoly';
+import type { PolyScheme } from './components/PastelPoly';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2455,6 +2457,56 @@ export const RemotionRoot: React.FC = () => {
         id="CheckMint"
         component={() => (
           <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PastelPoly"
+        component={() => (
+          <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PolyMint"
+        component={() => (
+          <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PolySunset"
+        component={() => (
+          <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PolyOcean"
+        component={() => (
+          <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PolyGrape"
+        component={() => (
+          <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="grape" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

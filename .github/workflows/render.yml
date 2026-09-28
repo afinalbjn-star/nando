@@ -1,4 +1,4 @@
-name: Render CandyCheck (5 colors)
+name: Render PastelPoly (5 colors)
 
 on:
   workflow_dispatch:
@@ -24,62 +24,62 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render CandyCheck (ProRes)
-        run: npx remotion render src/index.tsx CandyCheck output/CandyCheck-prores.mov --codec prores --prores-profile hq --scale 0.5
+      - name: Render PastelPoly (ProRes)
+        run: npx remotion render src/index.tsx PastelPoly output/PastelPoly-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CheckOcean (ProRes)
-        run: npx remotion render src/index.tsx CheckOcean output/CheckOcean-prores.mov --codec prores --prores-profile hq --scale 0.5
+      - name: Render PolyMint (ProRes)
+        run: npx remotion render src/index.tsx PolyMint output/PolyMint-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CheckGrape (ProRes)
-        run: npx remotion render src/index.tsx CheckGrape output/CheckGrape-prores.mov --codec prores --prores-profile hq --scale 0.5
+      - name: Render PolySunset (ProRes)
+        run: npx remotion render src/index.tsx PolySunset output/PolySunset-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CheckTangerine (ProRes)
-        run: npx remotion render src/index.tsx CheckTangerine output/CheckTangerine-prores.mov --codec prores --prores-profile hq --scale 0.5
+      - name: Render PolyOcean (ProRes)
+        run: npx remotion render src/index.tsx PolyOcean output/PolyOcean-prores.mov --codec prores --prores-profile hq
 
-      - name: Render CheckMint (ProRes)
-        run: npx remotion render src/index.tsx CheckMint output/CheckMint-prores.mov --codec prores --prores-profile hq --scale 0.5
+      - name: Render PolyGrape (ProRes)
+        run: npx remotion render src/index.tsx PolyGrape output/PolyGrape-prores.mov --codec prores --prores-profile hq
 
-      - name: Encode CandyCheck to MP4
-        run: ffmpeg -i output/CandyCheck-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CandyCheck.mp4
+      - name: Encode PastelPoly to MP4
+        run: ffmpeg -i output/PastelPoly-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelPoly.mp4
 
-      - name: Encode CheckOcean to MP4
-        run: ffmpeg -i output/CheckOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CheckOcean.mp4
+      - name: Encode PolyMint to MP4
+        run: ffmpeg -i output/PolyMint-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolyMint.mp4
 
-      - name: Encode CheckGrape to MP4
-        run: ffmpeg -i output/CheckGrape-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CheckGrape.mp4
+      - name: Encode PolySunset to MP4
+        run: ffmpeg -i output/PolySunset-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolySunset.mp4
 
-      - name: Encode CheckTangerine to MP4
-        run: ffmpeg -i output/CheckTangerine-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CheckTangerine.mp4
+      - name: Encode PolyOcean to MP4
+        run: ffmpeg -i output/PolyOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolyOcean.mp4
 
-      - name: Encode CheckMint to MP4
-        run: ffmpeg -i output/CheckMint-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t,scale=3840:2160" output/CheckMint.mp4
+      - name: Encode PolyGrape to MP4
+        run: ffmpeg -i output/PolyGrape-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolyGrape.mp4
 
-      - name: Upload CandyCheck
+      - name: Upload PastelPoly
         uses: actions/upload-artifact@v4
         with:
-          name: CandyCheck
-          path: output/CandyCheck.mp4
+          name: PastelPoly
+          path: output/PastelPoly.mp4
 
-      - name: Upload CheckOcean
+      - name: Upload PolyMint
         uses: actions/upload-artifact@v4
         with:
-          name: CheckOcean
-          path: output/CheckOcean.mp4
+          name: PolyMint
+          path: output/PolyMint.mp4
 
-      - name: Upload CheckGrape
+      - name: Upload PolySunset
         uses: actions/upload-artifact@v4
         with:
-          name: CheckGrape
-          path: output/CheckGrape.mp4
+          name: PolySunset
+          path: output/PolySunset.mp4
 
-      - name: Upload CheckTangerine
+      - name: Upload PolyOcean
         uses: actions/upload-artifact@v4
         with:
-          name: CheckTangerine
-          path: output/CheckTangerine.mp4
+          name: PolyOcean
+          path: output/PolyOcean.mp4
 
-      - name: Upload CheckMint
+      - name: Upload PolyGrape
         uses: actions/upload-artifact@v4
         with:
-          name: CheckMint
-          path: output/CheckMint.mp4
+          name: PolyGrape
+          path: output/PolyGrape.mp4
