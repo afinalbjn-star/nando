@@ -1,4 +1,4 @@
-name: Render PastelPoly (5 colors)
+name: Render Globe (5 compositions)
 
 on:
   workflow_dispatch:
@@ -24,62 +24,62 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render PastelPoly (ProRes)
-        run: npx remotion render src/index.tsx PastelPoly output/PastelPoly-prores.mov --codec prores --prores-profile hq
+      - name: Render Globe (ProRes)
+        run: npx remotion render src/index.tsx Globe output/Globe-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PolyMint (ProRes)
-        run: npx remotion render src/index.tsx PolyMint output/PolyMint-prores.mov --codec prores --prores-profile hq
+      - name: Render GlobeArcs (ProRes)
+        run: npx remotion render src/index.tsx GlobeArcs output/GlobeArcs-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PolySunset (ProRes)
-        run: npx remotion render src/index.tsx PolySunset output/PolySunset-prores.mov --codec prores --prores-profile hq
+      - name: Render GlobeNight (ProRes)
+        run: npx remotion render src/index.tsx GlobeNight output/GlobeNight-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PolyOcean (ProRes)
-        run: npx remotion render src/index.tsx PolyOcean output/PolyOcean-prores.mov --codec prores --prores-profile hq
+      - name: Render GlobeHolo (ProRes)
+        run: npx remotion render src/index.tsx GlobeHolo output/GlobeHolo-prores.mov --codec prores --prores-profile hq
 
-      - name: Render PolyGrape (ProRes)
-        run: npx remotion render src/index.tsx PolyGrape output/PolyGrape-prores.mov --codec prores --prores-profile hq
+      - name: Render GlobeOrbit (ProRes)
+        run: npx remotion render src/index.tsx GlobeOrbit output/GlobeOrbit-prores.mov --codec prores --prores-profile hq
 
-      - name: Encode PastelPoly to MP4
-        run: ffmpeg -i output/PastelPoly-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PastelPoly.mp4
+      - name: Encode Globe to MP4
+        run: ffmpeg -i output/Globe-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/Globe.mp4
 
-      - name: Encode PolyMint to MP4
-        run: ffmpeg -i output/PolyMint-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolyMint.mp4
+      - name: Encode GlobeArcs to MP4
+        run: ffmpeg -i output/GlobeArcs-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/GlobeArcs.mp4
 
-      - name: Encode PolySunset to MP4
-        run: ffmpeg -i output/PolySunset-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolySunset.mp4
+      - name: Encode GlobeNight to MP4
+        run: ffmpeg -i output/GlobeNight-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/GlobeNight.mp4
 
-      - name: Encode PolyOcean to MP4
-        run: ffmpeg -i output/PolyOcean-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolyOcean.mp4
+      - name: Encode GlobeHolo to MP4
+        run: ffmpeg -i output/GlobeHolo-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/GlobeHolo.mp4
 
-      - name: Encode PolyGrape to MP4
-        run: ffmpeg -i output/PolyGrape-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/PolyGrape.mp4
+      - name: Encode GlobeOrbit to MP4
+        run: ffmpeg -i output/GlobeOrbit-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/GlobeOrbit.mp4
 
-      - name: Upload PastelPoly
+      - name: Upload Globe
         uses: actions/upload-artifact@v4
         with:
-          name: PastelPoly
-          path: output/PastelPoly.mp4
+          name: Globe
+          path: output/Globe.mp4
 
-      - name: Upload PolyMint
+      - name: Upload GlobeArcs
         uses: actions/upload-artifact@v4
         with:
-          name: PolyMint
-          path: output/PolyMint.mp4
+          name: GlobeArcs
+          path: output/GlobeArcs.mp4
 
-      - name: Upload PolySunset
+      - name: Upload GlobeNight
         uses: actions/upload-artifact@v4
         with:
-          name: PolySunset
-          path: output/PolySunset.mp4
+          name: GlobeNight
+          path: output/GlobeNight.mp4
 
-      - name: Upload PolyOcean
+      - name: Upload GlobeHolo
         uses: actions/upload-artifact@v4
         with:
-          name: PolyOcean
-          path: output/PolyOcean.mp4
+          name: GlobeHolo
+          path: output/GlobeHolo.mp4
 
-      - name: Upload PolyGrape
+      - name: Upload GlobeOrbit
         uses: actions/upload-artifact@v4
         with:
-          name: PolyGrape
-          path: output/PolyGrape.mp4
+          name: GlobeOrbit
+          path: output/GlobeOrbit.mp4

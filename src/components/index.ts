@@ -111,3 +111,8 @@ export { CandyCheck } from './CandyCheck';
 export type { CheckScheme } from './CandyCheck';
 export { PastelPoly } from './PastelPoly';
 export type { PolyScheme } from './PastelPoly';
+export { Globe } from './Globe';
+export { GlobeArcs } from './GlobeArcs';
+export { GlobeNight } from './GlobeNight';
+export { GlobeHolo } from './GlobeHolo';
+export { GlobeOrbit } from './GlobeOrbit';

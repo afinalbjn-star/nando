@@ -105,6 +105,11 @@ import { CandyCheck } from './components/CandyCheck';
 import type { CheckScheme } from './components/CandyCheck';
 import { PastelPoly } from './components/PastelPoly';
 import type { PolyScheme } from './components/PastelPoly';
+import { Globe } from './components/Globe';
+import { GlobeArcs } from './components/GlobeArcs';
+import { GlobeNight } from './components/GlobeNight';
+import { GlobeHolo } from './components/GlobeHolo';
+import { GlobeOrbit } from './components/GlobeOrbit';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2507,6 +2512,56 @@ export const RemotionRoot: React.FC = () => {
         id="PolyGrape"
         component={() => (
           <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="grape" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="Globe"
+        component={() => (
+          <Globe width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GlobeArcs"
+        component={() => (
+          <GlobeArcs width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GlobeNight"
+        component={() => (
+          <GlobeNight width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GlobeHolo"
+        component={() => (
+          <GlobeHolo width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GlobeOrbit"
+        component={() => (
+          <GlobeOrbit width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
