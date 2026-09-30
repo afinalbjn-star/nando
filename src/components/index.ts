@@ -116,3 +116,4 @@ export { GlobeArcs } from './GlobeArcs';
 export { GlobeNight } from './GlobeNight';
 export { GlobeHolo } from './GlobeHolo';
 export { GlobeOrbit } from './GlobeOrbit';
+export { AmericaSignal } from './AmericaSignal';
