@@ -55,7 +55,7 @@ jobs:
           BR=$(python3 -c "print(max(4000, int($TARGET_MB * 8 * 1000 / float('$DUR'))))")
           echo "duration=${DUR}s target=${TARGET_MB}MB initial bitrate=${BR}kbps"
           for attempt in 1 2 3; do
-            ffmpeg -y -v error -i "$IN" -c:v libx264 -preset slow -b:v ${BR}k -pass 1 -passlogfile /tmp/plog -an -f null /dev/null
+            ffmpeg -y -v error -i "$IN" -c:v libx264 -preset slow -b:v ${BR}k -pix_fmt yuv420p -pass 1 -passlogfile /tmp/plog -an -f null /dev/null
             ffmpeg -y -v error -i "$IN" -c:v libx264 -preset slow -b:v ${BR}k \
               -maxrate $((BR * 3 / 2))k -bufsize $((BR * 3))k \
               -pass 2 -passlogfile /tmp/plog -pix_fmt yuv420p -profile:v high -level 5.2 \
