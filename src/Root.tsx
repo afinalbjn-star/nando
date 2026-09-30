@@ -111,6 +111,7 @@ import { GlobeNight } from './components/GlobeNight';
 import { GlobeHolo } from './components/GlobeHolo';
 import { GlobeOrbit } from './components/GlobeOrbit';
 import { AmericaSignal } from './components/AmericaSignal';
+import { DigitalStage } from './components/DigitalStage';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2573,6 +2574,16 @@ export const RemotionRoot: React.FC = () => {
         id="AmericaSignal"
         component={() => (
           <AmericaSignal width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="DigitalStage"
+        component={() => (
+          <DigitalStage width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
