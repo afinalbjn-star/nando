@@ -24,6 +24,7 @@ jobs:
           - GlobeOrbit
           - AmericaSignal
           - DigitalStage
+          - CourierScooter
 
     steps:
       - name: Checkout
