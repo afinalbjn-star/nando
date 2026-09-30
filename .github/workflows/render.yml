@@ -1,13 +1,29 @@
-name: Render Globe (5 compositions)
+name: Render
 
 on:
   workflow_dispatch:
   push:
     branches: [main, master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   render:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        composition:
+          - Globe
+          - GlobeArcs
+          - GlobeNight
+          - GlobeHolo
+          - GlobeOrbit
+          - AmericaSignal
+          - DigitalStage
 
     steps:
       - name: Checkout
@@ -24,62 +40,43 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render Globe (ProRes)
-        run: npx remotion render src/index.tsx Globe output/Globe-prores.mov --codec prores --prores-profile hq
+      - name: Render intermediate (ProRes HQ)
+        run: npx remotion render src/index.tsx ${{ matrix.composition }} "output/${{ matrix.composition }}-prores.mov" --codec prores --prores-profile hq
 
-      - name: Render GlobeArcs (ProRes)
-        run: npx remotion render src/index.tsx GlobeArcs output/GlobeArcs-prores.mov --codec prores --prores-profile hq
+      - name: Encode MP4 (100-300 MB target)
+        run: |
+          set -euo pipefail
+          IN="output/${{ matrix.composition }}-prores.mov"
+          OUT="output/${{ matrix.composition }}.mp4"
+          TARGET_MB=180
+          MIN_MB=100
+          MAX_MB=300
+          DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$IN")
+          BR=$(python3 -c "print(max(4000, int($TARGET_MB * 8 * 1000 / float('$DUR'))))")
+          echo "duration=${DUR}s target=${TARGET_MB}MB initial bitrate=${BR}kbps"
+          for attempt in 1 2 3; do
+            ffmpeg -y -v error -i "$IN" -c:v libx264 -preset slow -b:v ${BR}k -pass 1 -passlogfile /tmp/plog -an -f null /dev/null
+            ffmpeg -y -v error -i "$IN" -c:v libx264 -preset slow -b:v ${BR}k \
+              -maxrate $((BR * 3 / 2))k -bufsize $((BR * 3))k \
+              -pass 2 -passlogfile /tmp/plog -pix_fmt yuv420p -profile:v high -level 5.2 \
+              -movflags +faststart -r 30 "$OUT"
+            MB=$(( $(stat -c %s "$OUT") / 1024 / 1024 ))
+            echo "attempt ${attempt}: ${MB} MB at ${BR} kbps"
+            if [ "$MB" -ge "$MIN_MB" ] && [ "$MB" -le "$MAX_MB" ]; then
+              echo "::notice::${{ matrix.composition }} -> ${MB} MB (${BR} kbps, ${DUR}s)"
+              break
+            fi
+            if [ "$attempt" = "3" ]; then
+              echo "::error::${{ matrix.composition }} stuck at ${MB} MB, outside ${MIN_MB}-${MAX_MB} MB"
+              exit 1
+            fi
+            BR=$(python3 -c "print(max(4000, int($BR * $TARGET_MB / max(1, $MB) * 1.04)))")
+            echo "rescaling bitrate to ${BR} kbps"
+          done
 
-      - name: Render GlobeNight (ProRes)
-        run: npx remotion render src/index.tsx GlobeNight output/GlobeNight-prores.mov --codec prores --prores-profile hq
-
-      - name: Render GlobeHolo (ProRes)
-        run: npx remotion render src/index.tsx GlobeHolo output/GlobeHolo-prores.mov --codec prores --prores-profile hq
-
-      - name: Render GlobeOrbit (ProRes)
-        run: npx remotion render src/index.tsx GlobeOrbit output/GlobeOrbit-prores.mov --codec prores --prores-profile hq
-
-      - name: Encode Globe to MP4
-        run: ffmpeg -i output/Globe-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/Globe.mp4
-
-      - name: Encode GlobeArcs to MP4
-        run: ffmpeg -i output/GlobeArcs-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/GlobeArcs.mp4
-
-      - name: Encode GlobeNight to MP4
-        run: ffmpeg -i output/GlobeNight-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/GlobeNight.mp4
-
-      - name: Encode GlobeHolo to MP4
-        run: ffmpeg -i output/GlobeHolo-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/GlobeHolo.mp4
-
-      - name: Encode GlobeOrbit to MP4
-        run: ffmpeg -i output/GlobeOrbit-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/GlobeOrbit.mp4
-
-      - name: Upload Globe
+      - name: Upload ${{ matrix.composition }}
         uses: actions/upload-artifact@v4
         with:
-          name: Globe
-          path: output/Globe.mp4
-
-      - name: Upload GlobeArcs
-        uses: actions/upload-artifact@v4
-        with:
-          name: GlobeArcs
-          path: output/GlobeArcs.mp4
-
-      - name: Upload GlobeNight
-        uses: actions/upload-artifact@v4
-        with:
-          name: GlobeNight
-          path: output/GlobeNight.mp4
-
-      - name: Upload GlobeHolo
-        uses: actions/upload-artifact@v4
-        with:
-          name: GlobeHolo
-          path: output/GlobeHolo.mp4
-
-      - name: Upload GlobeOrbit
-        uses: actions/upload-artifact@v4
-        with:
-          name: GlobeOrbit
-          path: output/GlobeOrbit.mp4
+          name: ${{ matrix.composition }}
+          path: output/${{ matrix.composition }}.mp4
+          if-no-files-found: error
