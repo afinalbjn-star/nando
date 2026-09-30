@@ -1,9 +1,9 @@
 name: Render
 
+# Manual trigger only. Never add a `push:` trigger here: new compositions are
+# previewed locally first and only rendered after the user asks for it.
 on:
   workflow_dispatch:
-  push:
-    branches: [main, master]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
