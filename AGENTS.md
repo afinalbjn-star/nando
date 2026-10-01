@@ -33,7 +33,6 @@ loop seamless: frame 450 renders identically to frame 0, so the last frame is a 
 | Globe, GlobeArcs, GlobeNight, GlobeHolo, GlobeOrbit | `src/components/Globe*.tsx` | globe variants |
 | AmericaSignal | `AmericaSignal.tsx` + `geo.ts` | neon signal map |
 | DigitalStage | `DigitalStage.tsx` | digital music stage visualiser |
-| CourierScooter | `CourierScooter.tsx` + `kurirArt.ts` | flat vector courier on a scooter |
 
 ## Seamless loop rules
 
@@ -49,19 +48,15 @@ Every animated value must be a periodic function of `u = frame / totalFrames` wi
 - Particles: integer life cycles `(u*k + phase) % 1`; never a fractional speed.
 - Grain: deterministic, never `Math.random()`; offset by `round(u*N) % N`.
 
-## Vector art
+## Loading external art
 
-`public/kurir.svg` is loaded by `src/components/kurirArt.ts`: it fetches the SVG,
-parses the `.st*` CSS fills and builds one `Path2D` per path, cached module-wide.
-`CourierScooter` holds the render with `delayRender`/`continueRender` until it resolves,
-otherwise early frames can render without the art.
+If a composition loads art asynchronously (fetch, `staticFile`), hold the render with
+`delayRender`/`continueRender` until it resolves, otherwise early frames render without
+it. Cache the parsed result module-wide so it happens once per render, not per frame.
 
-Its art bbox is fixed at `x 392..1041.5, y 77.5..708.4` (measured with a bezier/arc-aware
-path parser). Do not compute it by scanning coordinate pairs, that overshoots because it
-misses control points and treats arc radii as coordinates.
-
-Wheel centres in SVG user units: front `(487, 616)`, rear `(858, 617)`. Exhaust tip
-`(958, 634)`.
+Do not derive a bounding box by scanning coordinate pairs out of SVG path data: that
+overshoots, because it treats arc radii as coordinates and misses bezier control points.
+Use a bezier/arc-aware parser, or measure the art in a browser and hardcode the result.
 
 ## GitHub Actions
 

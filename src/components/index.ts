@@ -118,4 +118,3 @@ export { GlobeHolo } from './GlobeHolo';
 export { GlobeOrbit } from './GlobeOrbit';
 export { AmericaSignal } from './AmericaSignal';
 export { DigitalStage } from './DigitalStage';
-export { CourierScooter } from './CourierScooter';
