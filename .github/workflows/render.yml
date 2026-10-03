@@ -1,13 +1,18 @@
-name: Render AmericaSignal
+name: Render
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, master]
 
 jobs:
   render:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        composition:
+          - AnalyticsBoard
+          - AnalyticsBoardIndigo
+          - AnalyticsBoardTeal
 
     steps:
       - name: Checkout
@@ -19,19 +24,46 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Render AmericaSignal (ProRes)
-        run: npx remotion render src/index.tsx AmericaSignal output/AmericaSignal-prores.mov --codec prores --prores-profile hq
+      - name: Render ProRes HQ intermediate
+        env:
+          ID: ${{ matrix.composition }}
+        run: npx remotion render src/index.tsx "$ID" "output/$ID-prores.mov" --codec prores --prores-profile hq
 
-      - name: Encode AmericaSignal to MP4
-        run: ffmpeg -i output/AmericaSignal-prores.mov -c:v libx264 -crf 18 -pix_fmt yuv420p -vf "noise=alls=8:allf=t" output/AmericaSignal.mp4
+      - name: Encode to size-targeted MP4
+        env:
+          ID: ${{ matrix.composition }}
+        run: |
+          set -euo pipefail
+          IN="output/${ID}-prores.mov"
+          OUT="output/${ID}.mp4"
+          DUR=$(ffprobe -v error -select_streams v:0 -show_entries stream=duration -of csv=p=0 "$IN")
+          DUR_MS=$(awk -v d="$DUR" 'BEGIN{printf "%d", d*1000}')
+          if [ "$DUR_MS" -lt 1 ]; then DUR_MS=1; fi
+          echo "source duration ${DUR}s (${DUR_MS}ms)"
+          SIZE_MB=0
+          for ATTEMPT in 1 2 3; do
+            TARGET_MB=$(( 150 + (ATTEMPT - 1) * 75 ))
+            BITRATE=$(( TARGET_MB * 8 * 1000 * 1000 / DUR_MS ))
+            echo "attempt ${ATTEMPT}: target ${TARGET_MB}MB -> ${BITRATE} kbps"
+            ffmpeg -y -v error -i "$IN" -c:v libx264 -b:v "${BITRATE}k" -pix_fmt yuv420p -pass 1 -an -f null /dev/null
+            ffmpeg -y -v error -i "$IN" -c:v libx264 -b:v "${BITRATE}k" -pix_fmt yuv420p -pass 2 -an -movflags +faststart "$OUT"
+            SIZE_MB=$(( $(stat -c%s "$OUT") / 1048576 ))
+            echo "produced ${SIZE_MB}MB"
+            if [ "$SIZE_MB" -ge 100 ] && [ "$SIZE_MB" -le 300 ]; then break; fi
+          done
+          if [ "$SIZE_MB" -lt 100 ] || [ "$SIZE_MB" -gt 300 ]; then
+            echo "::warning::final size ${SIZE_MB}MB is outside the 100-300MB band"
+          fi
+          ls -la "$OUT"
 
-      - name: Upload AmericaSignal
+      - name: Upload MP4
         uses: actions/upload-artifact@v4
         with:
-          name: AmericaSignal
-          path: output/AmericaSignal.mp4
+          name: ${{ matrix.composition }}
+          path: output/${{ matrix.composition }}.mp4
+          if-no-files-found: error

@@ -111,7 +111,11 @@ import { GlobeNight } from './components/GlobeNight';
 import { GlobeHolo } from './components/GlobeHolo';
 import { GlobeOrbit } from './components/GlobeOrbit';
 import { AmericaSignal } from './components/AmericaSignal';
+import { DustParticles } from './components/DustParticles';
+import { HudRadar } from './components/HudRadar';
 import { DigitalStage } from './components/DigitalStage';
+import { HoloGlobe } from './components/HoloGlobe';
+import { AnalyticsBoard } from './components/AnalyticsBoard';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2581,9 +2585,79 @@ export const RemotionRoot: React.FC = () => {
         height={2160}
       />
       <Composition
-        id="DigitalStage"
+        id="DustParticles"
         component={() => (
-          <DigitalStage width={3840} height={2160} totalFrames={DURATION} speed={1} />
+          <DustParticles width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HudRadar"
+        component={() => (
+          <HudRadar width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HoloGlobe"
+        component={() => (
+          <HoloGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HoloGlobeViolet"
+        component={() => (
+          <HoloGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="HoloGlobeAmber"
+        component={() => (
+          <HoloGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amber" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="AnalyticsBoard"
+        component={() => (
+          <AnalyticsBoard width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blue" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="AnalyticsBoardIndigo"
+        component={() => (
+          <AnalyticsBoard width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="indigo" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="AnalyticsBoardTeal"
+        component={() => (
+          <AnalyticsBoard width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

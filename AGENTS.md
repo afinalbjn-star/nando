@@ -33,6 +33,8 @@ loop seamless: frame 450 renders identically to frame 0, so the last frame is a 
 | Globe, GlobeArcs, GlobeNight, GlobeHolo, GlobeOrbit | `src/components/Globe*.tsx` | globe variants |
 | AmericaSignal | `AmericaSignal.tsx` + `geo.ts` | neon signal map |
 | DigitalStage | `DigitalStage.tsx` | digital music stage visualiser |
+| HoloGlobe, HoloGlobeViolet, HoloGlobeAmber | `HoloGlobe.tsx` + `landData.ts` | WebGL2 wireframe globe |
+| AnalyticsBoard, AnalyticsBoardIndigo, AnalyticsBoardTeal | `AnalyticsBoard.tsx` | light analytics dashboard |
 
 ## Seamless loop rules
 
@@ -61,8 +63,10 @@ Use a bezier/arc-aware parser, or measure the art in a browser and hardcode the 
 ## GitHub Actions
 
 `.github/workflows/render.yml`, named `Render`, is the **only** workflow. Manual trigger
-only. It renders all compositions as parallel matrix jobs (one run entry in the Actions
-list, not one per composition) and encodes each to a 100-300 MB MP4.
+only, and it must never regain a `push:` trigger. Its matrix currently covers the three
+`AnalyticsBoard*` compositions as parallel matrix jobs (one run entry in the Actions list,
+not one per composition); widen the `matrix.composition` list to cover more. Each job
+encodes to a 100-300 MB MP4.
 
 Size control: ProRes HQ intermediate, then two-pass x264 with the bitrate derived from
 the real duration (`TARGET_MB * 8 * 1000 / duration` in kbps), a 100-300 MB guard, and up
