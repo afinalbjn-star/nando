@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - BigDataHud
-          - BigDataHudViolet
-          - BigDataHudEmerald
+          - NeonSpiral
+          - NeonSpiralCool
+          - NeonSpiralAcid
 
     steps:
       - name: Checkout

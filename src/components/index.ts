@@ -126,3 +126,7 @@ export { AnalyticsBoard } from './AnalyticsBoard';
 export type { AnalyticsBoardScheme } from './AnalyticsBoard';
 export { BigDataHud } from './BigDataHud';
 export type { BigDataHudScheme } from './BigDataHud';
+export { ParticleOrb } from './ParticleOrb';
+export type { ParticleOrbScheme } from './ParticleOrb';
+export { NeonSpiral } from './NeonSpiral';
+export type { NeonSpiralScheme } from './NeonSpiral';

@@ -36,6 +36,8 @@ loop seamless: frame 450 renders identically to frame 0, so the last frame is a 
 | HoloGlobe, HoloGlobeViolet, HoloGlobeAmber | `HoloGlobe.tsx` + `landData.ts` | WebGL2 wireframe globe |
 | AnalyticsBoard, AnalyticsBoardIndigo, AnalyticsBoardTeal | `AnalyticsBoard.tsx` | light analytics dashboard |
 | BigDataHud, BigDataHudViolet, BigDataHudEmerald | `BigDataHud.tsx` | dark radial data dial |
+| ParticleOrb, ParticleOrbIce, ParticleOrbEmber | `ParticleOrb.tsx` | glowing particle sphere with orbit ring |
+| NeonSpiral, NeonSpiralCool, NeonSpiralAcid | `NeonSpiral.tsx` | neon loop tangle |
 
 ## Seamless loop rules
 
@@ -65,7 +67,7 @@ Use a bezier/arc-aware parser, or measure the art in a browser and hardcode the 
 
 `.github/workflows/render.yml`, named `Render`, is the **only** workflow. Manual trigger
 only, and it must never regain a `push:` trigger. Its matrix currently covers the three
-`BigDataHud*` compositions as parallel matrix jobs (one run entry in the Actions list,
+`NeonSpiral*` compositions as parallel matrix jobs (one run entry in the Actions list,
 not one per composition); widen the `matrix.composition` list to cover more. Each job
 encodes to a 100-300 MB MP4.
 

@@ -117,6 +117,8 @@ import { DigitalStage } from './components/DigitalStage';
 import { HoloGlobe } from './components/HoloGlobe';
 import { AnalyticsBoard } from './components/AnalyticsBoard';
 import { BigDataHud } from './components/BigDataHud';
+import { ParticleOrb } from './components/ParticleOrb';
+import { NeonSpiral } from './components/NeonSpiral';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2689,6 +2691,66 @@ export const RemotionRoot: React.FC = () => {
         id="BigDataHudEmerald"
         component={() => (
           <BigDataHud width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ParticleOrb"
+        component={() => (
+          <ParticleOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ParticleOrbIce"
+        component={() => (
+          <ParticleOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ParticleOrbEmber"
+        component={() => (
+          <ParticleOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonSpiral"
+        component={() => (
+          <NeonSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="hot" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonSpiralCool"
+        component={() => (
+          <NeonSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cool" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeonSpiralAcid"
+        component={() => (
+          <NeonSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="acid" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
