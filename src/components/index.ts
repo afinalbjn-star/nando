@@ -124,3 +124,5 @@ export { HoloGlobe } from './HoloGlobe';
 export type { HoloGlobeScheme } from './HoloGlobe';
 export { AnalyticsBoard } from './AnalyticsBoard';
 export type { AnalyticsBoardScheme } from './AnalyticsBoard';
+export { BigDataHud } from './BigDataHud';
+export type { BigDataHudScheme } from './BigDataHud';

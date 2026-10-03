@@ -116,6 +116,7 @@ import { HudRadar } from './components/HudRadar';
 import { DigitalStage } from './components/DigitalStage';
 import { HoloGlobe } from './components/HoloGlobe';
 import { AnalyticsBoard } from './components/AnalyticsBoard';
+import { BigDataHud } from './components/BigDataHud';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2658,6 +2659,36 @@ export const RemotionRoot: React.FC = () => {
         id="AnalyticsBoardTeal"
         component={() => (
           <AnalyticsBoard width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BigDataHud"
+        component={() => (
+          <BigDataHud width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BigDataHudViolet"
+        component={() => (
+          <BigDataHud width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BigDataHudEmerald"
+        component={() => (
+          <BigDataHud width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

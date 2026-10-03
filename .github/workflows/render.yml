@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - AnalyticsBoard
-          - AnalyticsBoardIndigo
-          - AnalyticsBoardTeal
+          - BigDataHud
+          - BigDataHudViolet
+          - BigDataHudEmerald
 
     steps:
       - name: Checkout
