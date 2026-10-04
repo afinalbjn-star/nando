@@ -11,20 +11,28 @@
     "render:grid-neon": "remotion render src/index.tsx GridWaveNeon output/GridWaveNeon.mp4",
     "render:all": "npm run render:grid && npm run render:grid-neon"
   },
-  "keywords": ["remotion", "video", "animation"],
+  "keywords": [
+    "remotion",
+    "video",
+    "animation"
+  ],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@react-three/fiber": "^8.18.0",
+    "@remotion/cli": "^4.0.524",
+    "@remotion/renderer": "^4.0.524",
+    "@remotion/three": "^4.0.524",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remotion": "^4.0.524",
-    "@remotion/cli": "^4.0.524",
-    "@remotion/renderer": "^4.0.524"
+    "three": "^0.160.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.160.0",
     "typescript": "^5.5.0"
   }
 }

@@ -16,7 +16,7 @@ user explicitly asks for it.** Creating or changing a composition is a *preview*
 3. Render **stills**, not video, and show them to the user:
    `npx remotion still src/index.tsx <id> <out.png> --frame=<n> --scale=0.5`
 4. For loops, also render the seam frames and measure the seam:
-   frames `448`, `449`, `0` (450-frame loop), then diff `448->449` against `449->0`.
+   frames `238`, `239`, `0` (240-frame loop), then diff `238->239` against `239->0`.
    The seam delta must be no larger than a normal frame step.
 5. Stop and wait for the user's go-ahead. Only then commit, push, and run the workflow.
 
@@ -24,9 +24,12 @@ The Remotion Studio (`npm start`, http://localhost:3000) is the interactive prev
 
 ## Compositions
 
-All are 3840x2160, 30 fps, `durationInFrames = DURATION + 1` (451 frames, 15.0 s).
+All are 3840x2160, 30 fps, `durationInFrames = DURATION + 1` (241 frames, 8.03 s).
 `durationInFrames` being one frame longer than the animation period is what makes the
-loop seamless: frame 450 renders identically to frame 0, so the last frame is a hold.
+loop seamless: frame 240 renders identically to frame 0, so the last frame is a hold.
+
+8 s rather than 15 s because that is the range stock buyers actually filter for on
+Pond5 and Adobe Stock. If you lengthen it, update the seam frame numbers below.
 
 | id | file | theme |
 |----|------|-------|
@@ -38,6 +41,9 @@ loop seamless: frame 450 renders identically to frame 0, so the last frame is a 
 | BigDataHud, BigDataHudViolet, BigDataHudEmerald | `BigDataHud.tsx` | dark radial data dial |
 | ParticleOrb, ParticleOrbIce, ParticleOrbEmber | `ParticleOrb.tsx` | glowing particle sphere with orbit ring |
 | NeonSpiral, NeonSpiralCool, NeonSpiralAcid | `NeonSpiral.tsx` | neon loop tangle |
+| BatFlock, BatFlockMoon, BatFlockBlood | `BatFlock.tsx` | static bat swarm, orange |
+| BatSwarm, BatSwarmMoon, BatSwarmBlood | `BatSwarm.tsx` | bats flying at the camera |
+| PerforatedSheet, PerforatedSheetViolet, PerforatedSheetMagenta | `PerforatedSheet.tsx` | 3D perforated metal data tunnel (needs three.js) |
 
 ## Seamless loop rules
 
@@ -67,9 +73,12 @@ Use a bezier/arc-aware parser, or measure the art in a browser and hardcode the 
 
 `.github/workflows/render.yml`, named `Render`, is the **only** workflow. Manual trigger
 only, and it must never regain a `push:` trigger. Its matrix currently covers the three
-`NeonSpiral*` compositions as parallel matrix jobs (one run entry in the Actions list,
-not one per composition); widen the `matrix.composition` list to cover more. Each job
-encodes to a 100-300 MB MP4.
+`PerforatedSheet*` compositions as parallel matrix jobs (one run entry in the Actions
+list, not one per composition); widen the `matrix.composition` list to cover more. Each
+job encodes to a 100-300 MB MP4.
+
+`PerforatedSheet*` renders through WebGL, so it costs far more per frame than the SVG
+compositions. That is why the matrix is three jobs and not all of them.
 
 Size control: ProRes HQ intermediate, then two-pass x264 with the bitrate derived from
 the real duration (`TARGET_MB * 8 * 1000 / duration` in kbps), a 100-300 MB guard, and up

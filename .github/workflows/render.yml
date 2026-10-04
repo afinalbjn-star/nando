@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - NeonSpiral
-          - NeonSpiralCool
-          - NeonSpiralAcid
+          - PerforatedSheet
+          - PerforatedSheetViolet
+          - PerforatedSheetMagenta
 
     steps:
       - name: Checkout

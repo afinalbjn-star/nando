@@ -119,10 +119,13 @@ import { AnalyticsBoard } from './components/AnalyticsBoard';
 import { BigDataHud } from './components/BigDataHud';
 import { ParticleOrb } from './components/ParticleOrb';
 import { NeonSpiral } from './components/NeonSpiral';
+import { BatFlock } from './components/BatFlock';
+import { BatSwarm } from './components/BatSwarm';
+import { PerforatedSheet } from './components/PerforatedSheet';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
-const DURATION = FPS * 15;
+const DURATION = FPS * 8;
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -2751,6 +2754,96 @@ export const RemotionRoot: React.FC = () => {
         id="NeonSpiralAcid"
         component={() => (
           <NeonSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="acid" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BatFlock"
+        component={() => (
+          <BatFlock width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BatFlockMoon"
+        component={() => (
+          <BatFlock width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="moon" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BatFlockBlood"
+        component={() => (
+          <BatFlock width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blood" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BatSwarm"
+        component={() => (
+          <BatSwarm width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BatSwarmMoon"
+        component={() => (
+          <BatSwarm width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="moon" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BatSwarmBlood"
+        component={() => (
+          <BatSwarm width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blood" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PerforatedSheet"
+        component={() => (
+          <PerforatedSheet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="azure" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PerforatedSheetViolet"
+        component={() => (
+          <PerforatedSheet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PerforatedSheetMagenta"
+        component={() => (
+          <PerforatedSheet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="magenta" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
