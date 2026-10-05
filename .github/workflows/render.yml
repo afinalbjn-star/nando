@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - PerforatedSheet
-          - PerforatedSheetViolet
-          - PerforatedSheetMagenta
+          - TechGears
+          - TechGearsGraphite
+          - TechGearsTeal
 
     steps:
       - name: Checkout

@@ -122,6 +122,9 @@ import { NeonSpiral } from './components/NeonSpiral';
 import { BatFlock } from './components/BatFlock';
 import { BatSwarm } from './components/BatSwarm';
 import { PerforatedSheet } from './components/PerforatedSheet';
+import { GlassOrbs } from './components/GlassOrbs';
+import { ChromeRibbons } from './components/ChromeRibbons';
+import { TechGears } from './components/TechGears';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2844,6 +2847,96 @@ export const RemotionRoot: React.FC = () => {
         id="PerforatedSheetMagenta"
         component={() => (
           <PerforatedSheet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="magenta" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GlassOrbs"
+        component={() => (
+          <GlassOrbs width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="noir" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GlassOrbsIce"
+        component={() => (
+          <GlassOrbs width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GlassOrbsEmber"
+        component={() => (
+          <GlassOrbs width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ChromeRibbons"
+        component={() => (
+          <ChromeRibbons width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="prismatic" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ChromeRibbonsIce"
+        component={() => (
+          <ChromeRibbons width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ChromeRibbonsEmber"
+        component={() => (
+          <ChromeRibbons width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="TechGears"
+        component={() => (
+          <TechGears width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blue" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="TechGearsGraphite"
+        component={() => (
+          <TechGears width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="graphite" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="TechGearsTeal"
+        component={() => (
+          <TechGears width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

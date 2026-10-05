@@ -41,6 +41,8 @@ Pond5 and Adobe Stock. If you lengthen it, update the seam frame numbers below.
 | BigDataHud, BigDataHudViolet, BigDataHudEmerald | `BigDataHud.tsx` | dark radial data dial |
 | ParticleOrb, ParticleOrbIce, ParticleOrbEmber | `ParticleOrb.tsx` | glowing particle sphere with orbit ring |
 | NeonSpiral, NeonSpiralCool, NeonSpiralAcid | `NeonSpiral.tsx` | neon loop tangle |
+| ChromeRibbons, ChromeRibbonsIce, ChromeRibbonsEmber | `ChromeRibbons.tsx` | chrome ribbons (needs three.js) |
+| TechGears, TechGearsGraphite, TechGearsTeal | `TechGears.tsx` | 3D gear cluster, white backdrop |
 | BatFlock, BatFlockMoon, BatFlockBlood | `BatFlock.tsx` | static bat swarm, orange |
 | BatSwarm, BatSwarmMoon, BatSwarmBlood | `BatSwarm.tsx` | bats flying at the camera |
 | PerforatedSheet, PerforatedSheetViolet, PerforatedSheetMagenta | `PerforatedSheet.tsx` | 3D perforated metal data tunnel (needs three.js) |
@@ -73,12 +75,12 @@ Use a bezier/arc-aware parser, or measure the art in a browser and hardcode the 
 
 `.github/workflows/render.yml`, named `Render`, is the **only** workflow. Manual trigger
 only, and it must never regain a `push:` trigger. Its matrix currently covers the three
-`PerforatedSheet*` compositions as parallel matrix jobs (one run entry in the Actions
-list, not one per composition); widen the `matrix.composition` list to cover more. Each
-job encodes to a 100-300 MB MP4.
+`TechGears*` compositions as parallel matrix jobs (one run entry in the Actions list,
+not one per composition); widen the `matrix.composition` list to cover more. Each job
+encodes to a 100-300 MB MP4.
 
-`PerforatedSheet*` renders through WebGL, so it costs far more per frame than the SVG
-compositions. That is why the matrix is three jobs and not all of them.
+`PerforatedSheet*` renders through WebGL and costs far more per frame than the SVG
+compositions, which is why the matrix is three jobs rather than all of them.
 
 Size control: ProRes HQ intermediate, then two-pass x264 with the bitrate derived from
 the real duration (`TARGET_MB * 8 * 1000 / duration` in kbps), a 100-300 MB guard, and up
