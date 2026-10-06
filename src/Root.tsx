@@ -125,6 +125,8 @@ import { PerforatedSheet } from './components/PerforatedSheet';
 import { GlassOrbs } from './components/GlassOrbs';
 import { ChromeRibbons } from './components/ChromeRibbons';
 import { TechGears } from './components/TechGears';
+import { PointWave } from './components/PointWave';
+import { NebulaFlow } from './components/NebulaFlow';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2937,6 +2939,66 @@ export const RemotionRoot: React.FC = () => {
         id="TechGearsTeal"
         component={() => (
           <TechGears width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PointWave"
+        component={() => (
+          <PointWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PointWaveMagenta"
+        component={() => (
+          <PointWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="magenta" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PointWaveMint"
+        component={() => (
+          <PointWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NebulaFlow"
+        component={() => (
+          <NebulaFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="nebula" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NebulaFlowAurora"
+        component={() => (
+          <NebulaFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NebulaFlowEmber"
+        component={() => (
+          <NebulaFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

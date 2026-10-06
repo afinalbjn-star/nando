@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - TechGears
-          - TechGearsGraphite
-          - TechGearsTeal
+          - NebulaFlow
+          - NebulaFlowAurora
+          - NebulaFlowEmber
 
     steps:
       - name: Checkout

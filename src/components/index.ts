@@ -142,3 +142,7 @@ export { ChromeRibbons } from './ChromeRibbons';
 export type { ChromeRibbonsScheme } from './ChromeRibbons';
 export { TechGears } from './TechGears';
 export type { TechGearsScheme } from './TechGears';
+export { PointWave } from './PointWave';
+export type { PointWaveScheme } from './PointWave';
+export { NebulaFlow } from './NebulaFlow';
+export type { NebulaFlowScheme } from './NebulaFlow';
