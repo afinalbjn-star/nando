@@ -146,3 +146,5 @@ export { PointWave } from './PointWave';
 export type { PointWaveScheme } from './PointWave';
 export { NebulaFlow } from './NebulaFlow';
 export type { NebulaFlowScheme } from './NebulaFlow';
+export { CandleWind } from './CandleWind';
+export type { CandleWindScheme } from './CandleWind';

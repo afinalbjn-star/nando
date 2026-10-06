@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - NebulaFlow
-          - NebulaFlowAurora
-          - NebulaFlowEmber
+          - CandleWind
+          - CandleWindBeeswax
+          - CandleWindBordeaux
 
     steps:
       - name: Checkout

@@ -127,6 +127,7 @@ import { ChromeRibbons } from './components/ChromeRibbons';
 import { TechGears } from './components/TechGears';
 import { PointWave } from './components/PointWave';
 import { NebulaFlow } from './components/NebulaFlow';
+import { CandleWind } from './components/CandleWind';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -2999,6 +3000,36 @@ export const RemotionRoot: React.FC = () => {
         id="NebulaFlowEmber"
         component={() => (
           <NebulaFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CandleWind"
+        component={() => (
+          <CandleWind width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="taper" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CandleWindBeeswax"
+        component={() => (
+          <CandleWind width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="beeswax" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CandleWindBordeaux"
+        component={() => (
+          <CandleWind width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="bordeaux" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
