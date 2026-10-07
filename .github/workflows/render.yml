@@ -45,16 +45,29 @@ jobs:
           DUR_MS=$(awk -v d="$DUR" 'BEGIN{printf "%d", d*1000}')
           if [ "$DUR_MS" -lt 1 ]; then DUR_MS=1; fi
           echo "source duration ${DUR}s (${DUR_MS}ms)"
+          # Target the middle of the band. ABR alone (-b:v only) undershoots badly on
+          # smooth/gradient-heavy 4K content: the encoder never spends the bits it is
+          # given, so a "150MB" bitrate yields ~21MB. Pin the rate with min/maxrate +
+          # bufsize and nal-hrd=cbr so the padding is actually written into the stream.
+          TARGET_BYTES=$(( 150 * 1000 * 1000 ))
+          BITRATE=$(( TARGET_BYTES * 8 / DUR_MS ))
           SIZE_MB=0
           for ATTEMPT in 1 2 3; do
-            TARGET_MB=$(( 150 + (ATTEMPT - 1) * 75 ))
-            BITRATE=$(( TARGET_MB * 8 * 1000 * 1000 / DUR_MS ))
-            echo "attempt ${ATTEMPT}: target ${TARGET_MB}MB -> ${BITRATE} kbps"
-            ffmpeg -y -v error -i "$IN" -c:v libx264 -b:v "${BITRATE}k" -pix_fmt yuv420p -pass 1 -an -f null /dev/null
-            ffmpeg -y -v error -i "$IN" -c:v libx264 -b:v "${BITRATE}k" -pix_fmt yuv420p -pass 2 -an -movflags +faststart "$OUT"
-            SIZE_MB=$(( $(stat -c%s "$OUT") / 1048576 ))
-            echo "produced ${SIZE_MB}MB"
+            echo "attempt ${ATTEMPT}: bitrate ${BITRATE} kbps"
+            ffmpeg -y -v error -i "$IN" \
+              -c:v libx264 -b:v "${BITRATE}k" -minrate "${BITRATE}k" -maxrate "${BITRATE}k" \
+              -bufsize "$(( BITRATE * 2 ))k" -x264-params "nal-hrd=cbr:force-cfr=1" \
+              -pix_fmt yuv420p -pass 1 -an -f null /dev/null
+            ffmpeg -y -v error -i "$IN" \
+              -c:v libx264 -b:v "${BITRATE}k" -minrate "${BITRATE}k" -maxrate "${BITRATE}k" \
+              -bufsize "$(( BITRATE * 2 ))k" -x264-params "nal-hrd=cbr:force-cfr=1" \
+              -pix_fmt yuv420p -pass 2 -an -movflags +faststart "$OUT"
+            BYTES=$(stat -c%s "$OUT")
+            SIZE_MB=$(( BYTES / 1048576 ))
+            echo "produced ${SIZE_MB}MB (${BYTES} bytes)"
             if [ "$SIZE_MB" -ge 100 ] && [ "$SIZE_MB" -le 300 ]; then break; fi
+            # Rescale from the size actually produced, not from the nominal target.
+            BITRATE=$(( BITRATE * TARGET_BYTES / BYTES ))
           done
           if [ "$SIZE_MB" -lt 100 ] || [ "$SIZE_MB" -gt 300 ]; then
             echo "::warning::final size ${SIZE_MB}MB is outside the 100-300MB band"
