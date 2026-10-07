@@ -13,6 +13,9 @@ jobs:
           - BeamLattice
           - BeamLatticeAbyss
           - BeamLatticeEmber
+          - DeformOrbCyan
+          - DeformOrbViolet
+          - DeformOrbEmber
 
     steps:
       - name: Checkout

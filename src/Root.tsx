@@ -110,6 +110,8 @@ import { GlobeArcs } from './components/GlobeArcs';
 import { GlobeNight } from './components/GlobeNight';
 import { GlobeHolo } from './components/GlobeHolo';
 import { GlobeOrbit } from './components/GlobeOrbit';
+import { SignalGlobe } from './components/SignalGlobe';
+import { LandDebug } from './components/LandDebug';
 import { AmericaSignal } from './components/AmericaSignal';
 import { DustParticles } from './components/DustParticles';
 import { HudRadar } from './components/HudRadar';
@@ -118,6 +120,7 @@ import { HoloGlobe } from './components/HoloGlobe';
 import { AnalyticsBoard } from './components/AnalyticsBoard';
 import { BigDataHud } from './components/BigDataHud';
 import { ParticleOrb } from './components/ParticleOrb';
+import { DeformOrb } from './components/DeformOrb';
 import { NeonSpiral } from './components/NeonSpiral';
 import { BatFlock } from './components/BatFlock';
 import { BatSwarm } from './components/BatSwarm';
@@ -2739,6 +2742,36 @@ export const RemotionRoot: React.FC = () => {
         height={2160}
       />
       <Composition
+        id="DeformOrbCyan"
+        component={() => (
+          <DeformOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="DeformOrbViolet"
+        component={() => (
+          <DeformOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="DeformOrbEmber"
+        component={() => (
+          <DeformOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
         id="NeonSpiral"
         component={() => (
           <NeonSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="hot" />
@@ -3082,6 +3115,44 @@ export const RemotionRoot: React.FC = () => {
         id="BeamLatticeAbyss"
         component={() => (
           <BeamLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LandDebug"
+        component={() => <LandDebug />}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3200}
+        height={1800}
+      />
+      <Composition
+        id="SignalGlobe"
+        component={() => (
+          <SignalGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="SignalGlobeIndigo"
+        component={() => (
+          <SignalGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="indigo" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="SignalGlobeCrimson"
+        component={() => (
+          <SignalGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
