@@ -148,3 +148,7 @@ export { NebulaFlow } from './NebulaFlow';
 export type { NebulaFlowScheme } from './NebulaFlow';
 export { CandleWind } from './CandleWind';
 export type { CandleWindScheme } from './CandleWind';
+export { GrowthChart } from './GrowthChart';
+export type { GrowthChartScheme } from './GrowthChart';
+export { BeamLattice } from './BeamLattice';
+export type { BeamLatticeScheme } from './BeamLattice';

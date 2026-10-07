@@ -128,6 +128,8 @@ import { TechGears } from './components/TechGears';
 import { PointWave } from './components/PointWave';
 import { NebulaFlow } from './components/NebulaFlow';
 import { CandleWind } from './components/CandleWind';
+import { GrowthChart } from './components/GrowthChart';
+import { BeamLattice } from './components/BeamLattice';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3030,6 +3032,66 @@ export const RemotionRoot: React.FC = () => {
         id="CandleWindBordeaux"
         component={() => (
           <CandleWind width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="bordeaux" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GrowthChart"
+        component={() => (
+          <GrowthChart width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="spectrum" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GrowthChartGlacier"
+        component={() => (
+          <GrowthChart width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="glacier" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="GrowthChartEmber"
+        component={() => (
+          <GrowthChart width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BeamLattice"
+        component={() => (
+          <BeamLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="steel" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BeamLatticeAbyss"
+        component={() => (
+          <BeamLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BeamLatticeEmber"
+        component={() => (
+          <BeamLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

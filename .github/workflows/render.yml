@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - CandleWind
-          - CandleWindBeeswax
-          - CandleWindBordeaux
+          - BeamLattice
+          - BeamLatticeAbyss
+          - BeamLatticeEmber
 
     steps:
       - name: Checkout
