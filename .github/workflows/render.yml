@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - NeuralNexusNeon
-          - NeuralNexusCyber
-          - NeuralNexusAurora
+          - BlockWaveLilac
+          - BlockWaveOcean
+          - BlockWaveSunset
 
     steps:
       - name: Checkout

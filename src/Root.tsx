@@ -143,6 +143,8 @@ import { PolyTunnel } from './components/PolyTunnel';
 import type { PolyScheme } from './components/PolyTunnel';
 import { NeuralNexus } from './components/NeuralNexus';
 import type { NeuralScheme } from './components/NeuralNexus';
+import { BlockWave } from './components/BlockWave';
+import type { BlockScheme } from './components/BlockWave';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3366,6 +3368,37 @@ export const RemotionRoot: React.FC = () => {
         id="NeuralNexusAurora"
         component={() => (
           <NeuralNexus width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="BlockWaveLilac"
+        component={() => (
+          <BlockWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lilac" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BlockWaveOcean"
+        component={() => (
+          <BlockWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BlockWaveSunset"
+        component={() => (
+          <BlockWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
