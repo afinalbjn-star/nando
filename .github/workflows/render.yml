@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - LotusBloomLotus
-          - LotusBloomCrystal
-          - LotusBloomEmber
+          - SpiralRingOcean
+          - SpiralRingAmethyst
+          - SpiralRingEmerald
 
     steps:
       - name: Checkout
