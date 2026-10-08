@@ -145,6 +145,10 @@ import { NeuralNexus } from './components/NeuralNexus';
 import type { NeuralScheme } from './components/NeuralNexus';
 import { BlockWave } from './components/BlockWave';
 import type { BlockScheme } from './components/BlockWave';
+import { SpiralRing } from './components/SpiralRing';
+import type { SpiralScheme } from './components/SpiralRing';
+import { CrystalCluster } from './components/CrystalCluster';
+import type { CrystalScheme } from './components/CrystalCluster';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3399,6 +3403,68 @@ export const RemotionRoot: React.FC = () => {
         id="BlockWaveSunset"
         component={() => (
           <BlockWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="SpiralRingOcean"
+        component={() => (
+          <SpiralRing width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="SpiralRingAmethyst"
+        component={() => (
+          <SpiralRing width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amethyst" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="SpiralRingEmerald"
+        component={() => (
+          <SpiralRing width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="CrystalClusterIridescent"
+        component={() => (
+          <CrystalCluster width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="iridescent" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CrystalClusterNeon"
+        component={() => (
+          <CrystalCluster width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="CrystalClusterObsidian"
+        component={() => (
+          <CrystalCluster width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="obsidian" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

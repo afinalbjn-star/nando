@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - SpiralRingOcean
-          - SpiralRingAmethyst
-          - SpiralRingEmerald
+          - CrystalClusterIridescent
+          - CrystalClusterNeon
+          - CrystalClusterObsidian
 
     steps:
       - name: Checkout
