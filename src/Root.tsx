@@ -154,6 +154,7 @@ import type { RibbonScheme } from './components/RibbonFlow';
 import { LotusBloom } from './components/LotusBloom';
 import type { LotusScheme } from './components/LotusBloom';
 import { VelvetDahlia } from './components/VelvetDahlia';
+import { AtomicStructure } from './components/AtomicStructure';
 import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
 
@@ -3564,6 +3565,37 @@ export const RemotionRoot: React.FC = () => {
         id="VelvetDahliaGold"
         component={() => (
           <VelvetDahlia width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="AtomicStructureClassic"
+        component={() => (
+          <AtomicStructure width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="AtomicStructureNeon"
+        component={() => (
+          <AtomicStructure width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="AtomicStructureGold"
+        component={() => (
+          <AtomicStructure width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

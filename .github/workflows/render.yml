@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - VelvetDahliaViolet
-          - VelvetDahliaCrimson
-          - VelvetDahliaGold
+          - AtomicStructureClassic
+          - AtomicStructureNeon
+          - AtomicStructureGold
 
     steps:
       - name: Checkout
@@ -32,7 +32,8 @@ jobs:
       - name: Render ProRes HQ intermediate
         env:
           ID: ${{ matrix.composition }}
-        run: npx remotion render src/index.tsx "$ID" "output/$ID-prores.mov" --codec prores --prores-profile hq
+        # --gl=angle: the runner has no GPU; WebGL (three.js) compositions need ANGLE/SwiftShader.
+        run: npx remotion render src/index.tsx "$ID" "output/$ID-prores.mov" --codec prores --prores-profile hq --gl=angle
 
       - name: Encode to size-targeted MP4
         env:
