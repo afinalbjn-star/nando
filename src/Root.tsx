@@ -155,6 +155,7 @@ import { LotusBloom } from './components/LotusBloom';
 import type { LotusScheme } from './components/LotusBloom';
 import { VelvetDahlia } from './components/VelvetDahlia';
 import { AtomicStructure } from './components/AtomicStructure';
+import { MolecularNetwork } from './components/MolecularNetwork';
 import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
 
@@ -3602,6 +3603,7 @@ export const RemotionRoot: React.FC = () => {
         width={3840}
         height={2160}
       />
+      <Composition id="MolecularNetwork" component={() => <MolecularNetwork width={3840} height={2160} totalFrames={DURATION} speed={1} />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
     </>
   );
 };

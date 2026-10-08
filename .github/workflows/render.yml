@@ -10,9 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - AtomicStructureClassic
-          - AtomicStructureNeon
-          - AtomicStructureGold
+          - MolecularNetwork
 
     steps:
       - name: Checkout
