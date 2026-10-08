@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - CrystalClusterIridescent
-          - CrystalClusterNeon
-          - CrystalClusterObsidian
+          - RibbonFlowCoral
+          - RibbonFlowAbyss
+          - RibbonFlowFlora
 
     steps:
       - name: Checkout

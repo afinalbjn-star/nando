@@ -149,6 +149,8 @@ import { SpiralRing } from './components/SpiralRing';
 import type { SpiralScheme } from './components/SpiralRing';
 import { CrystalCluster } from './components/CrystalCluster';
 import type { CrystalScheme } from './components/CrystalCluster';
+import { RibbonFlow } from './components/RibbonFlow';
+import type { RibbonScheme } from './components/RibbonFlow';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3465,6 +3467,37 @@ export const RemotionRoot: React.FC = () => {
         id="CrystalClusterObsidian"
         component={() => (
           <CrystalCluster width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="obsidian" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="RibbonFlowCoral"
+        component={() => (
+          <RibbonFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="coral" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RibbonFlowAbyss"
+        component={() => (
+          <RibbonFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="RibbonFlowFlora"
+        component={() => (
+          <RibbonFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="flora" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
