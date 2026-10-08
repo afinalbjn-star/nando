@@ -10,10 +10,10 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - PrismFoldNeon
-          - PrismFoldCyber
-          - PrismFoldAurora
-          - PrismFoldSunset
+          - PolyTunnelNeon
+          - PolyTunnelCyber
+          - PolyTunnelPlasma
+          - PolyTunnelMono
 
     steps:
       - name: Checkout

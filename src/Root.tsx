@@ -139,6 +139,8 @@ import { NexusGlobe } from './components/NexusGlobe';
 import type { NexusScheme } from './components/NexusGlobe';
 import { PrismFold } from './components/PrismFold';
 import type { PrismScheme } from './components/PrismFold';
+import { PolyTunnel } from './components/PolyTunnel';
+import type { PolyScheme } from './components/PolyTunnel';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3290,6 +3292,47 @@ export const RemotionRoot: React.FC = () => {
         id="PrismFoldSunset"
         component={() => (
           <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="PolyTunnelNeon"
+        component={() => (
+          <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PolyTunnelCyber"
+        component={() => (
+          <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PolyTunnelPlasma"
+        component={() => (
+          <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="plasma" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PolyTunnelMono"
+        component={() => (
+          <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mono" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
