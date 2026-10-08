@@ -156,6 +156,7 @@ import type { LotusScheme } from './components/LotusBloom';
 import { VelvetDahlia } from './components/VelvetDahlia';
 import { AtomicStructure } from './components/AtomicStructure';
 import { MolecularNetwork } from './components/MolecularNetwork';
+import { WaveLattice } from './components/WaveLattice';
 import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
 
@@ -3604,6 +3605,9 @@ export const RemotionRoot: React.FC = () => {
         height={2160}
       />
       <Composition id="MolecularNetwork" component={() => <MolecularNetwork width={3840} height={2160} totalFrames={DURATION} speed={1} />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
+      <Composition id="WaveLatticeOlive" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="olive" />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
+      <Composition id="WaveLatticeCyber" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
+      <Composition id="WaveLatticeGold" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
     </>
   );
 };
