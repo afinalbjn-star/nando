@@ -10,9 +10,10 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - BlockWaveLilac
-          - BlockWaveOcean
-          - BlockWaveSunset
+          - NexusGlobeAmethyst
+          - NexusGlobeViolet
+          - NexusGlobeSapphire
+          - NexusGlobeCrimson
 
     steps:
       - name: Checkout
