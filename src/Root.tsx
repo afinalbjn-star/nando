@@ -153,6 +153,8 @@ import { RibbonFlow } from './components/RibbonFlow';
 import type { RibbonScheme } from './components/RibbonFlow';
 import { LotusBloom } from './components/LotusBloom';
 import type { LotusScheme } from './components/LotusBloom';
+import { VelvetDahlia } from './components/VelvetDahlia';
+import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3531,6 +3533,37 @@ export const RemotionRoot: React.FC = () => {
         id="LotusBloomEmber"
         component={() => (
           <LotusBloom width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="VelvetDahliaViolet"
+        component={() => (
+          <VelvetDahlia width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VelvetDahliaCrimson"
+        component={() => (
+          <VelvetDahlia width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VelvetDahliaGold"
+        component={() => (
+          <VelvetDahlia width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

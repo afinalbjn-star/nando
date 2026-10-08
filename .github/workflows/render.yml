@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - SpiralRingOcean
-          - SpiralRingAmethyst
-          - SpiralRingEmerald
+          - VelvetDahliaViolet
+          - VelvetDahliaCrimson
+          - VelvetDahliaGold
 
     steps:
       - name: Checkout
