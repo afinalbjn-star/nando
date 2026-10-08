@@ -141,6 +141,8 @@ import { PrismFold } from './components/PrismFold';
 import type { PrismScheme } from './components/PrismFold';
 import { PolyTunnel } from './components/PolyTunnel';
 import type { PolyScheme } from './components/PolyTunnel';
+import { NeuralNexus } from './components/NeuralNexus';
+import type { NeuralScheme } from './components/NeuralNexus';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3333,6 +3335,37 @@ export const RemotionRoot: React.FC = () => {
         id="PolyTunnelMono"
         component={() => (
           <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mono" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="NeuralNexusNeon"
+        component={() => (
+          <NeuralNexus width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeuralNexusCyber"
+        component={() => (
+          <NeuralNexus width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NeuralNexusAurora"
+        component={() => (
+          <NeuralNexus width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}

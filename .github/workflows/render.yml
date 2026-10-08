@@ -10,10 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - PolyTunnelNeon
-          - PolyTunnelCyber
-          - PolyTunnelPlasma
-          - PolyTunnelMono
+          - NeuralNexusNeon
+          - NeuralNexusCyber
+          - NeuralNexusAurora
 
     steps:
       - name: Checkout
