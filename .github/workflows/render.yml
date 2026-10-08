@@ -10,10 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - NexusGlobeAmethyst
-          - NexusGlobeViolet
-          - NexusGlobeSapphire
-          - NexusGlobeCrimson
+          - SpiralRingOcean
+          - SpiralRingAmethyst
+          - SpiralRingEmerald
 
     steps:
       - name: Checkout
