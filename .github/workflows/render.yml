@@ -32,8 +32,8 @@ jobs:
       - name: Render ProRes HQ intermediate
         env:
           ID: ${{ matrix.composition }}
-        # --gl=swiftshader: the runner has no GPU; WebGL (three.js) compositions need a software rasterizer.
-        run: npx remotion render src/index.tsx "$ID" "output/$ID-prores.mov" --codec prores --prores-profile hq --gl=swiftshader
+        # --gl=swangle is the recommended software rasterizer for Three.js on GitHub Actions
+        run: npx remotion render src/index.tsx "$ID" "output/$ID-prores.mov" --codec prores --prores-profile hq --gl=swangle
 
       - name: Encode to size-targeted MP4
         env:
