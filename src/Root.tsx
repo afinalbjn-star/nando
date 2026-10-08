@@ -135,6 +135,10 @@ import { GrowthChart } from './components/GrowthChart';
 import { BeamLattice } from './components/BeamLattice';
 import { VelvetCheck } from './components/VelvetCheck';
 import type { VelvetScheme } from './components/VelvetCheck';
+import { NexusGlobe } from './components/NexusGlobe';
+import type { NexusScheme } from './components/NexusGlobe';
+import { PrismFold } from './components/PrismFold';
+import type { PrismScheme } from './components/PrismFold';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3205,6 +3209,87 @@ export const RemotionRoot: React.FC = () => {
         id="VelvetCheckRoyal"
         component={() => (
           <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="royal" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NexusGlobeAmethyst"
+        component={() => (
+          <NexusGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amethyst" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NexusGlobeViolet"
+        component={() => (
+          <NexusGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NexusGlobeSapphire"
+        component={() => (
+          <NexusGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sapphire" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="NexusGlobeCrimson"
+        component={() => (
+          <NexusGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="PrismFoldNeon"
+        component={() => (
+          <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PrismFoldCyber"
+        component={() => (
+          <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PrismFoldAurora"
+        component={() => (
+          <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="PrismFoldSunset"
+        component={() => (
+          <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
