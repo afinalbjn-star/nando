@@ -151,6 +151,8 @@ import { CrystalCluster } from './components/CrystalCluster';
 import type { CrystalScheme } from './components/CrystalCluster';
 import { RibbonFlow } from './components/RibbonFlow';
 import type { RibbonScheme } from './components/RibbonFlow';
+import { LotusBloom } from './components/LotusBloom';
+import type { LotusScheme } from './components/LotusBloom';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3498,6 +3500,37 @@ export const RemotionRoot: React.FC = () => {
         id="RibbonFlowFlora"
         component={() => (
           <RibbonFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="flora" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+
+      <Composition
+        id="LotusBloomLotus"
+        component={() => (
+          <LotusBloom width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lotus" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LotusBloomCrystal"
+        component={() => (
+          <LotusBloom width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crystal" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="LotusBloomEmber"
+        component={() => (
+          <LotusBloom width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
