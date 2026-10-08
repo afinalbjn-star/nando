@@ -10,12 +10,10 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - BeamLattice
-          - BeamLatticeAbyss
-          - BeamLatticeEmber
-          - DeformOrbCyan
-          - DeformOrbViolet
-          - DeformOrbEmber
+          - VelvetCheckCrimson
+          - VelvetCheckMidnight
+          - VelvetCheckForest
+          - VelvetCheckRoyal
 
     steps:
       - name: Checkout

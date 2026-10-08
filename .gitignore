@@ -3,3 +3,7 @@ output/
 *.mp4
 *.png
 .DS_Store
+
+# two-pass ffmpeg logs
+ffmpeg2pass-*.log
+ffmpeg2pass-*.log.mbtree

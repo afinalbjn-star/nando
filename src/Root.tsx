@@ -133,6 +133,8 @@ import { NebulaFlow } from './components/NebulaFlow';
 import { CandleWind } from './components/CandleWind';
 import { GrowthChart } from './components/GrowthChart';
 import { BeamLattice } from './components/BeamLattice';
+import { VelvetCheck } from './components/VelvetCheck';
+import type { VelvetScheme } from './components/VelvetCheck';
 import { palettes } from './utils/colors';
 
 const FPS = 30;
@@ -3163,6 +3165,46 @@ export const RemotionRoot: React.FC = () => {
         id="BeamLatticeEmber"
         component={() => (
           <BeamLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VelvetCheckCrimson"
+        component={() => (
+          <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VelvetCheckMidnight"
+        component={() => (
+          <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="midnight" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VelvetCheckForest"
+        component={() => (
+          <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
+        )}
+        durationInFrames={DURATION + 1}
+        fps={FPS}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="VelvetCheckRoyal"
+        component={() => (
+          <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="royal" />
         )}
         durationInFrames={DURATION + 1}
         fps={FPS}
