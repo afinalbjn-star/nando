@@ -3617,7 +3617,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="NodeNetworkNeon" component={() => <NodeNetworkNeon />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
       <Composition id="NodeNetworkGold" component={() => <NodeNetworkGold />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
       <Composition id="BarChartRace" component={BarChartRace} durationInFrames={300} fps={FPS} width={1920} height={1080} />
-      <Composition id="NeuralSynapseCore" component={NeuralSynapseCore} durationInFrames={300} fps={60} width={3840} height={2160} />
+      <Composition id="NeuralSynapseCore" component={NeuralSynapseCore} durationInFrames={600} fps={60} width={3840} height={2160} />
     </>
   );
 };

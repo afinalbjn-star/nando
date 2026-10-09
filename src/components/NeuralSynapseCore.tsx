@@ -5,134 +5,96 @@ import * as THREE from 'three';
 
 const TAU = Math.PI * 2;
 
-// Seeded pseudo-random generator for deterministic consistency
+// Deterministic seeded random
 function pseudoRandom(seed: number) {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
 }
 
-interface BranchData {
+interface FiberData {
   curve: THREE.CatmullRomCurve3;
-  length: number;
-  tip: THREE.Vector3;
-  phaseOffset: number;
+  phase1: number;
+  phase2: number;
 }
 
-// Generate organic neural branching structure
-function generateNeuralTree() {
-  const branches: BranchData[] = [];
-  const primaryCount = 28;
-  const coreRadius = 3.2;
+// Generate organic wavy neural fibers matching the reference image
+function generateNeuralFibers() {
+  const fibers: FiberData[] = [];
+  const count = 80; // Dense array of tentacle cables
+  const coreRadius = 3.1;
 
-  let seed = 42;
+  let seed = 303;
 
-  for (let i = 0; i < primaryCount; i++) {
-    // Fibonacci sphere distribution for evenly spaced roots
-    const y = 1 - (i / (primaryCount - 1)) * 2;
+  for (let i = 0; i < count; i++) {
+    // Fibonacci distribution over sphere
+    const y = 1 - (i / (count - 1)) * 2;
     const radiusAtY = Math.sqrt(1 - y * y);
     const theta = i * Math.PI * (3 - Math.sqrt(5));
-    const x = Math.cos(theta) * radiusAtY;
-    const z = Math.sin(theta) * radiusAtY;
+    const nx = Math.cos(theta) * radiusAtY;
+    const ny = y;
+    const nz = Math.sin(theta) * radiusAtY;
 
-    const rootDir = new THREE.Vector3(x, y, z).normalize();
-    const rootPos = rootDir.clone().multiplyScalar(coreRadius);
+    const normal = new THREE.Vector3(nx, ny, nz).normalize();
+    const p0 = normal.clone().multiplyScalar(coreRadius);
 
-    // Primary trunk control points
-    const p0 = rootPos.clone();
-    const midDistance = coreRadius + 2.5 + pseudoRandom(seed++) * 2.0;
-    const p1 = rootDir.clone().multiplyScalar(midDistance).add(
-      new THREE.Vector3(
-        (pseudoRandom(seed++) - 0.5) * 1.5,
-        (pseudoRandom(seed++) - 0.5) * 1.5,
-        (pseudoRandom(seed++) - 0.5) * 1.5
-      )
-    );
+    // Coordinate basis for organic S-curve displacement
+    const up = Math.abs(normal.y) < 0.95 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
+    const t1 = new THREE.Vector3().crossVectors(normal, up).normalize();
+    const t2 = new THREE.Vector3().crossVectors(normal, t1).normalize();
 
-    const tipDistance = midDistance + 3.5 + pseudoRandom(seed++) * 3.0;
-    const p2 = rootDir.clone().multiplyScalar(tipDistance).add(
-      new THREE.Vector3(
-        (pseudoRandom(seed++) - 0.5) * 2.5,
-        (pseudoRandom(seed++) - 0.5) * 2.5,
-        (pseudoRandom(seed++) - 0.5) * 2.5
-      )
-    );
+    // Natural flowing S-curve control points
+    const amp1 = (pseudoRandom(seed++) - 0.5) * 2.8;
+    const amp2 = (pseudoRandom(seed++) - 0.5) * 2.8;
+    const p1 = normal.clone().multiplyScalar(coreRadius + 2.2)
+      .addScaledVector(t1, amp1)
+      .addScaledVector(t2, amp2);
 
-    const primaryCurve = new THREE.CatmullRomCurve3([p0, p1, p2]);
-    branches.push({
-      curve: primaryCurve,
-      length: primaryCurve.getLength(),
-      tip: p2,
-      phaseOffset: pseudoRandom(seed++),
-    });
+    const amp3 = (pseudoRandom(seed++) - 0.5) * 4.0;
+    const amp4 = (pseudoRandom(seed++) - 0.5) * 4.0;
+    const p2 = normal.clone().multiplyScalar(coreRadius + 5.5)
+      .addScaledVector(t1, -amp1 * 0.8 + amp3)
+      .addScaledVector(t2, -amp2 * 0.8 + amp4);
 
-    // Sub-dendrite fork 1
-    const fork1Start = primaryCurve.getPointAt(0.55);
-    const fork1Dir = rootDir.clone().add(
-      new THREE.Vector3(
-        (pseudoRandom(seed++) - 0.5) * 1.8,
-        (pseudoRandom(seed++) - 0.5) * 1.8,
-        (pseudoRandom(seed++) - 0.5) * 1.8
-      )
-    ).normalize();
-    const fork1Tip = fork1Start.clone().add(fork1Dir.multiplyScalar(3.0 + pseudoRandom(seed++) * 2.0));
-    const fork1Curve = new THREE.CatmullRomCurve3([
-      fork1Start,
-      fork1Start.clone().lerp(fork1Tip, 0.5).add(new THREE.Vector3((pseudoRandom(seed++) - 0.5), (pseudoRandom(seed++) - 0.5), (pseudoRandom(seed++) - 0.5))),
-      fork1Tip,
-    ]);
-    branches.push({
-      curve: fork1Curve,
-      length: fork1Curve.getLength(),
-      tip: fork1Tip,
-      phaseOffset: pseudoRandom(seed++),
-    });
+    const amp5 = (pseudoRandom(seed++) - 0.5) * 5.0;
+    const amp6 = (pseudoRandom(seed++) - 0.5) * 5.0;
+    const p3 = normal.clone().multiplyScalar(coreRadius + 9.5)
+      .addScaledVector(t1, amp5)
+      .addScaledVector(t2, amp6);
 
-    // Sub-dendrite fork 2
-    const fork2Start = primaryCurve.getPointAt(0.75);
-    const fork2Dir = rootDir.clone().add(
-      new THREE.Vector3(
-        (pseudoRandom(seed++) - 0.5) * 1.8,
-        (pseudoRandom(seed++) - 0.5) * 1.8,
-        (pseudoRandom(seed++) - 0.5) * 1.8
-      )
-    ).normalize();
-    const fork2Tip = fork2Start.clone().add(fork2Dir.multiplyScalar(2.5 + pseudoRandom(seed++) * 2.0));
-    const fork2Curve = new THREE.CatmullRomCurve3([
-      fork2Start,
-      fork2Start.clone().lerp(fork2Tip, 0.5).add(new THREE.Vector3((pseudoRandom(seed++) - 0.5), (pseudoRandom(seed++) - 0.5), (pseudoRandom(seed++) - 0.5))),
-      fork2Tip,
-    ]);
-    branches.push({
-      curve: fork2Curve,
-      length: fork2Curve.getLength(),
-      tip: fork2Tip,
-      phaseOffset: pseudoRandom(seed++),
+    // Tip stretching outward dramatically (especially to the right as in reference)
+    const stretchX = normal.x > -0.2 ? 4.5 : 1.0;
+    const p4 = normal.clone().multiplyScalar(coreRadius + 14.0 + stretchX + pseudoRandom(seed++) * 3.5)
+      .addScaledVector(t1, amp5 * 1.3)
+      .addScaledVector(t2, amp6 * 1.3);
+
+    const curve = new THREE.CatmullRomCurve3([p0, p1, p2, p3, p4], false, 'centripetal', 0.5);
+    fibers.push({
+      curve,
+      phase1: pseudoRandom(seed++),
+      phase2: (pseudoRandom(seed++) + 0.48) % 1.0,
     });
   }
 
-  return branches;
+  return fibers;
 }
 
-// Neural Synapse 3D Scene
+// 3D Scene Component
 const SynapseScene: React.FC<{ progress: number }> = ({ progress }) => {
-  const branches = useMemo(() => generateNeuralTree(), []);
+  const fibers = useMemo(() => generateNeuralFibers(), []);
 
-  // Pre-generate tube geometries for dendritic fibers
-  const branchGeometries = useMemo(() => {
-    return branches.map((b, idx) => {
-      const radius = idx % 3 === 0 ? 0.08 : 0.045;
-      return new THREE.TubeGeometry(b.curve, 20, radius, 6, false);
-    });
-  }, [branches]);
+  // Pre-generate smooth glossy cable geometries
+  const fiberGeometries = useMemo(() => {
+    return fibers.map((f) => new THREE.TubeGeometry(f.curve, 40, 0.065, 8, false));
+  }, [fibers]);
 
-  // Ambient floating neurotransmitter dust particles
+  // Floating ambient digital speckles & particles
   const particleData = useMemo(() => {
-    const pts: { pos: THREE.Vector3; speed: number; phase: number; radius: number }[] = [];
-    let pSeed = 99;
-    for (let i = 0; i < 180; i++) {
+    const pts: { pos: THREE.Vector3; speed: number; phase: number; size: number }[] = [];
+    let pSeed = 404;
+    for (let i = 0; i < 280; i++) {
       const u1 = pseudoRandom(pSeed++);
       const u2 = pseudoRandom(pSeed++);
-      const radius = 4.0 + pseudoRandom(pSeed++) * 9.0;
+      const radius = 3.6 + pseudoRandom(pSeed++) * 16.0;
       const theta = u1 * TAU;
       const phi = Math.acos(2 * u2 - 1);
       const pos = new THREE.Vector3(
@@ -142,145 +104,138 @@ const SynapseScene: React.FC<{ progress: number }> = ({ progress }) => {
       );
       pts.push({
         pos,
-        speed: 1.0 + Math.floor(pseudoRandom(pSeed++) * 2),
+        speed: 1.0 + Math.floor(pseudoRandom(pSeed++) * 3), // Integer multiples ensure perfect 100% loop
         phase: pseudoRandom(pSeed++) * TAU,
-        radius: 0.04 + pseudoRandom(pSeed++) * 0.05,
+        size: 0.025 + pseudoRandom(pSeed++) * 0.045,
       });
     }
     return pts;
   }, []);
 
+  // Instanced Meshes for Neon Streak Dashes along the cables
+  const totalPulses = fibers.length * 2;
   const pulseMeshRef = useRef<THREE.InstancedMesh>(null);
-  const boutonMeshRef = useRef<THREE.InstancedMesh>(null);
   const particleMeshRef = useRef<THREE.InstancedMesh>(null);
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
+  const yAxis = useMemo(() => new THREE.Vector3(0, 1, 0), []);
 
-  // Update animated photons and breathing effects
+  // Update animated neon streaks along fiber tangents
   useLayoutEffect(() => {
-    if (!pulseMeshRef.current || !boutonMeshRef.current || !particleMeshRef.current) return;
+    if (!pulseMeshRef.current || !particleMeshRef.current) return;
 
-    // 1. Update Photon Pulses racing outward along fibers (sleek energy beads)
-    const PULSE_SPEED = 3;
-    branches.forEach((b, i) => {
-      const t = (b.phaseOffset + progress * PULSE_SPEED) % 1.0;
-      const pos = b.curve.getPointAt(t);
+    // In 10 seconds (600 frames), pulse completes exactly 3 full journeys -> 100% seamless loop
+    const CYCLES = 3;
 
-      dummy.position.copy(pos);
-      // Sleek energy bead that hugs the branch curve
-      const scaleCurve = Math.sin(t * Math.PI);
-      const pulseScale = (0.09 + scaleCurve * 0.12) * (1.0 + 0.15 * Math.sin(progress * TAU * 2));
-      dummy.scale.set(pulseScale, pulseScale, pulseScale);
+    let pulseIdx = 0;
+    fibers.forEach((f) => {
+      // Pulse 1
+      const t1 = (f.phase1 + progress * CYCLES) % 1.0;
+      const pos1 = f.curve.getPointAt(t1);
+      const tangent1 = f.curve.getTangentAt(t1);
+
+      dummy.position.copy(pos1);
+      dummy.quaternion.setFromUnitVectors(yAxis, tangent1);
+      // Sleek tapered pulse length
+      const streakLength1 = 0.5 + Math.sin(t1 * Math.PI) * 0.7;
+      dummy.scale.set(1.0, streakLength1, 1.0);
       dummy.updateMatrix();
-      pulseMeshRef.current!.setMatrixAt(i, dummy.matrix);
+      pulseMeshRef.current!.setMatrixAt(pulseIdx++, dummy.matrix);
+
+      // Pulse 2
+      const t2 = (f.phase2 + progress * CYCLES) % 1.0;
+      const pos2 = f.curve.getPointAt(t2);
+      const tangent2 = f.curve.getTangentAt(t2);
+
+      dummy.position.copy(pos2);
+      dummy.quaternion.setFromUnitVectors(yAxis, tangent2);
+      const streakLength2 = 0.5 + Math.sin(t2 * Math.PI) * 0.7;
+      dummy.scale.set(1.0, streakLength2, 1.0);
+      dummy.updateMatrix();
+      pulseMeshRef.current!.setMatrixAt(pulseIdx++, dummy.matrix);
     });
     pulseMeshRef.current.instanceMatrix.needsUpdate = true;
 
-    // 2. Update Synaptic Boutons (terminal tip spheres)
-    branches.forEach((b, i) => {
-      dummy.position.copy(b.tip);
-      const bScale = 0.12 + 0.04 * Math.sin(progress * TAU * 2 + b.phaseOffset * TAU);
-      dummy.scale.set(bScale, bScale, bScale);
-      dummy.updateMatrix();
-      boutonMeshRef.current!.setMatrixAt(i, dummy.matrix);
-    });
-    boutonMeshRef.current.instanceMatrix.needsUpdate = true;
-
-    // 3. Update Floating Neurotransmitter Particles (orbital drift)
+    // Ambient floating particles orbital drift (periodic integer frequency)
     particleData.forEach((p, i) => {
-      const driftAngle = p.phase + progress * TAU * p.speed;
-      const px = p.pos.x + Math.sin(driftAngle) * 0.4;
-      const py = p.pos.y + Math.cos(driftAngle) * 0.4;
-      const pz = p.pos.z + Math.sin(driftAngle * 0.5) * 0.3;
+      const angle = p.phase + progress * TAU * p.speed;
+      const px = p.pos.x + Math.sin(angle) * 0.45;
+      const py = p.pos.y + Math.cos(angle) * 0.45;
+      const pz = p.pos.z + Math.sin(angle * 0.5) * 0.35;
 
       dummy.position.set(px, py, pz);
-      dummy.scale.set(p.radius * 0.7, p.radius * 0.7, p.radius * 0.7);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(p.size, p.size, p.size);
       dummy.updateMatrix();
       particleMeshRef.current!.setMatrixAt(i, dummy.matrix);
     });
     particleMeshRef.current.instanceMatrix.needsUpdate = true;
-  }, [progress, branches, particleData, dummy]);
+  }, [progress, fibers, particleData, dummy, yAxis]);
 
-  // Harmonic Core Breathing: scale = 1.0 + 0.14 * sin(u * 2PI)
-  const corePulseScale = 1.0 + 0.12 * Math.sin(progress * TAU);
-  const coreEmissiveIntensity = 1.5 + 0.6 * Math.sin(progress * TAU);
+  // Core rhythmic pulse (sine breathing)
+  const corePulseScale = 1.0 + 0.07 * Math.sin(progress * TAU * 2);
+  const coreEmissive = 4.0 + 1.5 * Math.sin(progress * TAU * 2);
 
-  // Subtle isometric camera sway
-  const groupSwayY = Math.sin(progress * TAU) * 0.08;
-  const groupSwayX = Math.cos(progress * TAU) * 0.04;
+  // Subtle 3D scene breathing rotation
+  const swayY = Math.sin(progress * TAU) * 0.1;
+  const swayX = Math.cos(progress * TAU) * 0.05;
 
   return (
-    // Offset to the left by -3.5 units to allocate ~40% negative space on the right for editor typography
-    <group position={[-3.5, 0, 0]} rotation={[0.18 + groupSwayX, -0.35 + groupSwayY, 0.05]}>
-      {/* 1. Luminous Synapse Core Sphere */}
+    <group position={[-2.4, 0, 0]} rotation={[0.22 + swayX, -0.32 + swayY, 0.04]}>
+      {/* 1. Ultra-Bright Luminous Cyan Inner Core Sphere */}
       <mesh scale={[corePulseScale, corePulseScale, corePulseScale]}>
-        <sphereGeometry args={[3.0, 48, 48]} />
+        <sphereGeometry args={[2.8, 48, 48]} />
         <meshStandardMaterial
-          color="#0891B2"
-          emissive="#06B6D4"
-          emissiveIntensity={coreEmissiveIntensity}
-          roughness={0.15}
-          metalness={0.6}
+          color="#00F5FF"
+          emissive="#00F0FF"
+          emissiveIntensity={coreEmissive}
+          roughness={0.08}
+          metalness={0.2}
         />
       </mesh>
 
-      {/* 2. Concentric Outer Polyhedral Lattice Mesh */}
+      {/* 2. Geodesic Polyhedral Crystal Cage (Matching reference triangular facets) */}
       <mesh scale={[corePulseScale * 1.07, corePulseScale * 1.07, corePulseScale * 1.07]}>
-        <icosahedronGeometry args={[3.15, 2]} />
+        <icosahedronGeometry args={[2.9, 2]} />
         <meshStandardMaterial
           wireframe
-          color="#8B5CF6"
-          emissive="#7C3AED"
-          emissiveIntensity={2.2}
-          roughness={0.1}
+          color="#38BDF8"
+          emissive="#0284C7"
+          emissiveIntensity={2.5}
+          roughness={0.15}
           metalness={0.9}
         />
       </mesh>
 
-      {/* 3. Deep Indigo Dendritic Branches */}
-      {branchGeometries.map((geo, idx) => (
+      {/* 3. Deep Metallic Indigo/Purple Tendril Fibers (Vibrant sheen matching reference) */}
+      {fiberGeometries.map((geo, idx) => (
         <mesh key={idx} geometry={geo}>
           <meshStandardMaterial
-            color="#312E81"
+            color="#4338CA"
             roughness={0.25}
-            metalness={0.7}
+            metalness={0.75}
             emissive="#1E1B4B"
             emissiveIntensity={0.8}
           />
         </mesh>
       ))}
 
-      {/* 4. Action Potential Photon Signal Pulses (Instanced) */}
+      {/* 4. Neon Magenta/Violet Streak Dashes (Instanced Cylinders along tangents) */}
       <instancedMesh
         ref={pulseMeshRef}
-        args={[undefined, undefined, branches.length]}
+        args={[undefined, undefined, totalPulses]}
         frustumCulled={false}
       >
-        <sphereGeometry args={[1, 16, 16]} />
+        <cylinderGeometry args={[0.078, 0.078, 1.0, 12]} />
         <meshStandardMaterial
-          color="#E0F2FE"
-          emissive="#22D3EE"
-          emissiveIntensity={4.5}
-          roughness={0.1}
+          color="#F472B6"
+          emissive="#D946EF"
+          emissiveIntensity={7.0}
+          roughness={0.05}
         />
       </instancedMesh>
 
-      {/* 5. Synaptic Bouton Terminals (Instanced) */}
-      <instancedMesh
-        ref={boutonMeshRef}
-        args={[undefined, undefined, branches.length]}
-        frustumCulled={false}
-      >
-        <sphereGeometry args={[1, 16, 16]} />
-        <meshStandardMaterial
-          color="#DDD6FE"
-          emissive="#A855F7"
-          emissiveIntensity={3.2}
-          roughness={0.15}
-        />
-      </instancedMesh>
-
-      {/* 6. Floating Neurotransmitter Particles (Instanced) */}
+      {/* 5. Floating Ambient Data / Light Speckles (Instanced) */}
       <instancedMesh
         ref={particleMeshRef}
         args={[undefined, undefined, particleData.length]}
@@ -288,9 +243,9 @@ const SynapseScene: React.FC<{ progress: number }> = ({ progress }) => {
       >
         <sphereGeometry args={[1, 10, 10]} />
         <meshStandardMaterial
-          color="#BAE6FD"
-          emissive="#38BDF8"
-          emissiveIntensity={2.5}
+          color="#E0E7FF"
+          emissive="#C084FC"
+          emissiveIntensity={4.0}
           roughness={0.2}
         />
       </instancedMesh>
@@ -305,32 +260,32 @@ export const NeuralSynapseCore: React.FC<{
 }> = ({
   width = 3840,
   height = 2160,
-  totalFrames = 300,
+  totalFrames = 600, // Exactly 10 Seconds at 60 FPS
 }) => {
   const frame = useCurrentFrame();
   const progress = (frame / totalFrames) % 1.0;
 
   return (
-    <div style={{ width, height, backgroundColor: '#030712' }}>
+    <div style={{ width, height, backgroundColor: '#02040A' }}>
       <ThreeCanvas
         width={width}
         height={height}
-        camera={{ position: [0, 0, 24], fov: 42, near: 1, far: 100 }}
+        camera={{ position: [0, 0, 24.5], fov: 44, near: 1, far: 100 }}
         gl={{ antialias: true, alpha: false }}
-        style={{ background: '#030712' }}
+        style={{ background: '#02040A' }}
       >
-        <color attach="background" args={['#030712']} />
+        <color attach="background" args={['#02040A']} />
 
-        {/* Cinematic Multi-Point Lighting */}
-        <ambientLight intensity={0.6} color="#1E1B4B" />
-        <directionalLight position={[15, 20, 18]} intensity={2.0} color="#A5F3FC" />
-        <directionalLight position={[-15, -15, -10]} intensity={1.2} color="#4338CA" />
-        <pointLight position={[-4, 0, 4]} intensity={5.0} distance={22} color="#06B6D4" />
-        <pointLight position={[10, -6, -4]} intensity={3.0} distance={30} color="#8B5CF6" />
+        {/* Cinematic Multi-Angle Lighting for Rich Highlights */}
+        <ambientLight intensity={0.7} color="#1E1B4B" />
+        <pointLight position={[-2.4, 0, 1]} intensity={12.0} distance={22} color="#00F5FF" />
+        <directionalLight position={[18, 24, 20]} intensity={3.5} color="#A5F3FC" />
+        <directionalLight position={[-20, -18, -12]} intensity={2.5} color="#818CF8" />
+        <directionalLight position={[0, -20, 15]} intensity={2.0} color="#C084FC" />
+        <pointLight position={[15, -10, -5]} intensity={5.0} distance={40} color="#D946EF" />
 
         <SynapseScene progress={progress} />
       </ThreeCanvas>
     </div>
   );
 };
-
