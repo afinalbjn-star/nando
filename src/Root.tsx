@@ -161,6 +161,7 @@ import { GearCluster } from './components/GearCluster';
 import { NodeNetworkGhost, NodeNetworkNeon, NodeNetworkGold } from './components/TriangleNodeNetwork';
 import { BarChartRace } from './components/BarChartRace';
 import { NeuralSynapseCore } from './components/NeuralSynapseCore';
+import { QuantumQubitLattice } from './components/QuantumQubitLattice';
 import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
 
@@ -3618,6 +3619,8 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="NodeNetworkGold" component={() => <NodeNetworkGold />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
       <Composition id="BarChartRace" component={BarChartRace} durationInFrames={300} fps={FPS} width={1920} height={1080} />
       <Composition id="NeuralSynapseCore" component={NeuralSynapseCore} durationInFrames={600} fps={60} width={3840} height={2160} />
+      <Composition id="QuantumQubitLattice" component={QuantumQubitLattice} durationInFrames={600} fps={60} width={3840} height={2160} />
     </>
   );
 };
+
