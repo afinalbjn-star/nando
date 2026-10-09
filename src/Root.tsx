@@ -173,7 +173,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GridDots palette={palettes.ocean} rows={20} cols={35} speed={1} width={3840} height={2160} dotSize={12} totalFrames={DURATION} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -183,7 +183,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GridDots palette={palettes.neon} rows={20} cols={35} speed={1} width={3840} height={2160} dotSize={12} totalFrames={DURATION} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -193,7 +193,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SphereRipple width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -203,7 +203,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SphereRipple width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neonPurple" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -213,7 +213,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SphereRipple width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunsetGold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -223,7 +223,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DiamondKaleidoscope width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -233,7 +233,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlexusNetwork width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -243,7 +243,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VortexTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -253,7 +253,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VortexTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neonPink" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -263,7 +263,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VortexTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="toxicGreen" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -273,7 +273,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelFluidWaves width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -283,7 +283,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexagonalWave3D width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -293,7 +293,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexagonalWave3D width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="magma" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -303,7 +303,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexagonalWave3D width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -313,7 +313,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BreathingMesh width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blueOcean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -323,7 +323,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BreathingMesh width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="steel" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -333,7 +333,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BreathingMesh width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="deepSea" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -343,7 +343,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HypnoSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -353,7 +353,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HypnoSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -363,7 +363,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HypnoSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -373,7 +373,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <TorusKnot width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -383,7 +383,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PurpleCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="purple" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -393,7 +393,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PurpleCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -403,7 +403,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PurpleCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="magma" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -413,7 +413,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -423,7 +423,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -433,7 +433,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lava" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -443,7 +443,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RadialHex width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blue" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -453,7 +453,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RadialHex width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="red" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -463,7 +463,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RadialHex width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="green" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -473,7 +473,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroWaves width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -483,7 +483,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroWaves width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="candy" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -493,7 +493,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroWaves width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="miami" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -503,7 +503,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <TriMesh width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -513,7 +513,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <TriMesh width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -523,7 +523,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <TriMesh width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -533,7 +533,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FiberOptic width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -543,7 +543,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WaveSpectrum width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -553,7 +553,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkWaves width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rainbow" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -563,7 +563,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkWaves width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -573,7 +573,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkWaves width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="fire" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -583,7 +583,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkWaves width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -593,7 +593,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <Inferno width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="inferno" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -603,7 +603,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <Inferno width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="bluefire" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -613,7 +613,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <Inferno width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="toxic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -623,7 +623,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <Inferno width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="void" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -633,7 +633,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <Inferno width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="solar" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -643,7 +643,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AuroraFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -653,7 +653,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AuroraFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -663,7 +663,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AuroraFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="arctic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -673,7 +673,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AuroraFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -683,7 +683,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AuroraFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="golden" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -693,7 +693,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlitterFlow width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -703,7 +703,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LavaVeins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lava" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -713,7 +713,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LavaVeins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -723,7 +723,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LavaVeins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="toxic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -733,7 +733,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LavaVeins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="void" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -743,7 +743,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LavaVeins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="solar" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -753,7 +753,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MarbleFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -763,7 +763,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MarbleFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="noir" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -773,7 +773,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MarbleFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rosa" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -783,7 +783,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MarbleFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="verde" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -793,7 +793,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MarbleFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="royal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -803,7 +803,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <UnderwaterCaustics width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="tropical" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -813,7 +813,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <UnderwaterCaustics width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="deepOcean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -823,7 +823,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <UnderwaterCaustics width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="coral" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -833,7 +833,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <UnderwaterCaustics width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="kelp" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -843,7 +843,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <UnderwaterCaustics width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -853,7 +853,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FrostCrystal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="arctic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -863,7 +863,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FrostCrystal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -873,7 +873,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FrostCrystal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -883,7 +883,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FrostCrystal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="void" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -893,7 +893,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FrostCrystal width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -903,7 +903,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DiagonalFlow width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -913,7 +913,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BubbleDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="silver" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -923,7 +923,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BubbleDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -933,7 +933,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BubbleDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -943,7 +943,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BubbleDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -953,7 +953,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BubbleDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -963,7 +963,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PoolRipples width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="tropical" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -973,7 +973,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PoolRipples width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lagoon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -983,7 +983,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PoolRipples width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -993,7 +993,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PoolRipples width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="midnight" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1003,7 +1003,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PoolRipples width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1013,7 +1013,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BokehGlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aqua" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1023,7 +1023,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BokehGlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1033,7 +1033,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BokehGlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1043,7 +1043,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BokehGlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1053,7 +1053,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BokehGlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1063,7 +1063,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FlowLines width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1073,7 +1073,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonTubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1083,7 +1083,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonTubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="purple" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1093,7 +1093,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonTubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="magma" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1103,7 +1103,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexStone width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="carbon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1113,7 +1113,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexStone width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="graphite" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1123,7 +1123,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexStone width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sandstone" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1133,7 +1133,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexStone width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="slate" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1143,7 +1143,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexStone width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="bronze" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1153,7 +1153,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexStone width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="midnight" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1163,7 +1163,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WireWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mono" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1173,7 +1173,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WireWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1183,7 +1183,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WireWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1193,7 +1193,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WireWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1203,7 +1203,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WireWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="royal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1213,7 +1213,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlushFur width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="pink" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1223,7 +1223,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlushFur width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cream" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1233,7 +1233,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlushFur width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lavender" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1243,7 +1243,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlushFur width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1253,7 +1253,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlushFur width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sky" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1263,7 +1263,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlasmaVortex width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1273,7 +1273,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlasmaVortex width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1283,7 +1283,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlasmaVortex width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1293,7 +1293,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlasmaVortex width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="inferno" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1303,7 +1303,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PlasmaVortex width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="venom" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1313,7 +1313,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkGradient width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="dusk" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1323,7 +1323,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkGradient width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1333,7 +1333,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkGradient width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lagoon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1343,7 +1343,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkGradient width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1353,7 +1353,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SilkGradient width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="midnight" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1363,7 +1363,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SmokeWisps width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mono" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1373,7 +1373,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SmokeWisps width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1383,7 +1383,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SmokeWisps width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1393,7 +1393,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SmokeWisps width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1403,7 +1403,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SmokeWisps width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="royal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1413,7 +1413,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FlowingLines width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mono" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1423,7 +1423,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FlowingLines width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1433,7 +1433,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FlowingLines width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1443,7 +1443,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FlowingLines width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1453,7 +1453,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FlowingLines width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1463,7 +1463,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlueFire width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blue" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1473,7 +1473,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlueFire width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1483,7 +1483,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlueFire width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="toxic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1493,7 +1493,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlueFire width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1503,7 +1503,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlueFire width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="solar" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1513,7 +1513,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <TitaniumRibs width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1523,7 +1523,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlueLens width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1533,7 +1533,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1543,7 +1543,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1553,7 +1553,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="solar" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1563,7 +1563,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ConcentricLens width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1573,7 +1573,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FacetedMosaic width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1583,7 +1583,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1593,7 +1593,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1603,7 +1603,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1613,7 +1613,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ColorFacet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1623,7 +1623,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GoldHexWave width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1633,7 +1633,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1643,7 +1643,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1653,7 +1653,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1663,7 +1663,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1673,7 +1673,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1683,7 +1683,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="candy" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1693,7 +1693,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="wave" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1703,7 +1703,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="pop" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1713,7 +1713,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1723,7 +1723,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RetroPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="dusk" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1733,7 +1733,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="peach" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1743,7 +1743,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lavender" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1753,7 +1753,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1763,7 +1763,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sky" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1773,7 +1773,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelDrift width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1783,7 +1783,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <InkBloom width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1793,7 +1793,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DiscoPixel width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1803,7 +1803,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1813,7 +1813,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1823,7 +1823,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1833,7 +1833,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DiscoTiles width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1843,7 +1843,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CubeField width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1853,7 +1853,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1863,7 +1863,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="candy" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1873,7 +1873,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1883,7 +1883,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CubeBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1893,7 +1893,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RainbowVortex width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1903,7 +1903,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VioletFan width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1913,7 +1913,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1923,7 +1923,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1933,7 +1933,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1943,7 +1943,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <FanBlades width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amber" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1953,7 +1953,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1963,7 +1963,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1973,7 +1973,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1983,7 +1983,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -1993,7 +1993,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonStrings width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2003,7 +2003,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonTerrain width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2013,7 +2013,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2023,7 +2023,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="silver" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2033,7 +2033,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="copper" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2043,7 +2043,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2053,7 +2053,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <MoltenGold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2063,7 +2063,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2073,7 +2073,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2083,7 +2083,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2093,7 +2093,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2103,7 +2103,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HoloMarble width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2113,7 +2113,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2123,7 +2123,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2133,7 +2133,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2143,7 +2143,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2153,7 +2153,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LiquidChrome width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2163,7 +2163,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlassBlocks width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2173,7 +2173,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2183,7 +2183,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2193,7 +2193,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2203,7 +2203,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amber" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2213,7 +2213,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HexSphere width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2223,7 +2223,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2233,7 +2233,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2243,7 +2243,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2253,7 +2253,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="candy" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2263,7 +2263,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelCubes width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2273,7 +2273,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2283,7 +2283,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="warm" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2293,7 +2293,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cool" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2303,7 +2303,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2313,7 +2313,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyPlates width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sage" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2323,7 +2323,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2333,7 +2333,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2343,7 +2343,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2353,7 +2353,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2363,7 +2363,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CrystalShards width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2373,7 +2373,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2383,7 +2383,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2393,7 +2393,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2403,7 +2403,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2413,7 +2413,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <WaveFins width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2423,7 +2423,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2433,7 +2433,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="charcoal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2443,7 +2443,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="wine" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2453,7 +2453,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2463,7 +2463,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NavyGrunge width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="espresso" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2473,7 +2473,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2483,7 +2483,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2493,7 +2493,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="grape" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2503,7 +2503,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="tangerine" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2513,7 +2513,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CandyCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2523,7 +2523,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2533,7 +2533,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2543,7 +2543,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2553,7 +2553,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2563,7 +2563,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PastelPoly width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="grape" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2573,7 +2573,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <Globe width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2583,7 +2583,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlobeArcs width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2593,7 +2593,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlobeNight width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2603,7 +2603,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlobeHolo width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2613,7 +2613,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlobeOrbit width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2623,7 +2623,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AmericaSignal width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2633,7 +2633,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DustParticles width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2643,7 +2643,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HudRadar width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2653,7 +2653,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HoloGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2663,7 +2663,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HoloGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2673,7 +2673,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <HoloGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amber" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2683,7 +2683,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AnalyticsBoard width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blue" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2693,7 +2693,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AnalyticsBoard width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="indigo" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2703,7 +2703,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AnalyticsBoard width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2713,7 +2713,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BigDataHud width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2723,7 +2723,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BigDataHud width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2733,7 +2733,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BigDataHud width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2743,7 +2743,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ParticleOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="rose" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2753,7 +2753,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ParticleOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2763,7 +2763,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ParticleOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2773,7 +2773,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DeformOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2783,7 +2783,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DeformOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2793,7 +2793,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <DeformOrb width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2803,7 +2803,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="hot" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2813,7 +2813,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cool" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2823,7 +2823,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeonSpiral width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="acid" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2833,7 +2833,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BatFlock width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2843,7 +2843,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BatFlock width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="moon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2853,7 +2853,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BatFlock width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blood" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2863,7 +2863,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BatSwarm width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2873,7 +2873,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BatSwarm width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="moon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2883,7 +2883,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BatSwarm width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blood" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2893,7 +2893,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PerforatedSheet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="azure" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2903,7 +2903,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PerforatedSheet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2913,7 +2913,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PerforatedSheet width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="magenta" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2923,7 +2923,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlassOrbs width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="noir" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2933,7 +2933,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlassOrbs width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2943,7 +2943,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GlassOrbs width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2953,7 +2953,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ChromeRibbons width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="prismatic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2963,7 +2963,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ChromeRibbons width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ice" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2973,7 +2973,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <ChromeRibbons width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2983,7 +2983,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <TechGears width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="blue" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -2993,7 +2993,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <TechGears width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="graphite" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3003,7 +3003,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <TechGears width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="teal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3013,7 +3013,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PointWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyan" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3023,7 +3023,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PointWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="magenta" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3033,7 +3033,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PointWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mint" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3043,7 +3043,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NebulaFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="nebula" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3053,7 +3053,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NebulaFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3063,7 +3063,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NebulaFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3073,7 +3073,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CandleWind width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="taper" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3083,7 +3083,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CandleWind width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="beeswax" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3093,7 +3093,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CandleWind width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="bordeaux" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3103,7 +3103,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GrowthChart width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="spectrum" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3113,7 +3113,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GrowthChart width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="glacier" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3123,7 +3123,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <GrowthChart width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3133,7 +3133,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BeamLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="steel" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3143,7 +3143,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BeamLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3151,7 +3151,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="LandDebug"
         component={() => <LandDebug />}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3200}
         height={1800}
@@ -3161,7 +3161,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SignalGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3171,7 +3171,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SignalGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="indigo" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3181,7 +3181,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SignalGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3191,7 +3191,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BeamLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3201,7 +3201,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3211,7 +3211,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="midnight" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3221,7 +3221,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="forest" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3231,7 +3231,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VelvetCheck width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="royal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3241,7 +3241,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NexusGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amethyst" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3251,7 +3251,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NexusGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3261,7 +3261,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NexusGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sapphire" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3271,7 +3271,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NexusGlobe width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3282,7 +3282,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3292,7 +3292,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3302,7 +3302,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3312,7 +3312,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PrismFold width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3323,7 +3323,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3333,7 +3333,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3343,7 +3343,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="plasma" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3353,7 +3353,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <PolyTunnel width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="mono" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3364,7 +3364,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeuralNexus width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3374,7 +3374,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeuralNexus width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3384,7 +3384,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <NeuralNexus width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="aurora" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3395,7 +3395,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlockWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lilac" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3405,7 +3405,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlockWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3415,7 +3415,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <BlockWave width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="sunset" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3426,7 +3426,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SpiralRing width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ocean" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3436,7 +3436,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SpiralRing width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="amethyst" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3446,7 +3446,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <SpiralRing width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="emerald" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3457,7 +3457,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CrystalCluster width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="iridescent" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3467,7 +3467,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CrystalCluster width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3477,7 +3477,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <CrystalCluster width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="obsidian" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3488,7 +3488,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RibbonFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="coral" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3498,7 +3498,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RibbonFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="abyss" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3508,7 +3508,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <RibbonFlow width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="flora" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3519,7 +3519,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LotusBloom width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="lotus" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3529,7 +3529,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LotusBloom width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crystal" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3539,7 +3539,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <LotusBloom width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="ember" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3550,7 +3550,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VelvetDahlia width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="violet" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3560,7 +3560,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VelvetDahlia width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="crimson" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3570,7 +3570,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <VelvetDahlia width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3581,7 +3581,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AtomicStructure width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="classic" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3591,7 +3591,7 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AtomicStructure width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="neon" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
@@ -3601,19 +3601,19 @@ export const RemotionRoot: React.FC = () => {
         component={() => (
           <AtomicStructure width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />
         )}
-        durationInFrames={DURATION + 1}
+        durationInFrames={DURATION}
         fps={FPS}
         width={3840}
         height={2160}
       />
-      <Composition id="MolecularNetwork" component={() => <MolecularNetwork width={3840} height={2160} totalFrames={DURATION} speed={1} />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
-      <Composition id="WaveLatticeOlive" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="olive" />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
-      <Composition id="WaveLatticeCyber" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
-      <Composition id="WaveLatticeGold" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
-      <Composition id="GearCluster" component={() => <GearCluster width={3840} height={2160} totalFrames={DURATION} speed={1} />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
-      <Composition id="NodeNetworkGhost" component={() => <NodeNetworkGhost />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
-      <Composition id="NodeNetworkNeon" component={() => <NodeNetworkNeon />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
-      <Composition id="NodeNetworkGold" component={() => <NodeNetworkGold />} durationInFrames={DURATION + 1} fps={FPS} width={3840} height={2160} />
+      <Composition id="MolecularNetwork" component={() => <MolecularNetwork width={3840} height={2160} totalFrames={DURATION} speed={1} />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
+      <Composition id="WaveLatticeOlive" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="olive" />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
+      <Composition id="WaveLatticeCyber" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="cyber" />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
+      <Composition id="WaveLatticeGold" component={() => <WaveLattice width={3840} height={2160} totalFrames={DURATION} speed={1} scheme="gold" />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
+      <Composition id="GearCluster" component={() => <GearCluster width={3840} height={2160} totalFrames={DURATION} speed={1} />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
+      <Composition id="NodeNetworkGhost" component={() => <NodeNetworkGhost />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
+      <Composition id="NodeNetworkNeon" component={() => <NodeNetworkNeon />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
+      <Composition id="NodeNetworkGold" component={() => <NodeNetworkGold />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
     </>
   );
 };

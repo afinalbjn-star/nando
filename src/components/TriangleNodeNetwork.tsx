@@ -139,18 +139,27 @@ const NetworkMesh: React.FC<{ theme: ThemeKey; u: number }> = ({ theme, u }) => 
     roughness: 0.3
   }), [t.edge]);
 
-  // Breathing animation logic
+  // Elegant struggling animation logic
   const getAnimatedPoint = (p: THREE.Vector3, progress: number) => {
-    // 1. Calculate distance from center
-    const dist = p.length();
-    // 2. Multi-sine wave based on spatial coordinates and time
-    // u * TAU ensures it loops perfectly when u goes from 0 to 1
-    const wave1 = Math.sin(dist * 0.3 - progress * TAU) * 1.5;
-    const wave2 = Math.sin(p.y * 0.2 + progress * TAU) * 1.0;
-    
-    // 3. Displace outwards/inwards based on the wave
-    const offset = p.clone().normalize().multiplyScalar(wave1 + wave2);
-    return p.clone().add(offset);
+    // Spatial seeds for unique per-node movement
+    const px = p.x * 0.4;
+    const py = p.y * 0.4;
+    const pz = p.z * 0.4;
+
+    // 1. "Struggling" motion: Complex 3D wandering that loops seamlessly
+    // Nodes move independently in different directions
+    const dx = Math.sin(py + progress * TAU * 2) * Math.cos(pz - progress * TAU) * 1.5;
+    const dy = Math.sin(pz + progress * TAU * 3) * Math.cos(px + progress * TAU) * 1.5;
+    const dz = Math.sin(px - progress * TAU * 2) * Math.cos(py + progress * TAU) * 1.5;
+    const struggle = new THREE.Vector3(dx, dy, dz);
+
+    // 2. "Escaping" motion: Sharp outward pulses rippling across the structure
+    // Use smooth continuous sine to prevent sharp velocity stops (which look choppy/patah)
+    // (sin(x) + 1) / 2 creates a smooth 0-to-1 pulse
+    const escapePulse = Math.pow((Math.sin(p.length() * 0.3 - progress * TAU * 2) + 1) / 2, 2) * 1.8;
+    const outward = p.clone().normalize().multiplyScalar(escapePulse);
+
+    return p.clone().add(struggle).add(outward);
   };
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -164,8 +173,9 @@ const NetworkMesh: React.FC<{ theme: ThemeKey; u: number }> = ({ theme, u }) => 
     // Update Nodes
     animatedPoints.forEach((p, i) => {
       dummy.position.copy(p);
-      // Pulsating scale effect
-      const scale = 1.0 + Math.sin(p.length() * 0.4 - u * TAU) * 0.25;
+      // Smooth pulsating scale effect
+      const scalePulse = Math.pow((Math.sin(p.length() * 0.5 - u * TAU * 3) + 1) / 2, 2) * 0.4;
+      const scale = 1.0 + scalePulse;
       dummy.scale.set(scale, scale, scale);
       dummy.updateMatrix();
       nodeMeshRef.current!.setMatrixAt(i, dummy.matrix);
@@ -187,8 +197,9 @@ const NetworkMesh: React.FC<{ theme: ThemeKey; u: number }> = ({ theme, u }) => 
     edgeMeshRef.current.instanceMatrix.needsUpdate = true;
   }, [u, points, edgePairs, dummy]);
 
+  // Static rotation to match the reference image's tilted pyramid angle
   return (
-    <group rotation={[u * TAU, u * TAU * 0.5, 0]}>
+    <group rotation={[0.5, 0.6, -0.2]}>
       <instancedMesh
         ref={nodeMeshRef}
         args={[nodeGeo, nodeMat, points.length]}
