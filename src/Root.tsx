@@ -163,6 +163,7 @@ import { BarChartRace } from './components/BarChartRace';
 import { NeuralSynapseCore } from './components/NeuralSynapseCore';
 import { QuantumQubitLattice } from './components/QuantumQubitLattice';
 import { CyberShield } from './components/CyberShield';
+import { FiberOpticStream } from './components/FiberOpticStream';
 import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
 
@@ -3622,6 +3623,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="NeuralSynapseCore" component={NeuralSynapseCore} durationInFrames={600} fps={60} width={3840} height={2160} />
       <Composition id="QuantumQubitLattice" component={QuantumQubitLattice} durationInFrames={600} fps={60} width={3840} height={2160} />
       <Composition id="CyberShield" component={CyberShield} durationInFrames={600} fps={60} width={3840} height={2160} />
+      <Composition id="FiberOpticStream" component={FiberOpticStream} durationInFrames={600} fps={60} width={3840} height={2160} />
     </>
   );
 };
