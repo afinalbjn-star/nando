@@ -10,9 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - WaveLatticeOlive
-          - WaveLatticeCyber
-          - WaveLatticeGold
+          - GearCluster
 
     steps:
       - name: Checkout
