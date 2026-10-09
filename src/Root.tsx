@@ -159,6 +159,7 @@ import { MolecularNetwork } from './components/MolecularNetwork';
 import { WaveLattice } from './components/WaveLattice';
 import { GearCluster } from './components/GearCluster';
 import { NodeNetworkGhost, NodeNetworkNeon, NodeNetworkGold } from './components/TriangleNodeNetwork';
+import { BarChartRace } from './components/BarChartRace';
 import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
 
@@ -3614,6 +3615,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="NodeNetworkGhost" component={() => <NodeNetworkGhost />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
       <Composition id="NodeNetworkNeon" component={() => <NodeNetworkNeon />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
       <Composition id="NodeNetworkGold" component={() => <NodeNetworkGold />} durationInFrames={DURATION} fps={FPS} width={3840} height={2160} />
+      <Composition id="BarChartRace" component={BarChartRace} durationInFrames={300} fps={FPS} width={1920} height={1080} />
     </>
   );
 };
