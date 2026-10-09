@@ -245,7 +245,7 @@ export const GearCluster: React.FC<{ width?: number; height?: number; totalFrame
         bevelEnabled: true,
         bevelSize: 0.08,
         bevelThickness: 0.08,
-        bevelSegments: 4,
+        bevelSegments: 1, // Optimized for 200+ instances
       });
       geo.center(); 
       dict[`${t.t}_${t.s}`] = geo;
