@@ -7,22 +7,23 @@ import { useThree } from '@react-three/fiber';
 
 /**
  * GearCluster — an elegant, interlocking 3D mechanical gear system.
- * Generates involute-style spur gears with procedural spokes and meshes them perfectly.
+ * Updated: Much more complex (16 gears, multiple branches) and thicker gears.
  */
 
-const MODULE = 0.25; // Scale of the teeth
+const MODULE = 0.25; 
 const TOOTH_DEPTH = MODULE * 1.25;
+const GEAR_DEPTH = 1.4; // Thicker gears!
 const TAU = Math.PI * 2;
 
 interface GearDef {
   id: number;
-  t: number;      // teeth
-  s: number;      // spokes
+  t: number;      
+  s: number;      
   x: number;
   y: number;
   z: number;
-  ratio: number;  // gear ratio relative to master (id 0)
-  phase: number;  // rotational offset for meshing
+  ratio: number;  
+  phase: number;  
 }
 
 // Procedural Gear Shape Generator
@@ -51,13 +52,13 @@ const buildGearShape = (teeth: number, spokes: number) => {
 
   // Center hole for shaft
   const shaftHole = new THREE.Path();
-  shaftHole.moveTo(MODULE * 2.5, 0);
-  shaftHole.absarc(0, 0, MODULE * 2.5, 0, TAU, true);
+  shaftHole.moveTo(MODULE * 3.0, 0);
+  shaftHole.absarc(0, 0, MODULE * 3.0, 0, TAU, true);
   shape.holes.push(shaftHole);
 
   // Spoke cutouts
   if (spokes > 0) {
-    const hubR = MODULE * 4.5;
+    const hubR = MODULE * 5.5;
     const rimR = rRoot - MODULE * 2.5;
     
     if (rimR > hubR + MODULE) {
@@ -85,45 +86,53 @@ const buildGearShape = (teeth: number, spokes: number) => {
 // Gear Train Layout Planner
 const getGearSetup = (): GearDef[] => {
   const g: GearDef[] = [];
-  const add = (id: number, t: number, s: number, x: number, y: number, z: number, ratio: number, phase: number) => {
+  
+  const pushG = (id: number, t: number, s: number, x: number, y: number, z: number, ratio: number, phase: number) => {
     g.push({ id, t, s, x, y, z, ratio, phase });
   };
 
+  const meshGear = (id: number, pid: number, t: number, s: number, angleDeg: number, z: number, phaseAdjust: number) => {
+    const p = g.find(gear => gear.id === pid)!;
+    const dist = (p.t + t) * MODULE;
+    const angle = angleDeg * Math.PI / 180;
+    const x = p.x + Math.cos(angle) * dist;
+    const y = p.y + Math.sin(angle) * dist;
+    const ratio = p.ratio * (-p.t / t);
+    g.push({ id, t, s, x, y, z, ratio, phase: phaseAdjust });
+  };
+
+  const stackGear = (id: number, pid: number, t: number, s: number, zOffset: number) => {
+    const p = g.find(gear => gear.id === pid)!;
+    const z = p.z + zOffset;
+    g.push({ id, t, s, x: p.x, y: p.y, z, ratio: p.ratio, phase: 0 });
+  };
+
+  // Build a massive, deeply interconnected cluster
+  const Z_STEP = 1.8; // Z offset for stacked gears
+
   // G0: Master gear
-  add(0, 36, 6, 0, 0, 0, 1, 0);
+  pushG(0, 48, 8, 0, 0, 0, 1, 0);
 
-  // G1: Meshes with G0 at 0 degrees
-  const d1 = (36 + 18) * MODULE; // 13.5
-  add(1, 18, 0, d1, 0, 0, -2, 0.08);
+  // --- Branch 1 (Right Side) ---
+  meshGear(1, 0, 18, 0, 0, 0, 0.1); 
+  stackGear(2, 1, 36, 6, Z_STEP);
+  meshGear(3, 2, 24, 4, 120, Z_STEP, 0.05);
+  stackGear(4, 3, 12, 0, Z_STEP * 2);
+  meshGear(5, 4, 30, 5, -30, Z_STEP * 2, 0.08);
 
-  // G2: Stacked on G1
-  add(2, 36, 6, d1, 0, 1.2, -2, 0);
+  // --- Branch 2 (Top Left Side) ---
+  meshGear(6, 0, 24, 4, 135, 0, 0.05);
+  stackGear(7, 6, 12, 0, -Z_STEP);
+  meshGear(8, 7, 36, 6, 180, -Z_STEP, 0.1);
+  stackGear(9, 8, 24, 3, -Z_STEP * 2); // 3 spokes strictly required to mathematically loop perfectly
+  meshGear(10, 9, 15, 0, 90, -Z_STEP * 2, 0.1);
 
-  // G3: Meshes with G2 at 120 degrees
-  const d3 = (36 + 18) * MODULE; // 13.5
-  const x3 = d1 + d3 * Math.cos(TAU / 3);
-  const y3 = d3 * Math.sin(TAU / 3);
-  add(3, 18, 0, x3, y3, 1.2, 4, 0.08);
-
-  // G4: Stacked on G3
-  add(4, 24, 4, x3, y3, 2.4, 4, 0);
-
-  // G5: Meshes with G0 at 210 degrees
-  const d5 = (36 + 12) * MODULE; // 12.0
-  const a5 = 210 * Math.PI / 180;
-  const x5 = 12.0 * Math.cos(a5);
-  const y5 = 12.0 * Math.sin(a5);
-  add(5, 12, 0, x5, y5, 0, -3, 0.12);
-
-  // G6: Stacked on G5
-  add(6, 24, 4, x5, y5, -1.2, -3, 0);
-
-  // G7: Meshes with G6 at 150 degrees
-  const d7 = (24 + 12) * MODULE; // 9.0
-  const a7 = 150 * Math.PI / 180;
-  const x7 = x5 + 9.0 * Math.cos(a7);
-  const y7 = y5 + 9.0 * Math.sin(a7);
-  add(7, 12, 0, x7, y7, -1.2, 6, 0.12);
+  // --- Branch 3 (Bottom Left Side) ---
+  meshGear(11, 0, 15, 0, 240, 0, 0.1);
+  stackGear(12, 11, 30, 5, Z_STEP);
+  meshGear(13, 12, 48, 8, 280, Z_STEP, 0.03); 
+  stackGear(14, 13, 18, 0, -Z_STEP);
+  meshGear(15, 14, 24, 4, 210, -Z_STEP, 0.08);
 
   return g;
 };
@@ -142,26 +151,35 @@ const SingleGear: React.FC<{ def: GearDef; u: number }> = ({ def, u }) => {
   const geo = useMemo(() => {
     const shape = buildGearShape(def.t, def.s);
     const extrudeGeo = new THREE.ExtrudeGeometry(shape, {
-      depth: 0.6,
+      depth: GEAR_DEPTH,
       bevelEnabled: true,
-      bevelSize: 0.06,
-      bevelThickness: 0.06,
-      bevelSegments: 3,
+      bevelSize: 0.08,
+      bevelThickness: 0.08,
+      bevelSegments: 4,
     });
     extrudeGeo.center(); // Center on Z axis
     return extrudeGeo;
   }, [def.t, def.s]);
 
-  // Global loop: master rotates full 360 deg (TAU). All gear ratios are integers, so it perfectly loops.
+  // Determine material color tint based on gear ID to add visual richness
+  const color = useMemo(() => {
+    if (def.id % 4 === 1) return '#5e636b'; // Light Silver
+    if (def.id % 4 === 2) return '#474036'; // Brassy/Bronze
+    if (def.id % 4 === 3) return '#2a2c30'; // Dark Iron
+    return '#3f4246'; // Standard Gunmetal
+  }, [def.id]);
+
+  // Global loop: master rotates full 360 deg (TAU). 
+  // All math constraints strictly ensure every single gear is in identical visual position at u=1.
   const rotationZ = u * TAU * def.ratio + def.phase;
 
   return (
     <mesh position={[def.x, def.y, def.z]} rotation={[0, 0, rotationZ]} castShadow receiveShadow>
       <primitive object={geo} attach="geometry" />
       <meshPhysicalMaterial 
-        color="#3d4043" 
-        metalness={0.9} 
-        roughness={0.35} 
+        color={color} 
+        metalness={0.85} 
+        roughness={0.25} 
         clearcoat={0.3} 
         clearcoatRoughness={0.2}
       />
@@ -172,7 +190,7 @@ const SingleGear: React.FC<{ def: GearDef; u: number }> = ({ def, u }) => {
 export const GearCluster: React.FC<{ width?: number; height?: number; totalFrames?: number; speed?: number }> = ({
   width = 3840,
   height = 2160,
-  totalFrames = 300,
+  totalFrames = 480, // Slower default to appreciate the complexity
   speed = 1,
 }) => {
   const frame = useCurrentFrame();
@@ -196,37 +214,37 @@ export const GearCluster: React.FC<{ width?: number; height?: number; totalFrame
       x: s.x, 
       y: s.y, 
       z: (s.zMax + s.zMin) / 2, 
-      len: Math.max(2.0, (s.zMax - s.zMin) + 1.2)
+      len: Math.max(2.0, (s.zMax - s.zMin) + GEAR_DEPTH + 1.2)
     }));
   }, [gears]);
 
-  const shaftGeo = useMemo(() => new THREE.CylinderGeometry(MODULE * 2.4, MODULE * 2.4, 1, 32), []);
-  const shaftMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: '#222', metalness: 0.8, roughness: 0.5 }), []);
+  const shaftGeo = useMemo(() => new THREE.CylinderGeometry(MODULE * 2.8, MODULE * 2.8, 1, 32), []);
+  const shaftMat = useMemo(() => new THREE.MeshPhysicalMaterial({ color: '#111', metalness: 0.9, roughness: 0.3 }), []);
 
   // Elegant camera tilt/breathing motion (seamlessly looping)
-  const tiltX = Math.sin(u * TAU) * 0.15 - 0.2;
+  const tiltX = Math.sin(u * TAU) * 0.12 - 0.25;
   const tiltY = Math.cos(u * TAU) * 0.15;
 
   return (
-    <div style={{ width, height, backgroundColor: '#0a0a0c' }}>
+    <div style={{ width, height, backgroundColor: '#060608' }}>
       <ThreeCanvas
         width={width}
         height={height}
         shadows
-        camera={{ position: [0, -15, 30], fov: 45, near: 0.1, far: 200 }}
+        camera={{ position: [0, -30, 58], fov: 42, near: 1, far: 250 }}
         gl={{ antialias: true, alpha: false }}
-        style={{ background: '#0a0a0c' }}
+        style={{ background: '#060608' }}
       >
         <EnvironmentMap />
         
-        <ambientLight intensity={0.5} color="#ffffff" />
-        <directionalLight position={[10, 20, 30]} intensity={2.0} color="#e0f0ff" castShadow shadow-bias={-0.001} />
-        <directionalLight position={[-20, -10, -20]} intensity={1.5} color="#ffeedd" />
-        <pointLight position={[0, 0, 15]} intensity={1.0} color="#ffffff" />
+        <ambientLight intensity={0.6} color="#ffffff" />
+        <directionalLight position={[15, 30, 40]} intensity={2.5} color="#dbeaff" castShadow shadow-bias={-0.002} />
+        <directionalLight position={[-25, -15, -25]} intensity={1.5} color="#ffeedd" />
+        <pointLight position={[0, 0, 20]} intensity={1.5} color="#ffffff" />
 
         <group rotation={[tiltX, tiltY, 0]}>
-          {/* Shift the entire cluster to center it in the view */}
-          <group position={[-2, 0, 0]}>
+          {/* Shift the entire massive cluster to center it perfectly in the view */}
+          <group position={[-2, 2, 0]}>
             {gears.map((g) => (
               <SingleGear key={g.id} def={g} u={u} />
             ))}
