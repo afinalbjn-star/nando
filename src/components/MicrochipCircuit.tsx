@@ -26,11 +26,22 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = uTimeUniform;
       shader.fragmentShader = `uniform float uTime;\n` + shader.fragmentShader;
+      
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <color_fragment>',
+        `
+        #include <color_fragment>
+        #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
+          diffuseColor.rgb = vec3(0.85, 0.46, 0.02); // Restore Gold!
+        #endif
+        `
+      );
+
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <emissivemap_fragment>',
         `
         #include <emissivemap_fragment>
-        #ifdef USE_COLOR
+        #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
           float traceId = vColor.r;
           float p = fract(vUv.x * 3.0 - uTime * 2.0 + traceId * 23.7);
           float glow = smoothstep(0.7, 0.95, p) * smoothstep(1.0, 0.95, p);
@@ -94,11 +105,22 @@ const LEDs = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.IUn
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = uTimeUniform;
       shader.fragmentShader = `uniform float uTime;\n` + shader.fragmentShader;
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <color_fragment>',
+        `
+        #include <color_fragment>
+        #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
+          diffuseColor.rgb = vec3(0.37, 0.64, 0.97); // Restore Blue!
+        #endif
+        `
+      );
+
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <emissivemap_fragment>',
         `
         #include <emissivemap_fragment>
-        #ifdef USE_COLOR
+        #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
           float blink = step(0.8, fract(uTime * 4.0 + vColor.r * 17.0));
           totalEmissiveRadiance *= blink;
         #endif
