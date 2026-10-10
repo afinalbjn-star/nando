@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
 import { useThree } from '@react-three/fiber';
@@ -6,248 +6,158 @@ import * as THREE from 'three';
 
 const TILE_SIZE = 80;
 
-function createCircuitTexture(size = 1024) {
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return new THREE.Texture();
-  
-  ctx.fillStyle = '#000000';
-  ctx.fillRect(0, 0, size, size);
-
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'square';
-  ctx.lineJoin = 'miter';
-
-  const paths = [];
-  const numPaths = 150;
-  const grid = 32;
-  const step = size / grid;
-
-  // Deterministic random
-  let seed = 98765;
-  const random = () => {
-    seed = (seed * 16807) % 2147483647;
-    return (seed - 1) / 2147483646;
-  };
-
-  for (let i = 0; i < numPaths; i++) {
-    let x = Math.floor(random() * grid) * step;
-    let y = Math.floor(random() * grid) * step;
-    
-    const path = [{x, y, segLen: 0}];
-    let totalLen = 0;
-    const segments = 5 + Math.floor(random() * 10);
-    let dir = Math.floor(random() * 4);
-    
-    for (let j = 0; j < segments; j++) {
-      const isDiag = random() < 0.3;
-      let nx = x, ny = y;
-      const dist = (2 + Math.floor(random() * 4)) * step;
-      
-      if (isDiag) {
-         const dx = random() < 0.5 ? 1 : -1;
-         const dy = random() < 0.5 ? 1 : -1;
-         nx += dx * dist;
-         ny += dy * dist;
-      } else {
-         if (dir === 0) ny -= dist;
-         if (dir === 1) nx += dist;
-         if (dir === 2) ny += dist;
-         if (dir === 3) nx -= dist;
-      }
-      
-      const segLen = Math.hypot(nx - x, ny - y);
-      totalLen += segLen;
-      path.push({x: nx, y: ny, segLen});
-      
-      x = nx; y = ny;
-      dir = (dir + (random() < 0.5 ? 1 : -1) + 4) % 4;
-    }
-    
-    paths.push({ id: random(), nodes: path, totalLen: Math.max(1, totalLen) });
-  }
-
-  // Draw 9 times for seamless wrapping
-  for (let ox = -1; ox <= 1; ox++) {
-    for (let oy = -1; oy <= 1; oy++) {
-      ctx.save();
-      ctx.translate(ox * size, oy * size);
-      
-      for (const p of paths) {
-        let curDist = 0;
-        for (let j = 0; j < p.nodes.length - 1; j++) {
-          const n1 = p.nodes[j];
-          const n2 = p.nodes[j+1];
-          
-          if (n1.x === n2.x && n1.y === n2.y) continue;
-
-          const grad = ctx.createLinearGradient(n1.x, n1.y, n2.x, n2.y);
-          const r1 = Math.floor((curDist / p.totalLen) * 255);
-          const g1 = Math.floor(p.id * 255);
-          
-          curDist += n2.segLen;
-          const r2 = Math.floor((curDist / p.totalLen) * 255);
-          
-          grad.addColorStop(0, `rgb(${r1}, ${g1}, 255)`);
-          grad.addColorStop(1, `rgb(${r2}, ${g1}, 255)`);
-          
-          ctx.strokeStyle = grad;
-          ctx.beginPath();
-          ctx.moveTo(n1.x, n1.y);
-          ctx.lineTo(n2.x, n2.y);
-          ctx.stroke();
-        }
-      }
-      ctx.restore();
-    }
-  }
-  
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.RepeatWrapping;
-  return tex;
+interface BoxData {
+  pos: [number, number, number];
+  rot: [number, number, number];
+  scale: [number, number, number];
+  id?: number;
 }
 
-const Board = ({ size, uTimeUniform }: { size: number, uTimeUniform: THREE.IUniform }) => {
-  const flowTexture = useMemo(() => createCircuitTexture(1024), []);
-  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
-
-  useEffect(() => {
-    if (materialRef.current) {
-      materialRef.current.onBeforeCompile = (shader) => {
-        shader.uniforms.uTime = uTimeUniform;
-        shader.uniforms.tFlow = { value: flowTexture };
-        
-        shader.fragmentShader = `
-          uniform float uTime;
-          uniform sampler2D tFlow;
-          ${shader.fragmentShader}
-        `;
-        
-        shader.fragmentShader = shader.fragmentShader.replace(
-          '#include <color_fragment>',
-          `
-          #include <color_fragment>
-          vec2 uv = vUv * 5.0; // 5x5 grid repeat
-          vec4 flowTex = texture2D(tFlow, uv);
-          float isTrace = flowTex.b;
-          vec3 gold = vec3(0.5, 0.35, 0.05); // dark gold traces
-          diffuseColor.rgb = mix(diffuseColor.rgb, gold, isTrace);
-          `
-        );
-        
-        shader.fragmentShader = shader.fragmentShader.replace(
-          '#include <emissivemap_fragment>',
-          `
-          #include <emissivemap_fragment>
-          vec2 uvE = vUv * 5.0;
-          vec4 flowTexE = texture2D(tFlow, uvE);
-          float isTraceE = flowTexE.b;
-          float dist = flowTexE.r;
-          float id = flowTexE.g;
-          
-          // Animate the pulses! uTime * 2.0 = 2 cycles per 10s (perfect integer for loop)
-          float p = fract(dist * 6.0 - uTime * 2.0 + id * 23.7);
+const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.IUniform }) => {
+  const mesh = useMemo(() => {
+    const geo = new THREE.BoxGeometry(1, 1, 1);
+    const mat = new THREE.MeshStandardMaterial({ 
+      color: '#D97706', 
+      roughness: 0.3, 
+      metalness: 1.0,
+      vertexColors: true // Enables USE_COLOR
+    });
+    
+    mat.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = uTimeUniform;
+      shader.fragmentShader = `uniform float uTime;\n` + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        `
+        #include <emissivemap_fragment>
+        #ifdef USE_COLOR
+          float traceId = vColor.r;
+          float p = fract(vUv.x * 3.0 - uTime * 2.0 + traceId * 23.7);
           float glow = smoothstep(0.7, 0.95, p) * smoothstep(1.0, 0.95, p);
-          
-          vec3 pulseColor = vec3(1.0, 0.65, 0.1) * 3.5; 
-          totalEmissiveRadiance += pulseColor * glow * isTraceE;
-          `
-        );
-        
-        shader.fragmentShader = shader.fragmentShader.replace(
-          '#include <normal_fragment_begin>',
-          `
-          #include <normal_fragment_begin>
-          float eps = 0.002;
-          vec2 uvN = vUv * 5.0;
-          float tr = texture2D(tFlow, uvN).b;
-          float tx = texture2D(tFlow, uvN + vec2(eps, 0.0)).b;
-          float ty = texture2D(tFlow, uvN + vec2(0.0, eps)).b;
-          // fake bump map for traces
-          vec3 traceNormal = normalize(vec3((tr - tx) * 8.0, (tr - ty) * 8.0, 1.0));
-          normal = normalize(normal + traceNormal);
-          `
-        );
-      };
-      materialRef.current.needsUpdate = true;
-    }
-  }, [flowTexture, uTimeUniform]);
-
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <planeGeometry args={[size * 5, size * 5]} />
-      <meshStandardMaterial ref={materialRef} color="#101014" roughness={0.7} metalness={0.3} />
-    </mesh>
-  );
+          totalEmissiveRadiance += vec3(1.0, 0.5, 0.05) * glow * 20.0;
+        #endif
+        `
+      );
+    };
+    
+    const im = new THREE.InstancedMesh(geo, mat, data.length);
+    im.castShadow = true;
+    im.receiveShadow = true;
+    
+    const dummy = new THREE.Object3D();
+    const col = new THREE.Color();
+    data.forEach((t, i) => {
+      dummy.position.set(...t.pos);
+      dummy.rotation.set(...t.rot);
+      dummy.scale.set(...t.scale);
+      dummy.updateMatrix();
+      im.setMatrixAt(i, dummy.matrix);
+      col.setRGB((t.id || 0) / 400, 0, 0);
+      im.setColorAt(i, col);
+    });
+    return im;
+  }, [data, uTimeUniform]);
+  
+  return <primitive object={mesh} />;
 };
 
-const Tile = ({ offset }: { offset: [number, number, number] }) => {
-  return (
-    <group position={offset}>
-      {/* Main CPU */}
-      <group position={[20, 0, 20]}>
-        <mesh castShadow receiveShadow position={[0, 1, 0]}>
-          <boxGeometry args={[22, 2, 22]} />
-          <meshStandardMaterial color="#18181B" roughness={0.9} />
-        </mesh>
-        <mesh castShadow receiveShadow position={[0, 2.1, 0]}>
-          <boxGeometry args={[16, 0.5, 16]} />
-          <meshStandardMaterial color="#71717A" metalness={0.9} roughness={0.3} />
-        </mesh>
-      </group>
+const SMDs = ({ data }: { data: BoxData[] }) => {
+  const mesh = useMemo(() => {
+    const geo = new THREE.BoxGeometry(1, 1, 1);
+    const mat = new THREE.MeshStandardMaterial({ color: '#71717A', roughness: 0.5, metalness: 0.8 });
+    const im = new THREE.InstancedMesh(geo, mat, data.length);
+    im.castShadow = true;
+    im.receiveShadow = true;
+    const dummy = new THREE.Object3D();
+    data.forEach((t, i) => {
+      dummy.position.set(...t.pos);
+      dummy.rotation.set(...t.rot);
+      dummy.scale.set(...t.scale);
+      dummy.updateMatrix();
+      im.setMatrixAt(i, dummy.matrix);
+    });
+    return im;
+  }, [data]);
+  return <primitive object={mesh} />;
+};
 
-      {/* IC 1 */}
-      <mesh castShadow receiveShadow position={[-20, 0.75, 10]}>
-        <boxGeometry args={[8, 1.5, 12]} />
-        <meshStandardMaterial color="#09090B" roughness={0.85} />
-      </mesh>
-      {/* IC 2 */}
-      <mesh castShadow receiveShadow position={[-10, 0.75, -25]}>
-        <boxGeometry args={[14, 1.5, 6]} />
-        <meshStandardMaterial color="#09090B" roughness={0.85} />
-      </mesh>
-      {/* IC 3 */}
-      <mesh castShadow receiveShadow position={[15, 0.6, -15]}>
-        <boxGeometry args={[6, 1.2, 6]} />
-        <meshStandardMaterial color="#09090B" roughness={0.85} />
-      </mesh>
+const LEDs = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.IUniform }) => {
+  const mesh = useMemo(() => {
+    const geo = new THREE.BoxGeometry(1, 1, 1);
+    const mat = new THREE.MeshStandardMaterial({ 
+      color: '#60A5FA', 
+      emissive: '#3B82F6', 
+      emissiveIntensity: 8, 
+      toneMapped: false, 
+      vertexColors: true 
+    });
+    mat.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = uTimeUniform;
+      shader.fragmentShader = `uniform float uTime;\n` + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        `
+        #include <emissivemap_fragment>
+        #ifdef USE_COLOR
+          float blink = step(0.8, fract(uTime * 4.0 + vColor.r * 17.0));
+          totalEmissiveRadiance *= blink;
+        #endif
+        `
+      );
+    };
+    
+    const im = new THREE.InstancedMesh(geo, mat, data.length);
+    const dummy = new THREE.Object3D();
+    const col = new THREE.Color();
+    data.forEach((t, i) => {
+      dummy.position.set(...t.pos);
+      dummy.rotation.set(...t.rot);
+      dummy.scale.set(...t.scale);
+      dummy.updateMatrix();
+      im.setMatrixAt(i, dummy.matrix);
+      col.setRGB((t.id || 0) / 400, 0, 0);
+      im.setColorAt(i, col);
+    });
+    return im;
+  }, [data, uTimeUniform]);
+  
+  return <primitive object={mesh} />;
+};
 
-      {/* Capacitors */}
-      <mesh castShadow receiveShadow position={[0, 0.5, 5]}>
-        <boxGeometry args={[2, 1, 3]} />
-        <meshStandardMaterial color="#D4D4D8" metalness={0.9} roughness={0.4} />
-      </mesh>
-      <mesh castShadow receiveShadow position={[0, 0.5, 9]}>
-        <boxGeometry args={[2, 1, 3]} />
-        <meshStandardMaterial color="#D4D4D8" metalness={0.9} roughness={0.4} />
-      </mesh>
-      <mesh castShadow receiveShadow position={[4, 0.5, 7]}>
-        <boxGeometry args={[2, 1, 3]} />
-        <meshStandardMaterial color="#D4D4D8" metalness={0.9} roughness={0.4} />
-      </mesh>
-      <mesh castShadow receiveShadow position={[-30, 1, -10]}>
-        <boxGeometry args={[3, 2, 3]} />
-        <meshStandardMaterial color="#71717A" metalness={0.5} roughness={0.6} />
-      </mesh>
+const CPUs = ({ offsets }: { offsets: [number, number, number][] }) => {
+  const mesh = useMemo(() => {
+    const geo = new THREE.BoxGeometry(1, 1, 1);
+    const matBase = new THREE.MeshStandardMaterial({ color: '#18181B', roughness: 0.9 });
+    const imBase = new THREE.InstancedMesh(geo, matBase, offsets.length);
+    imBase.castShadow = true;
+    imBase.receiveShadow = true;
+    
+    const matTop = new THREE.MeshStandardMaterial({ color: '#A1A1AA', roughness: 0.3, metalness: 0.9 });
+    const imTop = new THREE.InstancedMesh(geo, matTop, offsets.length);
+    imTop.castShadow = true;
+    imTop.receiveShadow = true;
 
-      {/* LEDs */}
-      <mesh position={[-5, 0.5, 15]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="#60A5FA" emissive="#3B82F6" emissiveIntensity={6} toneMapped={false} />
-      </mesh>
-      <mesh position={[30, 0.5, -5]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="#60A5FA" emissive="#3B82F6" emissiveIntensity={6} toneMapped={false} />
-      </mesh>
-      <mesh position={[-25, 0.5, -20]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="#60A5FA" emissive="#3B82F6" emissiveIntensity={6} toneMapped={false} />
-      </mesh>
-    </group>
-  );
+    const dummy = new THREE.Object3D();
+    offsets.forEach((offset, i) => {
+      dummy.position.set(20 + offset[0], 1, 20 + offset[2]);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(28, 2, 28);
+      dummy.updateMatrix();
+      imBase.setMatrixAt(i, dummy.matrix);
+      
+      dummy.position.set(20 + offset[0], 2.1, 20 + offset[2]);
+      dummy.scale.set(20, 0.5, 20);
+      dummy.updateMatrix();
+      imTop.setMatrixAt(i, dummy.matrix);
+    });
+    
+    const group = new THREE.Group();
+    group.add(imBase);
+    group.add(imTop);
+    return group;
+  }, [offsets]);
+  
+  return <primitive object={mesh} />;
 };
 
 const TargetCamera = () => {
@@ -268,17 +178,57 @@ export const MicrochipProcessorCircuit: React.FC<{
   const uTimeUniform = useMemo(() => new THREE.Uniform(0), []);
   uTimeUniform.value = u;
   
-  // Smooth diagonal flight: Shift the entire world opposite to flight direction
   const groupOffset = [-u * TILE_SIZE, 0, -u * TILE_SIZE] as [number, number, number];
   
-  const tiles = useMemo(() => {
-    const arr: [number, number, number][] = [];
-    for(let x = -2; x <= 2; x++) {
-      for(let z = -2; z <= 2; z++) {
-        arr.push([x * TILE_SIZE, 0, z * TILE_SIZE]);
+  const { globalTraces, globalSmds, globalLeds, tileOffsets } = useMemo(() => {
+    const traceData: BoxData[] = [];
+    const smdData: BoxData[] = [];
+    const ledData: BoxData[] = [];
+    
+    let seed = 12345;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    
+    const gridSize = 40;
+    const step = TILE_SIZE / gridSize;
+    
+    for(let i=0; i<600; i++) {
+      const x = Math.floor(rnd() * gridSize) * step - TILE_SIZE/2;
+      const z = Math.floor(rnd() * gridSize) * step - TILE_SIZE/2;
+      const len = (4 + Math.floor(rnd() * 12)) * step;
+      const type = Math.floor(rnd() * 3);
+      
+      if (type === 0) {
+        traceData.push({ pos: [x + len/2, 0.1, z], rot: [0,0,0], scale: [len, 0.2, 0.6], id: i });
+        if (rnd() < 0.2) smdData.push({ pos: [x + len, 0.3, z], rot: [0,0,0], scale: [1.2, 0.6, 1.2] });
+      } else if (type === 1) {
+        traceData.push({ pos: [x, 0.1, z + len/2], rot: [0,0,0], scale: [0.6, 0.2, len], id: i });
+        if (rnd() < 0.2) smdData.push({ pos: [x, 0.3, z + len], rot: [0,0,0], scale: [1.2, 0.6, 1.2] });
+      } else {
+        const dLen = len * 1.414;
+        const dir = rnd() < 0.5 ? 1 : -1;
+        traceData.push({ pos: [x + len/2, 0.1, z + (len/2)*dir], rot: [0, dir * Math.PI/4, 0], scale: [dLen, 0.2, 0.6], id: i });
+      }
+      if (rnd() < 0.05) ledData.push({ pos: [x, 0.5, z], rot: [0,0,0], scale: [1.2, 1.2, 1.2], id: i });
+    }
+    
+    const offsets: [number, number, number][] = [];
+    for(let x=-2; x<=2; x++) {
+      for(let z=-2; z<=2; z++) {
+        offsets.push([x * TILE_SIZE, 0, z * TILE_SIZE]);
       }
     }
-    return arr;
+    
+    const gTraces: BoxData[] = [];
+    const gSmds: BoxData[] = [];
+    const gLeds: BoxData[] = [];
+    
+    offsets.forEach(off => {
+      traceData.forEach(t => gTraces.push({ pos: [t.pos[0]+off[0], t.pos[1], t.pos[2]+off[2]], rot: t.rot, scale: t.scale, id: t.id }));
+      smdData.forEach(t => gSmds.push({ pos: [t.pos[0]+off[0], t.pos[1], t.pos[2]+off[2]], rot: t.rot, scale: t.scale }));
+      ledData.forEach(t => gLeds.push({ pos: [t.pos[0]+off[0], t.pos[1], t.pos[2]+off[2]], rot: t.rot, scale: t.scale, id: t.id }));
+    });
+    
+    return { globalTraces: gTraces, globalSmds: gSmds, globalLeds: gLeds, tileOffsets: offsets };
   }, []);
 
   return (
@@ -286,7 +236,7 @@ export const MicrochipProcessorCircuit: React.FC<{
       <ThreeCanvas
         width={width}
         height={height}
-        camera={{ position: [-30, 40, 30], fov: 45 }}
+        camera={{ position: [-35, 45, 30], fov: 40 }}
         shadows
       >
         <ambientLight intensity={0.5} />
@@ -295,25 +245,32 @@ export const MicrochipProcessorCircuit: React.FC<{
           intensity={1.8} 
           castShadow 
           shadow-mapSize={[2048, 2048]} 
-          shadow-camera-left={-150}
-          shadow-camera-right={150}
-          shadow-camera-top={150}
-          shadow-camera-bottom={-150}
+          shadow-camera-left={-100}
+          shadow-camera-right={100}
+          shadow-camera-top={100}
+          shadow-camera-bottom={-100}
           shadow-bias={-0.0005}
         />
-        <directionalLight position={[-40, 20, -40]} intensity={0.4} />
+        <directionalLight position={[-40, 20, -40]} intensity={0.3} />
 
         <TargetCamera />
 
+        {/* Static Base Board */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.1, 0]}>
+          <planeGeometry args={[1000, 1000]} />
+          <meshStandardMaterial color="#0A0A0C" roughness={0.8} />
+        </mesh>
+
+        {/* Sliding Circuit Components */}
         <group position={groupOffset}>
-          <Board size={TILE_SIZE} uTimeUniform={uTimeUniform} />
-          {tiles.map((pos, i) => (
-            <Tile key={i} offset={pos} />
-          ))}
+          <Traces data={globalTraces} uTimeUniform={uTimeUniform} />
+          <SMDs data={globalSmds} />
+          <LEDs data={globalLeds} uTimeUniform={uTimeUniform} />
+          <CPUs offsets={tileOffsets} />
         </group>
         
-        {/* Deep fog to blend edges smoothly and give macro depth */}
-        <fog attach="fog" args={['#090D16', 70, 140]} />
+        {/* Depth of Field Fog */}
+        <fog attach="fog" args={['#090D16', 60, 150]} />
       </ThreeCanvas>
     </AbsoluteFill>
   );

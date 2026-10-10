@@ -80137,207 +80137,140 @@ const BinaryMatrixWaterfall = ({
 
 
 const TILE_SIZE = 80;
-function createCircuitTexture(size = 1024) {
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return new Texture();
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(0, 0, size, size);
-  ctx.lineWidth = 6;
-  ctx.lineCap = "square";
-  ctx.lineJoin = "miter";
-  const paths = [];
-  const numPaths = 150;
-  const grid = 32;
-  const step = size / grid;
-  let seed = 98765;
-  const random = () => {
-    seed = seed * 16807 % 2147483647;
-    return (seed - 1) / 2147483646;
-  };
-  for (let i = 0; i < numPaths; i++) {
-    let x = Math.floor(random() * grid) * step;
-    let y = Math.floor(random() * grid) * step;
-    const path = [{ x, y, segLen: 0 }];
-    let totalLen = 0;
-    const segments = 5 + Math.floor(random() * 10);
-    let dir = Math.floor(random() * 4);
-    for (let j = 0; j < segments; j++) {
-      const isDiag = random() < 0.3;
-      let nx = x, ny = y;
-      const dist = (2 + Math.floor(random() * 4)) * step;
-      if (isDiag) {
-        const dx = random() < 0.5 ? 1 : -1;
-        const dy = random() < 0.5 ? 1 : -1;
-        nx += dx * dist;
-        ny += dy * dist;
-      } else {
-        if (dir === 0) ny -= dist;
-        if (dir === 1) nx += dist;
-        if (dir === 2) ny += dist;
-        if (dir === 3) nx -= dist;
-      }
-      const segLen = Math.hypot(nx - x, ny - y);
-      totalLen += segLen;
-      path.push({ x: nx, y: ny, segLen });
-      x = nx;
-      y = ny;
-      dir = (dir + (random() < 0.5 ? 1 : -1) + 4) % 4;
-    }
-    paths.push({ id: random(), nodes: path, totalLen: Math.max(1, totalLen) });
-  }
-  for (let ox = -1; ox <= 1; ox++) {
-    for (let oy = -1; oy <= 1; oy++) {
-      ctx.save();
-      ctx.translate(ox * size, oy * size);
-      for (const p of paths) {
-        let curDist = 0;
-        for (let j = 0; j < p.nodes.length - 1; j++) {
-          const n1 = p.nodes[j];
-          const n2 = p.nodes[j + 1];
-          if (n1.x === n2.x && n1.y === n2.y) continue;
-          const grad = ctx.createLinearGradient(n1.x, n1.y, n2.x, n2.y);
-          const r1 = Math.floor(curDist / p.totalLen * 255);
-          const g1 = Math.floor(p.id * 255);
-          curDist += n2.segLen;
-          const r2 = Math.floor(curDist / p.totalLen * 255);
-          grad.addColorStop(0, `rgb(${r1}, ${g1}, 255)`);
-          grad.addColorStop(1, `rgb(${r2}, ${g1}, 255)`);
-          ctx.strokeStyle = grad;
-          ctx.beginPath();
-          ctx.moveTo(n1.x, n1.y);
-          ctx.lineTo(n2.x, n2.y);
-          ctx.stroke();
-        }
-      }
-      ctx.restore();
-    }
-  }
-  const tex = new CanvasTexture(canvas);
-  tex.wrapS = RepeatWrapping;
-  tex.wrapT = RepeatWrapping;
-  return tex;
-}
-const Board = ({ size, uTimeUniform }) => {
-  const flowTexture = (0,react.useMemo)(() => createCircuitTexture(1024), []);
-  const materialRef = (0,react.useRef)(null);
-  (0,react.useEffect)(() => {
-    if (materialRef.current) {
-      materialRef.current.onBeforeCompile = (shader) => {
-        shader.uniforms.uTime = uTimeUniform;
-        shader.uniforms.tFlow = { value: flowTexture };
-        shader.fragmentShader = `
-          uniform float uTime;
-          uniform sampler2D tFlow;
-          ${shader.fragmentShader}
-        `;
-        shader.fragmentShader = shader.fragmentShader.replace(
-          "#include <color_fragment>",
-          `
-          #include <color_fragment>
-          vec2 uv = vUv * 5.0; // 5x5 grid repeat
-          vec4 flowTex = texture2D(tFlow, uv);
-          float isTrace = flowTex.b;
-          vec3 gold = vec3(0.5, 0.35, 0.05); // dark gold traces
-          diffuseColor.rgb = mix(diffuseColor.rgb, gold, isTrace);
-          `
-        );
-        shader.fragmentShader = shader.fragmentShader.replace(
-          "#include <emissivemap_fragment>",
-          `
-          #include <emissivemap_fragment>
-          vec2 uvE = vUv * 5.0;
-          vec4 flowTexE = texture2D(tFlow, uvE);
-          float isTraceE = flowTexE.b;
-          float dist = flowTexE.r;
-          float id = flowTexE.g;
-          
-          // Animate the pulses! uTime * 2.0 = 2 cycles per 10s (perfect integer for loop)
-          float p = fract(dist * 6.0 - uTime * 2.0 + id * 23.7);
+const Traces = ({ data, uTimeUniform }) => {
+  const mesh = (0,react.useMemo)(() => {
+    const geo = new BoxGeometry(1, 1, 1);
+    const mat = new MeshStandardMaterial({
+      color: "#D97706",
+      roughness: 0.3,
+      metalness: 1,
+      vertexColors: true
+      // Enables USE_COLOR
+    });
+    mat.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = uTimeUniform;
+      shader.fragmentShader = `uniform float uTime;
+` + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <emissivemap_fragment>",
+        `
+        #include <emissivemap_fragment>
+        #ifdef USE_COLOR
+          float traceId = vColor.r;
+          float p = fract(vUv.x * 3.0 - uTime * 2.0 + traceId * 23.7);
           float glow = smoothstep(0.7, 0.95, p) * smoothstep(1.0, 0.95, p);
-          
-          vec3 pulseColor = vec3(1.0, 0.65, 0.1) * 3.5; 
-          totalEmissiveRadiance += pulseColor * glow * isTraceE;
-          `
-        );
-        shader.fragmentShader = shader.fragmentShader.replace(
-          "#include <normal_fragment_begin>",
-          `
-          #include <normal_fragment_begin>
-          float eps = 0.002;
-          vec2 uvN = vUv * 5.0;
-          float tr = texture2D(tFlow, uvN).b;
-          float tx = texture2D(tFlow, uvN + vec2(eps, 0.0)).b;
-          float ty = texture2D(tFlow, uvN + vec2(0.0, eps)).b;
-          // fake bump map for traces
-          vec3 traceNormal = normalize(vec3((tr - tx) * 8.0, (tr - ty) * 8.0, 1.0));
-          normal = normalize(normal + traceNormal);
-          `
-        );
-      };
-      materialRef.current.needsUpdate = true;
-    }
-  }, [flowTexture, uTimeUniform]);
-  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { rotation: [-Math.PI / 2, 0, 0], receiveShadow: true, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("planeGeometry", { args: [size * 5, size * 5] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { ref: materialRef, color: "#101014", roughness: 0.7, metalness: 0.3 })
-  ] });
+          totalEmissiveRadiance += vec3(1.0, 0.5, 0.05) * glow * 20.0;
+        #endif
+        `
+      );
+    };
+    const im = new InstancedMesh(geo, mat, data.length);
+    im.castShadow = true;
+    im.receiveShadow = true;
+    const dummy = new Object3D();
+    const col = new Color();
+    data.forEach((t, i) => {
+      dummy.position.set(...t.pos);
+      dummy.rotation.set(...t.rot);
+      dummy.scale.set(...t.scale);
+      dummy.updateMatrix();
+      im.setMatrixAt(i, dummy.matrix);
+      col.setRGB((t.id || 0) / 400, 0, 0);
+      im.setColorAt(i, col);
+    });
+    return im;
+  }, [data, uTimeUniform]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("primitive", { object: mesh });
 };
-const Tile = ({ offset }) => {
-  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: offset, children: [
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: [20, 0, 20], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [0, 1, 0], children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [22, 2, 22] }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#18181B", roughness: 0.9 })
-      ] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [0, 2.1, 0], children: [
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [16, 0.5, 16] }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#71717A", metalness: 0.9, roughness: 0.3 })
-      ] })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [-20, 0.75, 10], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [8, 1.5, 12] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#09090B", roughness: 0.85 })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [-10, 0.75, -25], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [14, 1.5, 6] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#09090B", roughness: 0.85 })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [15, 0.6, -15], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [6, 1.2, 6] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#09090B", roughness: 0.85 })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [0, 0.5, 5], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [2, 1, 3] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#D4D4D8", metalness: 0.9, roughness: 0.4 })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [0, 0.5, 9], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [2, 1, 3] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#D4D4D8", metalness: 0.9, roughness: 0.4 })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [4, 0.5, 7], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [2, 1, 3] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#D4D4D8", metalness: 0.9, roughness: 0.4 })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [-30, 1, -10], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [3, 2, 3] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#71717A", metalness: 0.5, roughness: 0.6 })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [-5, 0.5, 15], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [1, 1, 1] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#60A5FA", emissive: "#3B82F6", emissiveIntensity: 6, toneMapped: false })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [30, 0.5, -5], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [1, 1, 1] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#60A5FA", emissive: "#3B82F6", emissiveIntensity: 6, toneMapped: false })
-    ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [-25, 0.5, -20], children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [1, 1, 1] }),
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#60A5FA", emissive: "#3B82F6", emissiveIntensity: 6, toneMapped: false })
-    ] })
-  ] });
+const SMDs = ({ data }) => {
+  const mesh = (0,react.useMemo)(() => {
+    const geo = new BoxGeometry(1, 1, 1);
+    const mat = new MeshStandardMaterial({ color: "#71717A", roughness: 0.5, metalness: 0.8 });
+    const im = new InstancedMesh(geo, mat, data.length);
+    im.castShadow = true;
+    im.receiveShadow = true;
+    const dummy = new Object3D();
+    data.forEach((t, i) => {
+      dummy.position.set(...t.pos);
+      dummy.rotation.set(...t.rot);
+      dummy.scale.set(...t.scale);
+      dummy.updateMatrix();
+      im.setMatrixAt(i, dummy.matrix);
+    });
+    return im;
+  }, [data]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("primitive", { object: mesh });
+};
+const LEDs = ({ data, uTimeUniform }) => {
+  const mesh = (0,react.useMemo)(() => {
+    const geo = new BoxGeometry(1, 1, 1);
+    const mat = new MeshStandardMaterial({
+      color: "#60A5FA",
+      emissive: "#3B82F6",
+      emissiveIntensity: 8,
+      toneMapped: false,
+      vertexColors: true
+    });
+    mat.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = uTimeUniform;
+      shader.fragmentShader = `uniform float uTime;
+` + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <emissivemap_fragment>",
+        `
+        #include <emissivemap_fragment>
+        #ifdef USE_COLOR
+          float blink = step(0.8, fract(uTime * 4.0 + vColor.r * 17.0));
+          totalEmissiveRadiance *= blink;
+        #endif
+        `
+      );
+    };
+    const im = new InstancedMesh(geo, mat, data.length);
+    const dummy = new Object3D();
+    const col = new Color();
+    data.forEach((t, i) => {
+      dummy.position.set(...t.pos);
+      dummy.rotation.set(...t.rot);
+      dummy.scale.set(...t.scale);
+      dummy.updateMatrix();
+      im.setMatrixAt(i, dummy.matrix);
+      col.setRGB((t.id || 0) / 400, 0, 0);
+      im.setColorAt(i, col);
+    });
+    return im;
+  }, [data, uTimeUniform]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("primitive", { object: mesh });
+};
+const CPUs = ({ offsets }) => {
+  const mesh = (0,react.useMemo)(() => {
+    const geo = new BoxGeometry(1, 1, 1);
+    const matBase = new MeshStandardMaterial({ color: "#18181B", roughness: 0.9 });
+    const imBase = new InstancedMesh(geo, matBase, offsets.length);
+    imBase.castShadow = true;
+    imBase.receiveShadow = true;
+    const matTop = new MeshStandardMaterial({ color: "#A1A1AA", roughness: 0.3, metalness: 0.9 });
+    const imTop = new InstancedMesh(geo, matTop, offsets.length);
+    imTop.castShadow = true;
+    imTop.receiveShadow = true;
+    const dummy = new Object3D();
+    offsets.forEach((offset, i) => {
+      dummy.position.set(20 + offset[0], 1, 20 + offset[2]);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(28, 2, 28);
+      dummy.updateMatrix();
+      imBase.setMatrixAt(i, dummy.matrix);
+      dummy.position.set(20 + offset[0], 2.1, 20 + offset[2]);
+      dummy.scale.set(20, 0.5, 20);
+      dummy.updateMatrix();
+      imTop.setMatrixAt(i, dummy.matrix);
+    });
+    const group = new Group();
+    group.add(imBase);
+    group.add(imTop);
+    return group;
+  }, [offsets]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("primitive", { object: mesh });
 };
 const TargetCamera = () => {
   useThree(({ camera }) => {
@@ -80351,21 +80284,57 @@ const MicrochipProcessorCircuit = ({ width = 3840, height = 2160, totalFrames = 
   const uTimeUniform = (0,react.useMemo)(() => new Uniform(0), []);
   uTimeUniform.value = u;
   const groupOffset = [-u * TILE_SIZE, 0, -u * TILE_SIZE];
-  const tiles = (0,react.useMemo)(() => {
-    const arr = [];
+  const { globalTraces, globalSmds, globalLeds, tileOffsets } = (0,react.useMemo)(() => {
+    const traceData = [];
+    const smdData = [];
+    const ledData = [];
+    let seed = 12345;
+    const rnd = () => {
+      seed = seed * 16807 % 2147483647;
+      return (seed - 1) / 2147483646;
+    };
+    const gridSize = 40;
+    const step = TILE_SIZE / gridSize;
+    for (let i = 0; i < 600; i++) {
+      const x = Math.floor(rnd() * gridSize) * step - TILE_SIZE / 2;
+      const z = Math.floor(rnd() * gridSize) * step - TILE_SIZE / 2;
+      const len = (4 + Math.floor(rnd() * 12)) * step;
+      const type = Math.floor(rnd() * 3);
+      if (type === 0) {
+        traceData.push({ pos: [x + len / 2, 0.1, z], rot: [0, 0, 0], scale: [len, 0.2, 0.6], id: i });
+        if (rnd() < 0.2) smdData.push({ pos: [x + len, 0.3, z], rot: [0, 0, 0], scale: [1.2, 0.6, 1.2] });
+      } else if (type === 1) {
+        traceData.push({ pos: [x, 0.1, z + len / 2], rot: [0, 0, 0], scale: [0.6, 0.2, len], id: i });
+        if (rnd() < 0.2) smdData.push({ pos: [x, 0.3, z + len], rot: [0, 0, 0], scale: [1.2, 0.6, 1.2] });
+      } else {
+        const dLen = len * 1.414;
+        const dir = rnd() < 0.5 ? 1 : -1;
+        traceData.push({ pos: [x + len / 2, 0.1, z + len / 2 * dir], rot: [0, dir * Math.PI / 4, 0], scale: [dLen, 0.2, 0.6], id: i });
+      }
+      if (rnd() < 0.05) ledData.push({ pos: [x, 0.5, z], rot: [0, 0, 0], scale: [1.2, 1.2, 1.2], id: i });
+    }
+    const offsets = [];
     for (let x = -2; x <= 2; x++) {
       for (let z = -2; z <= 2; z++) {
-        arr.push([x * TILE_SIZE, 0, z * TILE_SIZE]);
+        offsets.push([x * TILE_SIZE, 0, z * TILE_SIZE]);
       }
     }
-    return arr;
+    const gTraces = [];
+    const gSmds = [];
+    const gLeds = [];
+    offsets.forEach((off) => {
+      traceData.forEach((t) => gTraces.push({ pos: [t.pos[0] + off[0], t.pos[1], t.pos[2] + off[2]], rot: t.rot, scale: t.scale, id: t.id }));
+      smdData.forEach((t) => gSmds.push({ pos: [t.pos[0] + off[0], t.pos[1], t.pos[2] + off[2]], rot: t.rot, scale: t.scale }));
+      ledData.forEach((t) => gLeds.push({ pos: [t.pos[0] + off[0], t.pos[1], t.pos[2] + off[2]], rot: t.rot, scale: t.scale, id: t.id }));
+    });
+    return { globalTraces: gTraces, globalSmds: gSmds, globalLeds: gLeds, tileOffsets: offsets };
   }, []);
   return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: "#090D16" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
     ThreeCanvas,
     {
       width,
       height,
-      camera: { position: [-30, 40, 30], fov: 45 },
+      camera: { position: [-35, 45, 30], fov: 40 },
       shadows: true,
       children: [
         /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.5 }),
@@ -80376,20 +80345,26 @@ const MicrochipProcessorCircuit = ({ width = 3840, height = 2160, totalFrames = 
             intensity: 1.8,
             castShadow: true,
             "shadow-mapSize": [2048, 2048],
-            "shadow-camera-left": -150,
-            "shadow-camera-right": 150,
-            "shadow-camera-top": 150,
-            "shadow-camera-bottom": -150,
+            "shadow-camera-left": -100,
+            "shadow-camera-right": 100,
+            "shadow-camera-top": 100,
+            "shadow-camera-bottom": -100,
             "shadow-bias": -5e-4
           }
         ),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-40, 20, -40], intensity: 0.4 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-40, 20, -40], intensity: 0.3 }),
         /* @__PURE__ */ (0,jsx_runtime.jsx)(TargetCamera, {}),
-        /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: groupOffset, children: [
-          /* @__PURE__ */ (0,jsx_runtime.jsx)(Board, { size: TILE_SIZE, uTimeUniform }),
-          tiles.map((pos, i) => /* @__PURE__ */ (0,jsx_runtime.jsx)(Tile, { offset: pos }, i))
+        /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { rotation: [-Math.PI / 2, 0, 0], receiveShadow: true, position: [0, -0.1, 0], children: [
+          /* @__PURE__ */ (0,jsx_runtime.jsx)("planeGeometry", { args: [1e3, 1e3] }),
+          /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#0A0A0C", roughness: 0.8 })
         ] }),
-        /* @__PURE__ */ (0,jsx_runtime.jsx)("fog", { attach: "fog", args: ["#090D16", 70, 140] })
+        /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: groupOffset, children: [
+          /* @__PURE__ */ (0,jsx_runtime.jsx)(Traces, { data: globalTraces, uTimeUniform }),
+          /* @__PURE__ */ (0,jsx_runtime.jsx)(SMDs, { data: globalSmds }),
+          /* @__PURE__ */ (0,jsx_runtime.jsx)(LEDs, { data: globalLeds, uTimeUniform }),
+          /* @__PURE__ */ (0,jsx_runtime.jsx)(CPUs, { offsets: tileOffsets })
+        ] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("fog", { attach: "fog", args: ["#090D16", 60, 150] })
       ]
     }
   ) });
