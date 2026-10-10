@@ -42,7 +42,7 @@ if (true) {
 
 /***/ },
 
-/***/ 9969
+/***/ 5728
 (__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -75090,7 +75090,5330 @@ const NeuralNexus = ({
   return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", background: pal.bg[0] }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("canvas", { ref: canvasRef, width, height, style: { display: "block" } }) });
 };
 
+;// ./src/components/BlockWave.tsx
+
+
+
+
+const BlockWave_PALS = {
+  lilac: {
+    bg: "#D2D0E0",
+    blocks: ["#6B52FF", "#9E80F9", "#5E3BF3", "#64A3F6", "#8740E4", "#B490FF"]
+  },
+  ocean: {
+    bg: "#C0D8E0",
+    blocks: ["#0077B6", "#0096C7", "#48CAE4", "#90E0EF", "#03045E", "#023E8A"]
+  },
+  sunset: {
+    bg: "#E0D0C0",
+    blocks: ["#FF7B54", "#FFB26B", "#FFD56F", "#939B62", "#E05D5D", "#FF5B5B"]
+  }
+};
+const BlockWave_hexToRgb = (hex) => {
+  const bigint = parseInt(hex.replace("#", ""), 16);
+  return { r: bigint >> 16 & 255, g: bigint >> 8 & 255, b: bigint & 255 };
+};
+const rotate3D = (v, pitch, yaw, roll) => {
+  const cx = Math.cos(pitch), sx = Math.sin(pitch);
+  const y1 = v.y * cx - v.z * sx;
+  const z1 = v.y * sx + v.z * cx;
+  const cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const x2 = v.x * cy + z1 * sy;
+  const z2 = -v.x * sy + z1 * cy;
+  const cz = Math.cos(roll), sz = Math.sin(roll);
+  const x3 = x2 * cz - y1 * sz;
+  const y3 = x2 * sz + y1 * cz;
+  return { x: x3, y: y3, z: z2 };
+};
+const BlockWave = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 240,
+  speed = 1,
+  scheme = "lilac"
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const canvasRef = (0,react.useRef)(null);
+  const pal = BlockWave_PALS[scheme];
+  const u = frame / totalFrames * speed;
+  const geometry = (0,react.useMemo)(() => {
+    const w = 25;
+    const h = 450;
+    const d = 250;
+    const verts = [
+      { x: -w, y: -h, z: -d },
+      { x: w, y: -h, z: -d },
+      { x: w, y: h, z: -d },
+      { x: -w, y: h, z: -d },
+      { x: -w, y: -h, z: d },
+      { x: w, y: -h, z: d },
+      { x: w, y: h, z: d },
+      { x: -w, y: h, z: d }
+    ];
+    const faces = [
+      { id: "front", n: { x: 0, y: 0, z: -1 }, v: [0, 3, 2, 1] },
+      { id: "back", n: { x: 0, y: 0, z: 1 }, v: [5, 6, 7, 4] },
+      { id: "left", n: { x: -1, y: 0, z: 0 }, v: [4, 7, 3, 0] },
+      { id: "right", n: { x: 1, y: 0, z: 0 }, v: [1, 2, 6, 5] },
+      { id: "top", n: { x: 0, y: -1, z: 0 }, v: [4, 0, 1, 5] },
+      { id: "bottom", n: { x: 0, y: 1, z: 0 }, v: [3, 7, 6, 2] }
+    ];
+    const blocks = [];
+    const numBlocks = 160;
+    const spacing = 55;
+    const startX = -(numBlocks * spacing) / 2;
+    for (let i = 0; i < numBlocks; i++) {
+      const x = startX + i * spacing;
+      blocks.push({
+        i,
+        x,
+        baseColor: BlockWave_hexToRgb(pal.blocks[i % pal.blocks.length])
+      });
+    }
+    return { verts, faces, blocks };
+  }, [pal]);
+  (0,react.useEffect)(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = pal.bg;
+    ctx.fillRect(0, 0, width, height);
+    const focalLength = 3500;
+    const camZ = -3e3;
+    const CX = width / 2;
+    const CY = height / 2;
+    const phase = u * Math.PI * 2;
+    const project = (p) => {
+      const dz = p.z - camZ;
+      if (dz < 1) return null;
+      const s = focalLength / dz;
+      return { x: CX + p.x * s, y: CY + p.y * s, z: p.z, s };
+    };
+    const renderedBlocks = geometry.blocks.map((b) => {
+      const k = 1e-3;
+      const angle = b.x * k - phase;
+      const tx = b.x;
+      const ty = Math.sin(angle) * 500;
+      const tz = Math.cos(angle) * 350;
+      const pitch = Math.cos(angle) * Math.PI / 2.5;
+      const yaw = Math.cos(angle) * Math.PI / 8;
+      const roll = Math.sin(angle) * Math.PI / 1.5;
+      const worldVerts = geometry.verts.map((v) => {
+        const r = rotate3D(v, pitch, yaw, roll);
+        return { x: r.x + tx, y: r.y + ty, z: r.z + tz };
+      });
+      const centerZ = worldVerts.reduce((sum, v) => sum + v.z, 0) / 8;
+      const worldFaces = geometry.faces.map((f) => {
+        const wn = rotate3D(f.n, pitch, yaw, roll);
+        const fv = f.v.map((idx) => worldVerts[idx]);
+        const center = fv.reduce((acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y, z: acc.z + v.z }), { x: 0, y: 0, z: 0 });
+        center.x /= 4;
+        center.y /= 4;
+        center.z /= 4;
+        const toCam = { x: CX - center.x, y: CY - center.y, z: camZ - center.z };
+        const dist = Math.sqrt(toCam.x ** 2 + toCam.y ** 2 + toCam.z ** 2);
+        toCam.x /= dist;
+        toCam.y /= dist;
+        toCam.z /= dist;
+        const dotCam = wn.x * toCam.x + wn.y * toCam.y + wn.z * toCam.z;
+        if (dotCam <= 0) return null;
+        const lightDir = { x: -0.5, y: -0.7, z: -0.5 };
+        const lLen = Math.sqrt(lightDir.x ** 2 + lightDir.y ** 2 + lightDir.z ** 2);
+        lightDir.x /= lLen;
+        lightDir.y /= lLen;
+        lightDir.z /= lLen;
+        const diffuse = Math.max(0, wn.x * lightDir.x + wn.y * lightDir.y + wn.z * lightDir.z);
+        const ambient = 0.35;
+        const intensity = Math.min(1, ambient + diffuse * 0.75);
+        const r = Math.floor(b.baseColor.r * intensity);
+        const g = Math.floor(b.baseColor.g * intensity);
+        const bl = Math.floor(b.baseColor.b * intensity);
+        return {
+          z: center.z,
+          color: `rgb(${r},${g},${bl})`,
+          verts: fv
+        };
+      }).filter((f) => f !== null);
+      return { centerZ, faces: worldFaces };
+    });
+    renderedBlocks.sort((a, b) => b.centerZ - a.centerZ);
+    renderedBlocks.forEach((b) => {
+      b.faces.sort((f1, f2) => f2.z - f1.z);
+      b.faces.forEach((f) => {
+        if (!f) return;
+        const p0 = project(f.verts[0]);
+        const p1 = project(f.verts[1]);
+        const p2 = project(f.verts[2]);
+        const p3 = project(f.verts[3]);
+        if (p0 && p1 && p2 && p3) {
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.lineTo(p3.x, p3.y);
+          ctx.closePath();
+          ctx.fillStyle = f.color;
+          ctx.fill();
+          ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      });
+    });
+  }, [frame, width, height, u, pal, geometry]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", background: pal.bg }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("canvas", { ref: canvasRef, width, height, style: { display: "block" } }) });
+};
+
+;// ./src/components/SpiralRing.tsx
+
+
+
+
+const generatePalette = (colors) => {
+  return [...colors, ...colors.slice(1, -1).reverse()];
+};
+const SpiralRing_PALS = {
+  ocean: {
+    bg: "#9BA6B8",
+    // Soft purplish-blue-grey from reference
+    blocks: generatePalette([
+      "#00F5FF",
+      "#00D4FF",
+      "#00A3FF",
+      "#0066FF",
+      "#4D00FF"
+    ])
+  },
+  amethyst: {
+    bg: "#2A203B",
+    blocks: generatePalette([
+      "#E0B0FF",
+      "#C88EE6",
+      "#B06CCD",
+      "#984BB4",
+      "#80299B"
+    ])
+  },
+  emerald: {
+    bg: "#1A2F25",
+    blocks: generatePalette([
+      "#52FFB8",
+      "#3CE09A",
+      "#26C27D",
+      "#10A35F",
+      "#008542"
+    ])
+  }
+};
+const SpiralRing_hexToRgb = (hex) => {
+  const bigint = parseInt(hex.replace("#", ""), 16);
+  return { r: bigint >> 16 & 255, g: bigint >> 8 & 255, b: bigint & 255 };
+};
+const SpiralRing_normalize = (v) => {
+  const len = Math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2);
+  return len === 0 ? v : { x: v.x / len, y: v.y / len, z: v.z / len };
+};
+const SpiralRing_rotate3D = (v, pitch, yaw, roll) => {
+  const cx = Math.cos(pitch), sx = Math.sin(pitch);
+  const y1 = v.y * cx - v.z * sx;
+  const z1 = v.y * sx + v.z * cx;
+  const cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const x2 = v.x * cy + z1 * sy;
+  const z2 = -v.x * sy + z1 * cy;
+  const cz = Math.cos(roll), sz = Math.sin(roll);
+  const x3 = x2 * cz - y1 * sz;
+  const y3 = x2 * sz + y1 * cz;
+  return { x: x3, y: y3, z: z2 };
+};
+const SpiralRing_TAU = Math.PI * 2;
+const SpiralRing = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 240,
+  speed = 1,
+  scheme = "ocean"
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const canvasRef = (0,react.useRef)(null);
+  const pal = SpiralRing_PALS[scheme];
+  const u = frame / totalFrames * speed;
+  const geometry = (0,react.useMemo)(() => {
+    const w = 11;
+    const h = 180;
+    const d = 180;
+    const verts = [
+      { x: -w, y: -h, z: -d },
+      { x: w, y: -h, z: -d },
+      { x: w, y: h, z: -d },
+      { x: -w, y: h, z: -d },
+      { x: -w, y: -h, z: d },
+      { x: w, y: -h, z: d },
+      { x: w, y: h, z: d },
+      { x: -w, y: h, z: d }
+    ];
+    const faces = [
+      { id: "front", n: { x: 0, y: 0, z: -1 }, v: [0, 3, 2, 1] },
+      { id: "back", n: { x: 0, y: 0, z: 1 }, v: [5, 6, 7, 4] },
+      { id: "left", n: { x: -1, y: 0, z: 0 }, v: [4, 7, 3, 0] },
+      { id: "right", n: { x: 1, y: 0, z: 0 }, v: [1, 2, 6, 5] },
+      { id: "top", n: { x: 0, y: -1, z: 0 }, v: [4, 0, 1, 5] },
+      { id: "bottom", n: { x: 0, y: 1, z: 0 }, v: [3, 7, 6, 2] }
+    ];
+    const blocks = [];
+    const N = 120;
+    for (let i = 0; i < N; i++) {
+      const cIdx = Math.floor(i / N * pal.blocks.length);
+      blocks.push({
+        i,
+        baseColor: SpiralRing_hexToRgb(pal.blocks[cIdx])
+      });
+    }
+    return { verts, faces, blocks, N };
+  }, [pal]);
+  (0,react.useEffect)(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const bgGrad = ctx.createRadialGradient(width / 2, height / 2, 200, width / 2, height / 2, height);
+    bgGrad.addColorStop(0, pal.bg);
+    bgGrad.addColorStop(1, "#6A7588");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+    const focalLength = 5e3;
+    const camZ = -3500;
+    const CX = width / 2;
+    const CY = height / 2;
+    const phase = u * SpiralRing_TAU;
+    const R = 450;
+    const k = 2;
+    const project = (p) => {
+      const dz = p.z - camZ;
+      if (dz < 1) return null;
+      const s = focalLength / dz;
+      return { x: CX + p.x * s, y: CY + p.y * s, z: p.z, s };
+    };
+    const l1 = SpiralRing_normalize({ x: -1, y: -0.8, z: -0.8 });
+    const l2 = SpiralRing_normalize({ x: 0.8, y: 0.5, z: -0.2 });
+    const globalPitch = 0.1;
+    const globalYaw = 0;
+    const renderedBlocks = geometry.blocks.map((b) => {
+      const theta = b.i / geometry.N * SpiralRing_TAU;
+      const phi = k * theta + phase;
+      const worldVerts = geometry.verts.map((v) => {
+        const v1 = SpiralRing_rotate3D(v, 0, phi, 0);
+        const v2 = { x: v1.x + R, y: v1.y, z: v1.z };
+        const v3 = SpiralRing_rotate3D(v2, 0, 0, theta);
+        return SpiralRing_rotate3D(v3, globalPitch, globalYaw, 0);
+      });
+      const centerZ = worldVerts.reduce((sum, v) => sum + v.z, 0) / 8;
+      const worldFaces = geometry.faces.map((f) => {
+        const n1 = SpiralRing_rotate3D(f.n, 0, phi, 0);
+        const n2 = SpiralRing_rotate3D(n1, 0, 0, theta);
+        const wn = SpiralRing_rotate3D(n2, globalPitch, globalYaw, 0);
+        const fv = f.v.map((idx) => worldVerts[idx]);
+        const center = fv.reduce((acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y, z: acc.z + v.z }), { x: 0, y: 0, z: 0 });
+        center.x /= 4;
+        center.y /= 4;
+        center.z /= 4;
+        const toCam = SpiralRing_normalize({ x: CX - center.x, y: CY - center.y, z: camZ - center.z });
+        const dotCam = wn.x * toCam.x + wn.y * toCam.y + wn.z * toCam.z;
+        if (dotCam <= 0) return null;
+        const d1 = Math.max(0, wn.x * l1.x + wn.y * l1.y + wn.z * l1.z);
+        const d2 = Math.max(0, wn.x * l2.x + wn.y * l2.y + wn.z * l2.z);
+        const ambient = 0.2;
+        const intensity = Math.min(1, ambient + Math.pow(d1, 1.5) * 0.85 + d2 * 0.2);
+        const r = Math.floor(b.baseColor.r * intensity);
+        const g = Math.floor(b.baseColor.g * intensity);
+        const bl = Math.floor(b.baseColor.b * intensity);
+        return {
+          z: center.z,
+          color: `rgb(${r},${g},${bl})`,
+          verts: fv
+        };
+      }).filter((f) => f !== null);
+      return { centerZ, faces: worldFaces };
+    });
+    renderedBlocks.sort((a, b) => b.centerZ - a.centerZ);
+    renderedBlocks.forEach((b) => {
+      b.faces.sort((f1, f2) => f2.z - f1.z);
+      b.faces.forEach((f) => {
+        if (!f) return;
+        const p0 = project(f.verts[0]);
+        const p1 = project(f.verts[1]);
+        const p2 = project(f.verts[2]);
+        const p3 = project(f.verts[3]);
+        if (p0 && p1 && p2 && p3) {
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.lineTo(p3.x, p3.y);
+          ctx.closePath();
+          ctx.fillStyle = f.color;
+          ctx.strokeStyle = f.color;
+          ctx.lineWidth = 1;
+          ctx.fill();
+          ctx.stroke();
+        }
+      });
+    });
+  }, [frame, width, height, u, pal, geometry]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", background: "#000" }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("canvas", { ref: canvasRef, width, height, style: { display: "block" } }) });
+};
+
+;// ./src/components/CrystalCluster.tsx
+
+
+
+
+const CrystalCluster_normalize = (v) => {
+  const len = Math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2);
+  return len === 0 ? v : { x: v.x / len, y: v.y / len, z: v.z / len };
+};
+const CrystalCluster_SCHEMES = {
+  iridescent: {
+    base: { r: 25, g: 25, b: 30 },
+    bg: "#000000",
+    l1: { col: { r: 255, g: 40, b: 150 }, dir: CrystalCluster_normalize({ x: -1, y: 1, z: 0.8 }) },
+    l2: { col: { r: 30, g: 255, b: 120 }, dir: CrystalCluster_normalize({ x: 1, y: -0.5, z: 0.8 }) },
+    l3: { col: { r: 255, g: 210, b: 40 }, dir: CrystalCluster_normalize({ x: 0, y: -1, z: -0.2 }) }
+  },
+  neon: {
+    base: { r: 15, g: 20, b: 25 },
+    bg: "#05050A",
+    l1: { col: { r: 0, g: 255, b: 255 }, dir: CrystalCluster_normalize({ x: -1, y: 0.5, z: 1 }) },
+    l2: { col: { r: 255, g: 0, b: 255 }, dir: CrystalCluster_normalize({ x: 1, y: 0.5, z: 1 }) },
+    l3: { col: { r: 255, g: 255, b: 0 }, dir: CrystalCluster_normalize({ x: 0, y: -1, z: 0.2 }) }
+  },
+  obsidian: {
+    base: { r: 5, g: 5, b: 5 },
+    bg: "#080808",
+    l1: { col: { r: 255, g: 100, b: 50 }, dir: CrystalCluster_normalize({ x: -1, y: 1, z: 1 }) },
+    l2: { col: { r: 50, g: 150, b: 255 }, dir: CrystalCluster_normalize({ x: 1, y: -1, z: 1 }) },
+    l3: { col: { r: 255, g: 50, b: 150 }, dir: CrystalCluster_normalize({ x: 0, y: 1, z: -1 }) }
+  }
+};
+const CrystalCluster_rotate3D = (v, pitch, yaw, roll) => {
+  const cx = Math.cos(pitch), sx = Math.sin(pitch);
+  const y1 = v.y * cx - v.z * sx;
+  const z1 = v.y * sx + v.z * cx;
+  const cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const x2 = v.x * cy + z1 * sy;
+  const z2 = -v.x * sy + z1 * cy;
+  const cz = Math.cos(roll), sz = Math.sin(roll);
+  const x3 = x2 * cz - y1 * sz;
+  const y3 = x2 * sz + y1 * cz;
+  return { x: x3, y: y3, z: z2 };
+};
+const CrystalCluster_TAU = Math.PI * 2;
+const CrystalCluster = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 240,
+  speed = 1,
+  scheme = "iridescent"
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const canvasRef = (0,react.useRef)(null);
+  const theme = CrystalCluster_SCHEMES[scheme];
+  const u = frame / totalFrames * speed;
+  const geometry = (0,react.useMemo)(() => {
+    const spikes = [];
+    const N = 180;
+    const phi = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < N; i++) {
+      const y = 1 - i / (N - 1) * 2;
+      const radius = Math.sqrt(1 - y * y);
+      const theta = phi * i;
+      const dx = Math.cos(theta) * radius;
+      const dz = Math.sin(theta) * radius;
+      const yaw = Math.atan2(dx, dz);
+      const pitch = Math.asin(-y);
+      const r_out = 850 + Math.sin(i * 137.5) * 450;
+      const r_mid = r_out * 0.75;
+      const w = 35 + Math.sin(i * 99.1) * 20;
+      const r_in = 60;
+      const localVerts = [
+        { x: 0, y: 0, z: r_in },
+        // 0: inner root
+        { x: w, y: 0, z: r_mid },
+        // 1: right edge
+        { x: 0, y: w, z: r_mid },
+        // 2: top edge
+        { x: -w, y: 0, z: r_mid },
+        // 3: left edge
+        { x: 0, y: -w, z: r_mid },
+        // 4: bottom edge
+        { x: 0, y: 0, z: r_out }
+        // 5: outer tip
+      ];
+      const worldBaseVerts = localVerts.map((v) => {
+        const v1 = CrystalCluster_rotate3D(v, pitch, 0, 0);
+        return CrystalCluster_rotate3D(v1, 0, yaw, 0);
+      });
+      spikes.push({ verts: worldBaseVerts });
+    }
+    const faces = [
+      { v: [0, 2, 1] },
+      { v: [0, 3, 2] },
+      { v: [0, 4, 3] },
+      { v: [0, 1, 4] },
+      { v: [5, 1, 2] },
+      { v: [5, 2, 3] },
+      { v: [5, 3, 4] },
+      { v: [5, 4, 1] }
+    ];
+    return { spikes, faces };
+  }, []);
+  (0,react.useEffect)(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = theme.bg;
+    ctx.fillRect(0, 0, width, height);
+    const focalLength = 5500;
+    const camZ = -5e3;
+    const CX = width / 2;
+    const CY = height / 2;
+    const globalYaw = u * CrystalCluster_TAU;
+    const globalPitch = Math.sin(u * CrystalCluster_TAU) * 0.35;
+    const globalRoll = Math.cos(u * CrystalCluster_TAU) * 0.15;
+    const project = (p) => {
+      const dz = p.z - camZ;
+      if (dz < 1) return null;
+      const s = focalLength / dz;
+      return { x: CX + p.x * s, y: CY + p.y * s, z: p.z, s };
+    };
+    const renderedFaces = [];
+    geometry.spikes.forEach((spike) => {
+      const animVerts = spike.verts.map((v) => CrystalCluster_rotate3D(v, globalPitch, globalYaw, globalRoll));
+      geometry.faces.forEach((f) => {
+        const p0 = animVerts[f.v[0]];
+        const p1 = animVerts[f.v[1]];
+        const p2 = animVerts[f.v[2]];
+        const ux = p1.x - p0.x, uy = p1.y - p0.y, uz = p1.z - p0.z;
+        const vx = p2.x - p0.x, vy = p2.y - p0.y, vz = p2.z - p0.z;
+        let nx = uy * vz - uz * vy;
+        let ny = uz * vx - ux * vz;
+        let nz = ux * vy - uy * vx;
+        const nlen = Math.sqrt(nx * nx + ny * ny + nz * nz);
+        if (nlen > 0) {
+          nx /= nlen;
+          ny /= nlen;
+          nz /= nlen;
+        }
+        const center = {
+          x: (p0.x + p1.x + p2.x) / 3,
+          y: (p0.y + p1.y + p2.y) / 3,
+          z: (p0.z + p1.z + p2.z) / 3
+        };
+        const toCam = CrystalCluster_normalize({ x: CX - center.x, y: CY - center.y, z: camZ - center.z });
+        const dotCam = nx * toCam.x + ny * toCam.y + nz * toCam.z;
+        if (dotCam <= 0) return;
+        const d1 = Math.max(0, nx * theme.l1.dir.x + ny * theme.l1.dir.y + nz * theme.l1.dir.z);
+        const d2 = Math.max(0, nx * theme.l2.dir.x + ny * theme.l2.dir.y + nz * theme.l2.dir.z);
+        const d3 = Math.max(0, nx * theme.l3.dir.x + ny * theme.l3.dir.y + nz * theme.l3.dir.z);
+        const i1 = Math.pow(d1, 2.5);
+        const i2 = Math.pow(d2, 2.5);
+        const i3 = Math.pow(d3, 2.5);
+        const spec = Math.pow(Math.max(0, d1), 16) * 1.5 + Math.pow(Math.max(0, d2), 16) * 1.5 + Math.pow(Math.max(0, d3), 16) * 1.5;
+        let r = theme.base.r + i1 * theme.l1.col.r + i2 * theme.l2.col.r + i3 * theme.l3.col.r + spec * 255;
+        let g = theme.base.g + i1 * theme.l1.col.g + i2 * theme.l2.col.g + i3 * theme.l3.col.g + spec * 255;
+        let b = theme.base.b + i1 * theme.l1.col.b + i2 * theme.l2.col.b + i3 * theme.l3.col.b + spec * 255;
+        renderedFaces.push({
+          z: center.z,
+          color: `rgb(${Math.min(255, Math.floor(r))},${Math.min(255, Math.floor(g))},${Math.min(255, Math.floor(b))})`,
+          verts: [p0, p1, p2]
+        });
+      });
+    });
+    renderedFaces.sort((a, b) => b.z - a.z);
+    renderedFaces.forEach((f) => {
+      const p0 = project(f.verts[0]);
+      const p1 = project(f.verts[1]);
+      const p2 = project(f.verts[2]);
+      if (p0 && p1 && p2) {
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.closePath();
+        ctx.fillStyle = f.color;
+        ctx.strokeStyle = f.color;
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+      }
+    });
+  }, [frame, width, height, u, theme, geometry]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", background: theme.bg }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("canvas", { ref: canvasRef, width, height, style: { display: "block" } }) });
+};
+
+;// ./src/components/RibbonFlow.tsx
+
+
+
+
+const RibbonFlow_SCHEMES = {
+  coral: {
+    bgTop: "#5CE1E6",
+    bgBottom: "#007A94",
+    blocks: ["#FF007A", "#FF2865", "#FF5B55", "#FF953E", "#FFC824"]
+  },
+  abyss: {
+    bgTop: "#001A33",
+    bgBottom: "#00050A",
+    blocks: ["#00F0FF", "#009DFF", "#0055FF", "#3B00FF", "#7A00FF"]
+  },
+  flora: {
+    bgTop: "#FFEBF0",
+    bgBottom: "#FFA1B8",
+    blocks: ["#00FF87", "#60E02D", "#A1C000", "#D69B00", "#FF6B00"]
+  }
+};
+const RibbonFlow_hexToRgb = (hex) => {
+  const bigint = parseInt(hex.replace("#", ""), 16);
+  return { r: bigint >> 16 & 255, g: bigint >> 8 & 255, b: bigint & 255 };
+};
+const cross = (a, b) => ({
+  x: a.y * b.z - a.z * b.y,
+  y: a.z * b.x - a.x * b.z,
+  z: a.x * b.y - a.y * b.x
+});
+const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y, z: a.z + b.z });
+const sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y, z: a.z - b.z });
+const mul = (v, s) => ({ x: v.x * s, y: v.y * s, z: v.z * s });
+const mag = (v) => Math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2);
+const RibbonFlow_norm = (v) => {
+  const m = mag(v);
+  return m === 0 ? v : mul(v, 1 / m);
+};
+const RibbonFlow_rotate3D = (v, pitch, yaw, roll) => {
+  const cx = Math.cos(pitch), sx = Math.sin(pitch);
+  const y1 = v.y * cx - v.z * sx;
+  const z1 = v.y * sx + v.z * cx;
+  const cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const x2 = v.x * cy + z1 * sy;
+  const z2 = -v.x * sy + z1 * cy;
+  const cz = Math.cos(roll), sz = Math.sin(roll);
+  const x3 = x2 * cz - y1 * sz;
+  const y3 = x2 * sz + y1 * cz;
+  return { x: x3, y: y3, z: z2 };
+};
+const RibbonFlow_TAU = Math.PI * 2;
+const RibbonFlow = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 240,
+  speed = 1,
+  scheme = "coral"
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const canvasRef = (0,react.useRef)(null);
+  const theme = RibbonFlow_SCHEMES[scheme];
+  const u = frame / totalFrames * speed;
+  const strandsData = (0,react.useMemo)(() => {
+    const strands = [];
+    const N = 220;
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1);
+      const Y = -1400 + t * 2800;
+      const theta = i * 2.39996;
+      const cT = t * (theme.blocks.length - 1);
+      const idx = Math.floor(cT);
+      const fract = cT - idx;
+      const c1 = RibbonFlow_hexToRgb(theme.blocks[idx]);
+      const c2 = RibbonFlow_hexToRgb(theme.blocks[Math.min(idx + 1, theme.blocks.length - 1)]);
+      const baseColor = {
+        r: c1.r + (c2.r - c1.r) * fract,
+        g: c1.g + (c2.g - c1.g) * fract,
+        b: c1.b + (c2.b - c1.b) * fract
+      };
+      strands.push({ Y, theta, baseColor, index: i });
+    }
+    return strands;
+  }, [theme]);
+  (0,react.useEffect)(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+    bgGrad.addColorStop(0, theme.bgTop);
+    bgGrad.addColorStop(1, theme.bgBottom);
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+    const focalLength = 5500;
+    const camZ = -5e3;
+    const CX = width / 2;
+    const CY = height / 2;
+    const phase = u * RibbonFlow_TAU;
+    const globalYaw = u * RibbonFlow_TAU;
+    const globalPitch = 0.15 + Math.sin(u * RibbonFlow_TAU) * 0.15;
+    const globalRoll = 0;
+    const project = (p) => {
+      const dz = p.z - camZ;
+      if (dz < 1) return null;
+      const s = focalLength / dz;
+      return { x: CX + p.x * s, y: CY + p.y * s, z: p.z, s };
+    };
+    const l1 = RibbonFlow_norm({ x: -1, y: 1, z: 0.8 });
+    const l2 = RibbonFlow_norm({ x: 1, y: 0.5, z: 0.3 });
+    const renderedFaces = [];
+    const SEG = 4;
+    strandsData.forEach((strand) => {
+      let currP = {
+        x: 80 * Math.cos(strand.theta),
+        y: strand.Y,
+        z: 80 * Math.sin(strand.theta)
+      };
+      const wave = Math.sin(strand.Y * 4e-3 - phase);
+      let currPitch = 0.5 + wave * 0.25;
+      let currYaw = strand.theta + wave * 0.15;
+      for (let s = 0; s < SEG; s++) {
+        const L = 250;
+        const W = 45;
+        const D = 18;
+        const dir = {
+          x: Math.cos(currPitch) * Math.sin(currYaw),
+          y: Math.sin(currPitch),
+          z: Math.cos(currPitch) * Math.cos(currYaw)
+        };
+        const nextP = add(currP, mul(dir, L));
+        const F = RibbonFlow_norm(sub(nextP, currP));
+        let U = { x: 0, y: 1, z: 0 };
+        if (Math.abs(F.y) > 0.99) U = { x: 1, y: 0, z: 0 };
+        const R_vec = RibbonFlow_norm(cross(U, F));
+        const V_vec = RibbonFlow_norm(cross(F, R_vec));
+        const wR = mul(R_vec, W / 2);
+        const dV = mul(V_vec, D / 2);
+        const localVerts = [
+          sub(sub(currP, wR), dV),
+          add(sub(currP, wR), dV),
+          add(add(currP, wR), dV),
+          sub(add(currP, wR), dV),
+          sub(sub(nextP, wR), dV),
+          add(sub(nextP, wR), dV),
+          add(add(nextP, wR), dV),
+          sub(add(nextP, wR), dV)
+        ];
+        const boxVerts = localVerts.map((v) => RibbonFlow_rotate3D(v, globalPitch, globalYaw, globalRoll));
+        const faces = [
+          [0, 3, 2, 1],
+          // Base
+          [4, 5, 6, 7],
+          // Tip
+          [0, 1, 5, 4],
+          // Bottom
+          [1, 2, 6, 5],
+          // Right
+          [2, 3, 7, 6],
+          // Top
+          [3, 0, 4, 7]
+          // Left
+        ];
+        faces.forEach((f) => {
+          const p0 = boxVerts[f[0]], p1 = boxVerts[f[1]], p2 = boxVerts[f[2]], p3 = boxVerts[f[3]];
+          const ux = p1.x - p0.x, uy = p1.y - p0.y, uz = p1.z - p0.z;
+          const vx = p2.x - p0.x, vy = p2.y - p0.y, vz = p2.z - p0.z;
+          let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+          const nlen = Math.sqrt(nx * nx + ny * ny + nz * nz);
+          if (nlen > 0) {
+            nx /= nlen;
+            ny /= nlen;
+            nz /= nlen;
+          }
+          const cx = (p0.x + p1.x + p2.x + p3.x) / 4;
+          const cy = (p0.y + p1.y + p2.y + p3.y) / 4;
+          const cz = (p0.z + p1.z + p2.z + p3.z) / 4;
+          const toCam = RibbonFlow_norm({ x: CX - cx, y: CY - cy, z: camZ - cz });
+          const dotCam = nx * toCam.x + ny * toCam.y + nz * toCam.z;
+          if (dotCam <= 0) return;
+          const d1 = Math.max(0, nx * l1.x + ny * l1.y + nz * l1.z);
+          const d2 = Math.max(0, nx * l2.x + ny * l2.y + nz * l2.z);
+          const ambientOcclusion = 0.35 + 0.65 * (s / (SEG - 1));
+          const intensity = Math.min(1, 0.2 + d1 * 0.75 + d2 * 0.25) * ambientOcclusion;
+          const r = Math.floor(strand.baseColor.r * intensity);
+          const g = Math.floor(strand.baseColor.g * intensity);
+          const b = Math.floor(strand.baseColor.b * intensity);
+          renderedFaces.push({
+            z: cz,
+            color: `rgb(${r},${g},${b})`,
+            verts: [p0, p1, p2, p3]
+          });
+        });
+        currP = nextP;
+        currPitch -= 0.35;
+        currYaw += 0.2;
+      }
+    });
+    renderedFaces.sort((a, b) => b.z - a.z);
+    renderedFaces.forEach((f) => {
+      const proj = f.verts.map(project);
+      if (proj.every((p) => p !== null)) {
+        ctx.beginPath();
+        ctx.moveTo(proj[0].x, proj[0].y);
+        ctx.lineTo(proj[1].x, proj[1].y);
+        ctx.lineTo(proj[2].x, proj[2].y);
+        ctx.lineTo(proj[3].x, proj[3].y);
+        ctx.closePath();
+        ctx.fillStyle = f.color;
+        ctx.strokeStyle = f.color;
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+      }
+    });
+  }, [frame, width, height, u, theme, strandsData]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", background: theme.bgTop }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("canvas", { ref: canvasRef, width, height, style: { display: "block" } }) });
+};
+
+;// ./src/components/LotusBloom.tsx
+
+
+
+
+const LotusBloom_SCHEMES = {
+  lotus: {
+    bgTop: "#150A26",
+    bgBottom: "#05020A",
+    core: "#FFFBE6",
+    rings: [
+      { N: 6, scale: 0.35, basePitch: 0.1, color: "#FFF3B0" },
+      { N: 8, scale: 0.6, basePitch: 0.4, color: "#FFB3D9" },
+      { N: 12, scale: 0.85, basePitch: 0.7, color: "#F772B5" },
+      { N: 16, scale: 1.1, basePitch: 1, color: "#D64096" },
+      { N: 20, scale: 1.35, basePitch: 1.25, color: "#9E2A70" }
+    ]
+  },
+  crystal: {
+    bgTop: "#0B1A2E",
+    bgBottom: "#02060A",
+    core: "#E6FBFF",
+    rings: [
+      { N: 6, scale: 0.35, basePitch: 0.1, color: "#B0F3FF" },
+      { N: 8, scale: 0.6, basePitch: 0.4, color: "#B3D9FF" },
+      { N: 12, scale: 0.85, basePitch: 0.7, color: "#72B5F7" },
+      { N: 16, scale: 1.1, basePitch: 1, color: "#4096D6" },
+      { N: 20, scale: 1.35, basePitch: 1.25, color: "#2A709E" }
+    ]
+  },
+  ember: {
+    bgTop: "#260A0A",
+    bgBottom: "#0A0202",
+    core: "#FFF1E6",
+    rings: [
+      { N: 6, scale: 0.35, basePitch: 0.1, color: "#FFD3B0" },
+      { N: 8, scale: 0.6, basePitch: 0.4, color: "#FF9B73" },
+      { N: 12, scale: 0.85, basePitch: 0.7, color: "#F75C3A" },
+      { N: 16, scale: 1.1, basePitch: 1, color: "#D62A1A" },
+      { N: 20, scale: 1.35, basePitch: 1.25, color: "#9E150B" }
+    ]
+  }
+};
+const LotusBloom_hexToRgb = (hex) => {
+  const bigint = parseInt(hex.replace("#", ""), 16);
+  return { r: bigint >> 16 & 255, g: bigint >> 8 & 255, b: bigint & 255 };
+};
+const LotusBloom_mul = (v, s) => ({ x: v.x * s, y: v.y * s, z: v.z * s });
+const LotusBloom_norm = (v) => {
+  const m = Math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2);
+  return m === 0 ? v : LotusBloom_mul(v, 1 / m);
+};
+const LotusBloom_rotate3D = (v, pitch, yaw, roll) => {
+  const cx = Math.cos(pitch), sx = Math.sin(pitch);
+  const y1 = v.y * cx - v.z * sx;
+  const z1 = v.y * sx + v.z * cx;
+  const cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const x2 = v.x * cy + z1 * sy;
+  const z2 = -v.x * sy + z1 * cy;
+  const cz = Math.cos(roll), sz = Math.sin(roll);
+  const x3 = x2 * cz - y1 * sz;
+  const y3 = x2 * sz + y1 * cz;
+  return { x: x3, y: y3, z: z2 };
+};
+const LotusBloom_TAU = Math.PI * 2;
+const LotusBloom = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 240,
+  speed = 1,
+  scheme = "lotus"
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const canvasRef = (0,react.useRef)(null);
+  const theme = LotusBloom_SCHEMES[scheme];
+  const u = frame / totalFrames * speed;
+  const geometry = (0,react.useMemo)(() => {
+    const H = 600;
+    const W = 280;
+    const B = 220;
+    const baseVerts = [
+      { x: 0, y: 0, z: 0 },
+      // 0: Base
+      { x: -W, y: H * 0.45, z: B * 0.7 },
+      // 1: Left
+      { x: W, y: H * 0.45, z: B * 0.7 },
+      // 2: Right
+      { x: 0, y: H * 0.5, z: B },
+      // 3: Center Spine
+      { x: 0, y: H, z: B * 1.5 }
+      // 4: Tip
+    ];
+    const petalFaces = [
+      [0, 1, 3],
+      [0, 3, 2],
+      [1, 4, 3],
+      [3, 4, 2]
+    ];
+    const particles = Array.from({ length: 80 }).map(() => ({
+      x: (Math.random() - 0.5) * 600,
+      z: (Math.random() - 0.5) * 600,
+      yStart: Math.random(),
+      speed: 0.5 + Math.random() * 1.5,
+      size: 2 + Math.random() * 6
+    }));
+    return { baseVerts, petalFaces, particles };
+  }, []);
+  (0,react.useEffect)(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+    bgGrad.addColorStop(0, theme.bgTop);
+    bgGrad.addColorStop(1, theme.bgBottom);
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+    const focalLength = 5e3;
+    const camZ = -5500;
+    const CX = width / 2;
+    const CY = height * 0.6;
+    const globalYaw = u * LotusBloom_TAU;
+    const camPitch = -0.15;
+    const project = (p) => {
+      const dz = p.z - camZ;
+      if (dz < 1) return null;
+      const s = focalLength / dz;
+      return { x: CX + p.x * s, y: CY - p.y * s, z: p.z, s };
+    };
+    const l1 = LotusBloom_norm({ x: 0, y: 1, z: 0.2 });
+    const l2 = LotusBloom_norm({ x: 0.5, y: 0.5, z: -1 });
+    const renderList = [];
+    theme.rings.forEach((ring, rIdx) => {
+      const currentPitch = ring.basePitch + Math.sin(u * LotusBloom_TAU - rIdx * 0.9) * 0.12;
+      for (let i = 0; i < ring.N; i++) {
+        const yaw = i / ring.N * LotusBloom_TAU;
+        const petalWorldVerts = geometry.baseVerts.map((v) => {
+          const scaled = LotusBloom_mul(v, ring.scale);
+          const pitched = LotusBloom_rotate3D(scaled, currentPitch, 0, 0);
+          return LotusBloom_rotate3D(pitched, 0, yaw, 0);
+        });
+        geometry.petalFaces.forEach((f) => {
+          const p0 = petalWorldVerts[f[0]];
+          const p1 = petalWorldVerts[f[1]];
+          const p2 = petalWorldVerts[f[2]];
+          const ux = p1.x - p0.x, uy = p1.y - p0.y, uz = p1.z - p0.z;
+          const vx = p2.x - p0.x, vy = p2.y - p0.y, vz = p2.z - p0.z;
+          let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+          const nlen = Math.sqrt(nx * nx + ny * ny + nz * nz);
+          if (nlen > 0) {
+            nx /= nlen;
+            ny /= nlen;
+            nz /= nlen;
+          }
+          const baseCol = LotusBloom_hexToRgb(ring.color);
+          const d1 = Math.abs(nx * l1.x + ny * l1.y + nz * l1.z);
+          const d2 = Math.abs(nx * l2.x + ny * l2.y + nz * l2.z);
+          const ambient = 0.65;
+          const intensity = Math.min(1, ambient + d1 * 0.4 + d2 * 0.2);
+          const colorStr = `rgb(${Math.floor(baseCol.r * intensity)},${Math.floor(baseCol.g * intensity)},${Math.floor(baseCol.b * intensity)})`;
+          const rp0 = LotusBloom_rotate3D(p0, camPitch, globalYaw, 0);
+          const rp1 = LotusBloom_rotate3D(p1, camPitch, globalYaw, 0);
+          const rp2 = LotusBloom_rotate3D(p2, camPitch, globalYaw, 0);
+          const cz = (rp0.z + rp1.z + rp2.z) / 3;
+          renderList.push({ type: "poly", z: cz, color: colorStr, verts: [rp0, rp1, rp2], alpha: 1 });
+          const ref0 = { x: p0.x, y: -p0.y, z: p0.z };
+          const ref1 = { x: p1.x, y: -p1.y, z: p1.z };
+          const ref2 = { x: p2.x, y: -p2.y, z: p2.z };
+          const rref0 = LotusBloom_rotate3D(ref0, camPitch, globalYaw, 0);
+          const rref1 = LotusBloom_rotate3D(ref1, camPitch, globalYaw, 0);
+          const rref2 = LotusBloom_rotate3D(ref2, camPitch, globalYaw, 0);
+          const rfcz = (rref0.z + rref1.z + rref2.z) / 3;
+          renderList.push({ type: "poly", z: rfcz, color: colorStr, verts: [rref0, rref2, rref1], alpha: 0.35 });
+        });
+      }
+    });
+    geometry.particles.forEach((p) => {
+      const yProgress = (p.yStart + u * p.speed) % 1;
+      const y = 50 + yProgress * 1500;
+      const opacity = Math.sin(yProgress * Math.PI);
+      const pX = p.x + Math.sin(y * 5e-3 + p.yStart * LotusBloom_TAU) * 150;
+      const pZ = p.z + Math.cos(y * 5e-3 + p.yStart * LotusBloom_TAU) * 150;
+      const pWorld = { x: pX, y, z: pZ };
+      const pCam = LotusBloom_rotate3D(pWorld, camPitch, globalYaw, 0);
+      renderList.push({ type: "particle", z: pCam.z, pCam, size: p.size, opacity, color: theme.core });
+      const pRefWorld = { x: pX, y: -y, z: pZ };
+      const pRefCam = LotusBloom_rotate3D(pRefWorld, camPitch, globalYaw, 0);
+      renderList.push({ type: "particle", z: pRefCam.z, pCam: pRefCam, size: p.size, opacity: opacity * 0.3, color: theme.core });
+    });
+    const coreCam = LotusBloom_rotate3D({ x: 0, y: 80, z: 0 }, camPitch, globalYaw, 0);
+    renderList.push({ type: "core", z: coreCam.z, pCam: coreCam, isReflect: false });
+    const coreRefCam = LotusBloom_rotate3D({ x: 0, y: -80, z: 0 }, camPitch, globalYaw, 0);
+    renderList.push({ type: "core", z: coreRefCam.z, pCam: coreRefCam, isReflect: true });
+    renderList.sort((a, b) => b.z - a.z);
+    renderList.forEach((item) => {
+      if (item.type === "poly") {
+        const p0 = project(item.verts[0]);
+        const p1 = project(item.verts[1]);
+        const p2 = project(item.verts[2]);
+        if (p0 && p1 && p2) {
+          ctx.globalAlpha = item.alpha;
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.closePath();
+          ctx.fillStyle = item.color;
+          ctx.strokeStyle = item.color;
+          ctx.lineWidth = 1;
+          ctx.fill();
+          ctx.stroke();
+        }
+      } else if (item.type === "particle") {
+        const p = project(item.pCam);
+        if (p) {
+          ctx.globalAlpha = item.opacity;
+          ctx.fillStyle = item.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, item.size * p.s, 0, LotusBloom_TAU);
+          ctx.fill();
+        }
+      } else if (item.type === "core") {
+        const p = project(item.pCam);
+        if (p) {
+          ctx.globalAlpha = item.isReflect ? 0.35 : 1;
+          ctx.fillStyle = theme.core;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 100 * p.s, 0, LotusBloom_TAU);
+          ctx.fill();
+          const auraGrad = ctx.createRadialGradient(p.x, p.y, 50 * p.s, p.x, p.y, 500 * p.s);
+          auraGrad.addColorStop(0, `${theme.core}99`);
+          auraGrad.addColorStop(1, `${theme.core}00`);
+          ctx.fillStyle = auraGrad;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 500 * p.s, 0, LotusBloom_TAU);
+          ctx.fill();
+        }
+      }
+    });
+    ctx.globalAlpha = 1;
+  }, [frame, width, height, u, theme, geometry]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", background: theme.bgTop }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("canvas", { ref: canvasRef, width, height, style: { display: "block" } }) });
+};
+
+;// ./src/components/VelvetDahlia.tsx
+
+
+
+
+const VelvetDahlia_SCHEMES = {
+  violet: {
+    bgTop: "#100522",
+    bgBottom: "#050011",
+    coreDark: "#0A001A",
+    // Deep center void
+    petalBase: "#3D007A",
+    petalTip: "#8C1AFF",
+    rimLight: "#D9B3FF"
+  },
+  crimson: {
+    bgTop: "#220505",
+    bgBottom: "#110000",
+    coreDark: "#1A0000",
+    petalBase: "#7A0000",
+    petalTip: "#FF1A1A",
+    rimLight: "#FFB3B3"
+  },
+  gold: {
+    bgTop: "#221A05",
+    bgBottom: "#110A00",
+    coreDark: "#1A1100",
+    petalBase: "#7A5C00",
+    petalTip: "#FFC81A",
+    rimLight: "#FFEBB3"
+  }
+};
+const VelvetDahlia_hexToRgb = (hex) => {
+  const bigint = parseInt(hex.replace("#", ""), 16);
+  return { r: bigint >> 16 & 255, g: bigint >> 8 & 255, b: bigint & 255 };
+};
+const VelvetDahlia_lerpColor = (c1, c2, t) => ({
+  r: c1.r + (c2.r - c1.r) * t,
+  g: c1.g + (c2.g - c1.g) * t,
+  b: c1.b + (c2.b - c1.b) * t
+});
+const rgbToStr = (c) => `rgb(${Math.floor(c.r)},${Math.floor(c.g)},${Math.floor(c.b)})`;
+const VelvetDahlia_norm = (v) => {
+  const m = Math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2);
+  return m === 0 ? v : { x: v.x / m, y: v.y / m, z: v.z / m };
+};
+const VelvetDahlia_rotate3D = (v, pitch, yaw, roll) => {
+  const cx = Math.cos(pitch), sx = Math.sin(pitch);
+  const y1 = v.y * cx - v.z * sx;
+  const z1 = v.y * sx + v.z * cx;
+  const cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const x2 = v.x * cy + z1 * sy;
+  const z2 = -v.x * sy + z1 * cy;
+  const cz = Math.cos(roll), sz = Math.sin(roll);
+  const x3 = x2 * cz - y1 * sz;
+  const y3 = x2 * sz + y1 * cz;
+  return { x: x3, y: y3, z: z2 };
+};
+const VelvetDahlia_TAU = Math.PI * 2;
+const VelvetDahlia = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 240,
+  speed = 1,
+  scheme = "violet"
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const canvasRef = (0,react.useRef)(null);
+  const theme = VelvetDahlia_SCHEMES[scheme];
+  const u = frame / totalFrames * speed;
+  const geometry = (0,react.useMemo)(() => {
+    const H = 550;
+    const W = 360;
+    const B = 220;
+    const v = [
+      { x: 0, y: 0, z: 0 },
+      // 0: Base
+      { x: -W, y: H * 0.5, z: B * 0.8 },
+      // 1: Control Left
+      { x: W, y: H * 0.5, z: B * 0.8 },
+      // 2: Control Right
+      { x: 0, y: H, z: B * 1.5 }
+      // 3: Tip
+    ];
+    const N = 650;
+    const petals = [];
+    const coreDark = VelvetDahlia_hexToRgb(theme.coreDark);
+    const petalBase = VelvetDahlia_hexToRgb(theme.petalBase);
+    const petalTip = VelvetDahlia_hexToRgb(theme.petalTip);
+    const rimLight = VelvetDahlia_hexToRgb(theme.rimLight);
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1);
+      const yaw = i * 2.39996;
+      const radius = Math.pow(t, 0.55) * 1650;
+      const yOffset = t * 800 - 400;
+      const basePitch = Math.pow(t, 0.9) * 1.05;
+      const scale = 0.15 + t * 0.85;
+      const tCol = Math.pow(t, 0.7);
+      const baseCol = VelvetDahlia_lerpColor(coreDark, petalBase, tCol);
+      const tipCol = VelvetDahlia_lerpColor(coreDark, petalTip, tCol);
+      const rimCol = VelvetDahlia_lerpColor(petalBase, rimLight, tCol);
+      const ao = 0.1 + 0.9 * Math.pow(t, 0.5);
+      petals.push({ t, yaw, radius, yOffset, basePitch, scale, baseCol, tipCol, rimCol, ao });
+    }
+    return { v, petals };
+  }, [theme]);
+  (0,react.useEffect)(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+    bgGrad.addColorStop(0, theme.bgTop);
+    bgGrad.addColorStop(1, theme.bgBottom);
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+    const focalLength = 6e3;
+    const camZ = -6e3;
+    const CX = width / 2;
+    const CY = height / 2 + 100;
+    const globalYaw = u * VelvetDahlia_TAU;
+    const camPitch = -0.65;
+    const project = (p) => {
+      const dz = p.z - camZ;
+      if (dz < 1) return null;
+      const s = focalLength / dz;
+      return { x: CX + p.x * s, y: CY - p.y * s, z: p.z, s };
+    };
+    const lightDir = VelvetDahlia_norm({ x: -0.5, y: 1, z: 0.8 });
+    const renderList = [];
+    geometry.petals.forEach((petal) => {
+      const wave = Math.sin(u * VelvetDahlia_TAU - petal.radius * 5e-3);
+      const currentPitch = petal.basePitch + wave * 0.12;
+      const worldVerts = geometry.v.map((vert) => {
+        const sv = { x: vert.x * petal.scale, y: vert.y * petal.scale, z: vert.z * petal.scale };
+        const pv = VelvetDahlia_rotate3D(sv, currentPitch, 0, 0);
+        const mv = { x: pv.x, y: pv.y + petal.yOffset, z: pv.z + petal.radius };
+        const yv = VelvetDahlia_rotate3D(mv, 0, petal.yaw, 0);
+        return VelvetDahlia_rotate3D(yv, camPitch, globalYaw, 0);
+      });
+      const p0 = worldVerts[0];
+      const p1 = worldVerts[1];
+      const p2 = worldVerts[2];
+      const p3 = worldVerts[3];
+      const ux = p1.x - p0.x, uy = p1.y - p0.y, uz = p1.z - p0.z;
+      const vx = p3.x - p0.x, vy = p3.y - p0.y, vz = p3.z - p0.z;
+      let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+      const nlen = Math.sqrt(nx * nx + ny * ny + nz * nz);
+      if (nlen > 0) {
+        nx /= nlen;
+        ny /= nlen;
+        nz /= nlen;
+      }
+      const cx = (p0.x + p1.x + p2.x + p3.x) / 4;
+      const cy = (p0.y + p1.y + p2.y + p3.y) / 4;
+      const cz = (p0.z + p1.z + p2.z + p3.z) / 4;
+      const vCamX = CX - cx, vCamY = CY - cy, vCamZ = camZ - cz;
+      const dotCam = nx * vCamX + ny * vCamY + nz * vCamZ;
+      const isBackFace = dotCam < 0;
+      const effNx = isBackFace ? -nx : nx;
+      const effNy = isBackFace ? -ny : ny;
+      const effNz = isBackFace ? -nz : nz;
+      const d1 = Math.max(0, effNx * lightDir.x + effNy * lightDir.y + effNz * lightDir.z);
+      const backFaceShadow = isBackFace ? 0.75 : 1;
+      const intensity = Math.min(1, (0.4 + d1 * 0.6) * petal.ao * backFaceShadow);
+      const rB = Math.floor(petal.baseCol.r * intensity);
+      const gB = Math.floor(petal.baseCol.g * intensity);
+      const bB = Math.floor(petal.baseCol.b * intensity);
+      const rT = Math.floor(petal.tipCol.r * intensity);
+      const gT = Math.floor(petal.tipCol.g * intensity);
+      const bT = Math.floor(petal.tipCol.b * intensity);
+      const rR = Math.floor(petal.rimCol.r * intensity);
+      const gR = Math.floor(petal.rimCol.g * intensity);
+      const bR = Math.floor(petal.rimCol.b * intensity);
+      renderList.push({
+        z: cz,
+        colorBase: `rgb(${rB},${gB},${bB})`,
+        colorTip: `rgb(${rT},${gT},${bT})`,
+        colorRim: `rgb(${rR},${gR},${bR})`,
+        verts: worldVerts
+      });
+    });
+    renderList.sort((a, b) => b.z - a.z);
+    renderList.forEach((item) => {
+      const pBase = project(item.verts[0]);
+      const pLeft = project(item.verts[1]);
+      const pRight = project(item.verts[2]);
+      const pTip = project(item.verts[3]);
+      if (pBase && pLeft && pRight && pTip) {
+        const grad = ctx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
+        grad.addColorStop(0, item.colorBase);
+        grad.addColorStop(1, item.colorTip);
+        ctx.beginPath();
+        ctx.moveTo(pBase.x, pBase.y);
+        ctx.quadraticCurveTo(pLeft.x, pLeft.y, pTip.x, pTip.y);
+        ctx.quadraticCurveTo(pRight.x, pRight.y, pBase.x, pBase.y);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.strokeStyle = item.colorRim;
+        ctx.lineWidth = Math.max(0.5, 6 * pTip.s);
+        ctx.stroke();
+      }
+    });
+  }, [frame, width, height, u, theme, geometry]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", background: theme.bgTop }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("canvas", { ref: canvasRef, width, height, style: { display: "block" } }) });
+};
+
+;// ./node_modules/three/examples/jsm/environments/RoomEnvironment.js
+/**
+ * https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts
+ */
+
+
+
+class RoomEnvironment extends Scene {
+
+	constructor( renderer = null ) {
+
+		super();
+
+		const geometry = new BoxGeometry();
+		geometry.deleteAttribute( 'uv' );
+
+		const roomMaterial = new MeshStandardMaterial( { side: BackSide } );
+		const boxMaterial = new MeshStandardMaterial();
+
+		let intensity = 5;
+
+		if ( renderer !== null && renderer._useLegacyLights === false ) intensity = 900;
+
+		const mainLight = new PointLight( 0xffffff, intensity, 28, 2 );
+		mainLight.position.set( 0.418, 16.199, 0.300 );
+		this.add( mainLight );
+
+		const room = new Mesh( geometry, roomMaterial );
+		room.position.set( - 0.757, 13.219, 0.717 );
+		room.scale.set( 31.713, 28.305, 28.591 );
+		this.add( room );
+
+		const box1 = new Mesh( geometry, boxMaterial );
+		box1.position.set( - 10.906, 2.009, 1.846 );
+		box1.rotation.set( 0, - 0.195, 0 );
+		box1.scale.set( 2.328, 7.905, 4.651 );
+		this.add( box1 );
+
+		const box2 = new Mesh( geometry, boxMaterial );
+		box2.position.set( - 5.607, - 0.754, - 0.758 );
+		box2.rotation.set( 0, 0.994, 0 );
+		box2.scale.set( 1.970, 1.534, 3.955 );
+		this.add( box2 );
+
+		const box3 = new Mesh( geometry, boxMaterial );
+		box3.position.set( 6.167, 0.857, 7.803 );
+		box3.rotation.set( 0, 0.561, 0 );
+		box3.scale.set( 3.927, 6.285, 3.687 );
+		this.add( box3 );
+
+		const box4 = new Mesh( geometry, boxMaterial );
+		box4.position.set( - 2.017, 0.018, 6.124 );
+		box4.rotation.set( 0, 0.333, 0 );
+		box4.scale.set( 2.002, 4.566, 2.064 );
+		this.add( box4 );
+
+		const box5 = new Mesh( geometry, boxMaterial );
+		box5.position.set( 2.291, - 0.756, - 2.621 );
+		box5.rotation.set( 0, - 0.286, 0 );
+		box5.scale.set( 1.546, 1.552, 1.496 );
+		this.add( box5 );
+
+		const box6 = new Mesh( geometry, boxMaterial );
+		box6.position.set( - 2.193, - 0.369, - 5.547 );
+		box6.rotation.set( 0, 0.516, 0 );
+		box6.scale.set( 3.875, 3.487, 2.986 );
+		this.add( box6 );
+
+
+		// -x right
+		const light1 = new Mesh( geometry, createAreaLightMaterial( 50 ) );
+		light1.position.set( - 16.116, 14.37, 8.208 );
+		light1.scale.set( 0.1, 2.428, 2.739 );
+		this.add( light1 );
+
+		// -x left
+		const light2 = new Mesh( geometry, createAreaLightMaterial( 50 ) );
+		light2.position.set( - 16.109, 18.021, - 8.207 );
+		light2.scale.set( 0.1, 2.425, 2.751 );
+		this.add( light2 );
+
+		// +x
+		const light3 = new Mesh( geometry, createAreaLightMaterial( 17 ) );
+		light3.position.set( 14.904, 12.198, - 1.832 );
+		light3.scale.set( 0.15, 4.265, 6.331 );
+		this.add( light3 );
+
+		// +z
+		const light4 = new Mesh( geometry, createAreaLightMaterial( 43 ) );
+		light4.position.set( - 0.462, 8.89, 14.520 );
+		light4.scale.set( 4.38, 5.441, 0.088 );
+		this.add( light4 );
+
+		// -z
+		const light5 = new Mesh( geometry, createAreaLightMaterial( 20 ) );
+		light5.position.set( 3.235, 11.486, - 12.541 );
+		light5.scale.set( 2.5, 2.0, 0.1 );
+		this.add( light5 );
+
+		// +y
+		const light6 = new Mesh( geometry, createAreaLightMaterial( 100 ) );
+		light6.position.set( 0.0, 20.0, 0.0 );
+		light6.scale.set( 1.0, 0.1, 1.0 );
+		this.add( light6 );
+
+	}
+
+	dispose() {
+
+		const resources = new Set();
+
+		this.traverse( ( object ) => {
+
+			if ( object.isMesh ) {
+
+				resources.add( object.geometry );
+				resources.add( object.material );
+
+			}
+
+		} );
+
+		for ( const resource of resources ) {
+
+			resource.dispose();
+
+		}
+
+	}
+
+}
+
+function createAreaLightMaterial( intensity ) {
+
+	const material = new MeshBasicMaterial();
+	material.color.setScalar( intensity );
+	return material;
+
+}
+
+
+
+;// ./src/components/AtomicStructure.tsx
+
+
+
+
+
+
+
+
+const AtomicStructure_SCHEMES = {
+  classic: {
+    background: "radial-gradient(circle at 50% 45%, #ffffff 0%, #eef2f7 55%, #d9e0ea 100%)",
+    nucleus: "#d40d0d",
+    nucleusEmissive: "#000000",
+    electron: "#1e9be0",
+    electronEmissive: "#000000",
+    ring: "#d9dde3",
+    ringRoughness: 0.18,
+    envIntensity: 1
+  },
+  neon: {
+    background: "radial-gradient(circle at 50% 45%, #1a0b33 0%, #0a0418 55%, #020007 100%)",
+    nucleus: "#ff1f8f",
+    nucleusEmissive: "#5a0030",
+    electron: "#22f2ff",
+    electronEmissive: "#0a8a99",
+    ring: "#9aa7c7",
+    ringRoughness: 0.12,
+    envIntensity: 0.8
+  },
+  gold: {
+    background: "radial-gradient(circle at 50% 45%, #2e2719 0%, #14100a 55%, #050402 100%)",
+    nucleus: "#141414",
+    nucleusEmissive: "#000000",
+    electron: "#ffb81f",
+    electronEmissive: "#2a1800",
+    ring: "#f2c14e",
+    ringRoughness: 0.15,
+    envIntensity: 1.1
+  }
+};
+const AtomicStructure_TAU = Math.PI * 2;
+const RING_R = 4;
+const RING_TUBE = 0.075;
+const NUCLEUS_R = 1.35;
+const ELECTRON_R = 0.36;
+const AtomicStructure_RINGS = [0, 1, 2].map((i) => ({
+  tilt: 1.2,
+  // tip towards the camera (radians around X)
+  roll: i * Math.PI / 3,
+  // spread 60° apart around Z
+  phase: i * AtomicStructure_TAU / 3
+  // electrons start staggered
+}));
+const Environment = () => {
+  const { gl, scene } = useThree();
+  (0,react.useMemo)(() => {
+    const pmrem = new PMREMGenerator(gl);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+  }, [gl, scene]);
+  return null;
+};
+const Atom = ({ u, theme }) => {
+  const geo = (0,react.useMemo)(
+    () => ({
+      nucleus: new SphereGeometry(NUCLEUS_R, 128, 128),
+      electron: new SphereGeometry(ELECTRON_R, 64, 64),
+      ring: new TorusGeometry(RING_R, RING_TUBE, 48, 400)
+    }),
+    []
+  );
+  const mat = (0,react.useMemo)(
+    () => ({
+      nucleus: new MeshPhysicalMaterial({
+        color: theme.nucleus,
+        emissive: theme.nucleusEmissive,
+        roughness: 0.18,
+        metalness: 0,
+        clearcoat: 1,
+        clearcoatRoughness: 0.04,
+        envMapIntensity: theme.envIntensity
+      }),
+      electron: new MeshPhysicalMaterial({
+        color: theme.electron,
+        emissive: theme.electronEmissive,
+        roughness: 0.15,
+        metalness: 0,
+        clearcoat: 1,
+        clearcoatRoughness: 0.04,
+        envMapIntensity: theme.envIntensity
+      }),
+      ring: new MeshStandardMaterial({
+        color: theme.ring,
+        metalness: 1,
+        roughness: theme.ringRoughness,
+        envMapIntensity: theme.envIntensity * 1.3
+      })
+    }),
+    [theme]
+  );
+  const spinY = u * AtomicStructure_TAU;
+  const tiltX = 0.22 * Math.sin(u * AtomicStructure_TAU);
+  const tiltZ = 0.08 * Math.sin(u * AtomicStructure_TAU * 2);
+  const pulse = 1 + 0.025 * Math.sin(u * AtomicStructure_TAU * 2);
+  const LAPS = 2;
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { rotation: [tiltX, spinY, tiltZ], children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("mesh", { geometry: geo.nucleus, material: mat.nucleus, scale: pulse, castShadow: true, receiveShadow: true }),
+    AtomicStructure_RINGS.map((r, i) => {
+      const a = r.phase + u * AtomicStructure_TAU * LAPS;
+      return (
+        // Roll around Z first, then tip around X (Euler order 'ZXY' via nesting)
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("group", { rotation: [0, 0, r.roll], children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { rotation: [r.tilt, 0, 0], children: [
+          /* @__PURE__ */ (0,jsx_runtime.jsx)("mesh", { geometry: geo.ring, material: mat.ring, castShadow: true, receiveShadow: true }),
+          [0, Math.PI].map((off, k) => /* @__PURE__ */ (0,jsx_runtime.jsx)(
+            "mesh",
+            {
+              geometry: geo.electron,
+              material: mat.electron,
+              position: [RING_R * Math.cos(a + off), RING_R * Math.sin(a + off), 0],
+              castShadow: true,
+              receiveShadow: true
+            },
+            k
+          ))
+        ] }) }, i)
+      );
+    })
+  ] });
+};
+const AtomicStructure = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 240,
+  speed = 1,
+  scheme = "classic"
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const theme = AtomicStructure_SCHEMES[scheme];
+  const u = frame / totalFrames * Math.max(1, Math.round(speed));
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, background: theme.background }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      shadows: true,
+      camera: { position: [0, 0.6, 15], fov: 38, near: 0.1, far: 100 },
+      gl: { antialias: true, alpha: true },
+      style: { background: "transparent" },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(Environment, {}),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.25 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(
+          "directionalLight",
+          {
+            position: [-6, 9, 10],
+            intensity: 2.2,
+            castShadow: true,
+            "shadow-mapSize-width": 4096,
+            "shadow-mapSize-height": 4096,
+            "shadow-bias": -4e-4,
+            "shadow-camera-left": -7,
+            "shadow-camera-right": 7,
+            "shadow-camera-top": 7,
+            "shadow-camera-bottom": -7,
+            "shadow-camera-near": 1,
+            "shadow-camera-far": 40
+          }
+        ),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [7, -4, 6], intensity: 30, color: "#ffffff" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(Atom, { u, theme })
+      ]
+    }
+  ) });
+};
+
+;// ./src/components/MolecularNetwork.tsx
+
+
+
+
+
+
+
+
+const pseudoRandom = (seed) => {
+  const x = Math.sin(seed * 999.99) * 1e4;
+  return x - Math.floor(x);
+};
+const MolecularNetwork_Environment = () => {
+  const { gl, scene } = useThree();
+  (0,react.useMemo)(() => {
+    const pmrem = new PMREMGenerator(gl);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+  }, [gl, scene]);
+  return null;
+};
+const Molecule = ({ u }) => {
+  const { mainAtoms, sideAtoms, edges } = (0,react.useMemo)(() => {
+    const geo = new IcosahedronGeometry(7, 2);
+    const vMap = /* @__PURE__ */ new Map();
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const v = new Vector3(pos.getX(i), pos.getY(i), pos.getZ(i));
+      const key = `${v.x.toFixed(2)}_${v.y.toFixed(2)}_${v.z.toFixed(2)}`;
+      if (!vMap.has(key)) vMap.set(key, v);
+    }
+    const uniqueVertices = Array.from(vMap.values());
+    const palette = [
+      "#e62020",
+      // Bright Red
+      "#053060",
+      // Dark Blue
+      "#0080c0",
+      // Med Blue
+      "#20c0e0",
+      // Light Blue/Cyan
+      "#10a080",
+      // Green
+      "#f09040",
+      // Orange
+      "#f0a0a0"
+      // Pink
+    ];
+    const mainAtoms2 = uniqueVertices.map((v, i) => {
+      const color = palette[Math.floor(pseudoRandom(i) * palette.length)];
+      return { pos: v, color };
+    });
+    const wire = new WireframeGeometry(geo);
+    const wPos = wire.attributes.position;
+    const edges2 = [];
+    const edgeMap = /* @__PURE__ */ new Set();
+    for (let i = 0; i < wPos.count; i += 2) {
+      const p1 = new Vector3(wPos.getX(i), wPos.getY(i), wPos.getZ(i));
+      const p2 = new Vector3(wPos.getX(i + 1), wPos.getY(i + 1), wPos.getZ(i + 1));
+      const k1 = `${p1.x.toFixed(2)}_${p1.y.toFixed(2)}_${p1.z.toFixed(2)}`;
+      const k2 = `${p2.x.toFixed(2)}_${p2.y.toFixed(2)}_${p2.z.toFixed(2)}`;
+      const edgeKey = k1 < k2 ? `${k1}-${k2}` : `${k2}-${k1}`;
+      if (!edgeMap.has(edgeKey)) {
+        edgeMap.add(edgeKey);
+        edges2.push({ p1, p2 });
+      }
+    }
+    const sideAtoms2 = [];
+    mainAtoms2.forEach((atom, i) => {
+      const normal = atom.pos.clone().normalize();
+      const numSide = pseudoRandom(i + 1e3) > 0.4 ? 2 : 1;
+      for (let k = 0; k < numSide; k++) {
+        const jitter = new Vector3(
+          (pseudoRandom(i + k * 10) - 0.5) * 1.2,
+          (pseudoRandom(i + k * 20) - 0.5) * 1.2,
+          (pseudoRandom(i + k * 30) - 0.5) * 1.2
+        );
+        const dir = normal.clone().add(jitter).normalize();
+        const sidePos = atom.pos.clone().add(dir.multiplyScalar(1.6));
+        const sideColor = pseudoRandom(i + k) > 0.5 ? "#ffffff" : "#ffe8e0";
+        sideAtoms2.push({ pos: sidePos, color: sideColor });
+        edges2.push({ p1: atom.pos, p2: sidePos });
+      }
+    });
+    return { mainAtoms: mainAtoms2, sideAtoms: sideAtoms2, edges: edges2 };
+  }, []);
+  const sphereGeoMain = (0,react.useMemo)(() => new SphereGeometry(0.65, 32, 32), []);
+  const sphereGeoSide = (0,react.useMemo)(() => new SphereGeometry(0.35, 24, 24), []);
+  const cylinderGeo = (0,react.useMemo)(() => new CylinderGeometry(0.15, 0.15, 1, 12), []);
+  const bondMat = (0,react.useMemo)(() => new MeshStandardMaterial({
+    color: "#e4e8ec",
+    roughness: 0.3,
+    metalness: 0.1
+  }), []);
+  const spinY = u * Math.PI * 2;
+  const tiltX = Math.sin(u * Math.PI * 2) * 0.2;
+  const tiltZ = Math.cos(u * Math.PI * 2) * 0.1;
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { rotation: [tiltX, spinY, tiltZ], children: [
+    mainAtoms.map((atom, i) => /* @__PURE__ */ (0,jsx_runtime.jsx)("mesh", { position: atom.pos, geometry: sphereGeoMain, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      "meshPhysicalMaterial",
+      {
+        color: atom.color,
+        roughness: 0.15,
+        clearcoat: 1,
+        clearcoatRoughness: 0.05,
+        metalness: 0.05
+      }
+    ) }, `m_${i}`)),
+    sideAtoms.map((atom, i) => /* @__PURE__ */ (0,jsx_runtime.jsx)("mesh", { position: atom.pos, geometry: sphereGeoSide, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      "meshPhysicalMaterial",
+      {
+        color: atom.color,
+        roughness: 0.2,
+        clearcoat: 0.8,
+        clearcoatRoughness: 0.1
+      }
+    ) }, `s_${i}`)),
+    edges.map((edge, i) => {
+      const distance = edge.p1.distanceTo(edge.p2);
+      const pos = edge.p1.clone().lerp(edge.p2, 0.5);
+      const quat = new Quaternion().setFromUnitVectors(
+        new Vector3(0, 1, 0),
+        edge.p2.clone().sub(edge.p1).normalize()
+      );
+      return /* @__PURE__ */ (0,jsx_runtime.jsx)(
+        "mesh",
+        {
+          position: pos,
+          quaternion: quat,
+          geometry: cylinderGeo,
+          material: bondMat,
+          scale: [1, distance, 1]
+        },
+        `e_${i}`
+      );
+    })
+  ] });
+};
+const MolecularNetwork = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 240,
+  speed = 1
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const u = frame / totalFrames * Math.max(1, Math.round(speed));
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, backgroundColor: "#000000" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      camera: { position: [0, 0, 18], fov: 40, near: 0.1, far: 100 },
+      gl: { antialias: true, alpha: false },
+      style: { background: "#000000" },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(MolecularNetwork_Environment, {}),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.2 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [10, 20, 15], intensity: 2.5 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-10, -10, -15], intensity: 1 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [0, 0, 10], intensity: 1.5 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(Molecule, { u })
+      ]
+    }
+  ) });
+};
+
+;// ./src/components/WaveLattice.tsx
+
+
+
+
+
+
+
+
+const THEMES = {
+  olive: {
+    bg: "#0a0d12",
+    color: "#848f72",
+    roughness: 0.6,
+    metalness: 0.2,
+    light1: "#ffffff",
+    light2: "#e6f0ff",
+    envIntensity: 0.5
+  },
+  cyber: {
+    bg: "#02000a",
+    color: "#00e5ff",
+    roughness: 0.2,
+    metalness: 0.8,
+    light1: "#ff0055",
+    light2: "#0055ff",
+    envIntensity: 1.2
+  },
+  gold: {
+    bg: "#140a00",
+    color: "#ffc400",
+    roughness: 0.15,
+    metalness: 0.9,
+    light1: "#ffffff",
+    light2: "#ff8800",
+    envIntensity: 1.5
+  }
+};
+const WaveLattice_TAU = Math.PI * 2;
+const R = 1;
+const r_inner = 0.82;
+const WaveLattice_DEPTH = 3.5;
+const WaveLattice_Environment = () => {
+  const { gl, scene } = useThree();
+  (0,react.useMemo)(() => {
+    const pmrem = new PMREMGenerator(gl);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+  }, [gl, scene]);
+  return null;
+};
+const LatticeMesh = ({ u, theme }) => {
+  const meshRef = (0,react.useRef)(null);
+  const geometry = (0,react.useMemo)(() => {
+    const shape = new Shape();
+    const hole = new Path();
+    for (let i = 0; i < 6; i++) {
+      const angle = i * Math.PI / 3 + Math.PI / 6;
+      if (i === 0) {
+        shape.moveTo(Math.cos(angle) * R, Math.sin(angle) * R);
+        hole.moveTo(Math.cos(angle) * r_inner, Math.sin(angle) * r_inner);
+      } else {
+        shape.lineTo(Math.cos(angle) * R, Math.sin(angle) * R);
+        hole.lineTo(Math.cos(angle) * r_inner, Math.sin(angle) * r_inner);
+      }
+    }
+    shape.closePath();
+    hole.closePath();
+    shape.holes.push(hole);
+    const geo = new ExtrudeGeometry(shape, {
+      depth: WaveLattice_DEPTH,
+      bevelEnabled: true,
+      bevelThickness: 0.08,
+      bevelSize: 0.08,
+      bevelSegments: 2
+    });
+    geo.center();
+    return geo;
+  }, []);
+  const grid = (0,react.useMemo)(() => {
+    const pts = [];
+    const cols = 70;
+    const rows = 60;
+    const W = Math.sqrt(3) * R;
+    const H = 2 * R;
+    for (let row = -rows / 2; row < rows / 2; row++) {
+      for (let col = -cols / 2; col < cols / 2; col++) {
+        const x = col * W + (Math.abs(row) % 2 === 1 ? W / 2 : 0);
+        const z = row * (H * 0.75);
+        pts.push({ x, z });
+      }
+    }
+    return pts;
+  }, []);
+  (0,react.useEffect)(() => {
+    if (!meshRef.current) return;
+    const dummy = new Object3D();
+    dummy.rotation.x = Math.PI / 2;
+    const angle = u * WaveLattice_TAU;
+    for (let i = 0; i < grid.length; i++) {
+      const { x, z } = grid[i];
+      const d = Math.sqrt(x * x + z * z);
+      const y1 = Math.sin(x * 0.12 + angle) * 3;
+      const y2 = Math.sin(z * 0.15 - angle * 1.5) * 2;
+      const y3 = Math.cos(d * 0.08 - angle) * 2.5;
+      const y = y1 + y2 + y3;
+      dummy.position.set(x, y, z);
+      const scaleBase = 0.95 + 0.05 * Math.sin(y * 0.5);
+      dummy.scale.set(scaleBase, scaleBase, scaleBase);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(i, dummy.matrix);
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  }, [u, grid]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(
+    "instancedMesh",
+    {
+      ref: meshRef,
+      args: [geometry, void 0, grid.length],
+      castShadow: true,
+      receiveShadow: true,
+      children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
+        "meshStandardMaterial",
+        {
+          color: theme.color,
+          roughness: theme.roughness,
+          metalness: theme.metalness,
+          envMapIntensity: theme.envIntensity
+        }
+      )
+    }
+  );
+};
+const WaveLattice = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 300,
+  speed = 1,
+  scheme = "olive"
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const theme = THEMES[scheme];
+  const u = frame / totalFrames * Math.max(1, Math.round(speed));
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, backgroundColor: theme.bg }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      shadows: true,
+      camera: { position: [0, 28, 45], fov: 38, near: 1, far: 200 },
+      gl: { antialias: true, alpha: false },
+      style: { background: theme.bg },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveLattice_Environment, {}),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.5, color: theme.light2 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(
+          "directionalLight",
+          {
+            position: [-20, 40, 20],
+            intensity: 3.5,
+            color: theme.light1,
+            castShadow: true,
+            "shadow-mapSize-width": 2048,
+            "shadow-mapSize-height": 2048,
+            "shadow-camera-left": -60,
+            "shadow-camera-right": 60,
+            "shadow-camera-top": 50,
+            "shadow-camera-bottom": -50,
+            "shadow-camera-near": 10,
+            "shadow-camera-far": 120,
+            "shadow-bias": -1e-3
+          }
+        ),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [30, 10, -30], intensity: 4, color: theme.light2 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(LatticeMesh, { u, theme }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("fog", { attach: "fog", args: [theme.bg, 60, 110] })
+      ]
+    }
+  ) });
+};
+
+;// ./src/components/GearCluster.tsx
+
+
+
+
+
+
+
+
+const MODULE = 0.2;
+const TOOTH_DEPTH = MODULE * 1.25;
+const GEAR_DEPTH = 2.5;
+const GearCluster_TAU = Math.PI * 2;
+const TEMPLATES = [
+  { t: 80, s: 6 },
+  { t: 60, s: 5 },
+  { t: 60, s: 5 },
+  { t: 48, s: 4 },
+  { t: 48, s: 4 },
+  { t: 40, s: 5 },
+  { t: 40, s: 5 },
+  { t: 30, s: 5 },
+  { t: 30, s: 5 },
+  { t: 24, s: 4 },
+  { t: 24, s: 4 },
+  { t: 20, s: 4 },
+  { t: 20, s: 4 },
+  { t: 15, s: 3 },
+  { t: 15, s: 3 },
+  { t: 12, s: 0 },
+  { t: 12, s: 0 }
+];
+function sfc32(a, b, c, d) {
+  return function() {
+    a >>>= 0;
+    b >>>= 0;
+    c >>>= 0;
+    d >>>= 0;
+    let t = (a + b | 0) + d | 0;
+    d = d + 1 | 0;
+    a = b ^ b >>> 9;
+    b = c + (c << 3) | 0;
+    c = c << 21 | c >>> 11;
+    c = c + t | 0;
+    return (t >>> 0) / 4294967296;
+  };
+}
+const buildGearShape = (teeth, spokes) => {
+  const R = teeth * MODULE;
+  const rOuter = R + MODULE;
+  const rRoot = R - TOOTH_DEPTH;
+  const pitch = GearCluster_TAU / teeth;
+  const shape = new Shape();
+  for (let i = 0; i < teeth; i++) {
+    const a0 = i * pitch - pitch * 0.25;
+    const a1 = i * pitch - pitch * 0.08;
+    const a2 = i * pitch + pitch * 0.08;
+    const a3 = i * pitch + pitch * 0.25;
+    if (i === 0) shape.moveTo(Math.cos(a0) * rRoot, Math.sin(a0) * rRoot);
+    else shape.lineTo(Math.cos(a0) * rRoot, Math.sin(a0) * rRoot);
+    shape.lineTo(Math.cos(a1) * rOuter, Math.sin(a1) * rOuter);
+    shape.lineTo(Math.cos(a2) * rOuter, Math.sin(a2) * rOuter);
+    shape.lineTo(Math.cos(a3) * rRoot, Math.sin(a3) * rRoot);
+  }
+  shape.closePath();
+  const shaftHole = new Path();
+  shaftHole.moveTo(MODULE * 2.5, 0);
+  shaftHole.absarc(0, 0, MODULE * 2.5, 0, GearCluster_TAU, true);
+  shape.holes.push(shaftHole);
+  if (spokes > 0) {
+    const hubR = MODULE * 5;
+    const rimR = rRoot - MODULE * 2.2;
+    if (rimR > hubR + MODULE) {
+      const spokeAngle = GearCluster_TAU / spokes;
+      const gapAngle = spokeAngle * 0.65;
+      for (let s = 0; s < spokes; s++) {
+        const startA = s * spokeAngle + (spokeAngle - gapAngle) / 2;
+        const endA = startA + gapAngle;
+        const wedge = new Path();
+        wedge.moveTo(Math.cos(startA) * hubR, Math.sin(startA) * hubR);
+        wedge.absarc(0, 0, hubR, startA, endA, false);
+        wedge.lineTo(Math.cos(endA) * rimR, Math.sin(endA) * rimR);
+        wedge.absarc(0, 0, rimR, endA, startA, true);
+        wedge.lineTo(Math.cos(startA) * hubR, Math.sin(startA) * hubR);
+        shape.holes.push(wedge);
+      }
+    }
+  }
+  return shape;
+};
+const generateWeb = (seed, zBase, count, boundsX, boundsY) => {
+  const rand = sfc32(seed, seed + 1, seed + 2, seed + 3);
+  const gears = [];
+  const queue = [];
+  const mTemplate = TEMPLATES[0];
+  gears.push({
+    id: seed * 1e3,
+    t: mTemplate.t,
+    s: mTemplate.s,
+    x: rand() * 40 - 20,
+    y: rand() * 40 - 20,
+    z: zBase,
+    speed: 120 / mTemplate.t,
+    phase: 0,
+    color: "#3d4043"
+  });
+  queue.push(gears[0]);
+  let idCounter = 1;
+  const colors = ["#5e636b", "#474036", "#2a2c30", "#3f4246", "#505358"];
+  while (queue.length > 0 && gears.length < count) {
+    const P = queue.shift();
+    const spawnCount = Math.floor(rand() * 3) + 2;
+    let spawned = 0;
+    for (let attempt = 0; attempt < 80 && spawned < spawnCount; attempt++) {
+      if (gears.length >= count) break;
+      const T = TEMPLATES[Math.floor(rand() * TEMPLATES.length)];
+      const angle = Math.floor(rand() * 8) * (Math.PI / 4);
+      const dist = (P.t + T.t) * MODULE;
+      const nx = P.x + Math.cos(angle) * dist;
+      const ny = P.y + Math.sin(angle) * dist;
+      if (Math.abs(nx) > boundsX || Math.abs(ny) > boundsY) continue;
+      let collision = false;
+      for (const E of gears) {
+        if (E.id === P.id) continue;
+        const d = Math.hypot(E.x - nx, E.y - ny);
+        const req = (E.t + T.t) * MODULE;
+        if (d < req + 0.8) {
+          collision = true;
+          break;
+        }
+      }
+      if (!collision) {
+        const ratio = -P.t / T.t;
+        const phase = P.phase * ratio + angle * (1 - ratio) + Math.PI / T.t;
+        const speed = P.speed * ratio;
+        const newGear = {
+          id: seed * 1e3 + idCounter++,
+          t: T.t,
+          s: T.s,
+          x: nx,
+          y: ny,
+          z: zBase,
+          speed,
+          phase,
+          color: colors[Math.floor(rand() * colors.length)]
+        };
+        gears.push(newGear);
+        queue.push(newGear);
+        spawned++;
+      }
+    }
+  }
+  return gears;
+};
+const EnvironmentMap = () => {
+  const { gl, scene } = useThree();
+  (0,react.useMemo)(() => {
+    const pmrem = new PMREMGenerator(gl);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+  }, [gl, scene]);
+  return null;
+};
+const SingleGear = ({ def, u, geo }) => {
+  const rotationZ = u * GearCluster_TAU * def.speed + def.phase;
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [def.x, def.y, def.z], rotation: [0, 0, rotationZ], castShadow: true, receiveShadow: true, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("primitive", { object: geo, attach: "geometry" }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      "meshPhysicalMaterial",
+      {
+        color: def.color,
+        metalness: 0.9,
+        roughness: 0.25,
+        clearcoat: 0.4,
+        clearcoatRoughness: 0.2
+      }
+    )
+  ] });
+};
+const GearCluster = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 600,
+  // Slower, elegant, massive loop
+  speed = 1
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const u = frame / totalFrames * Math.max(1, Math.round(speed));
+  const allGears = (0,react.useMemo)(() => {
+    const layer1 = generateWeb(101, -12, 120, 110, 70);
+    const layer2 = generateWeb(202, 0, 150, 110, 70);
+    const layer3 = generateWeb(303, 12, 100, 110, 70);
+    return [...layer1, ...layer2, ...layer3];
+  }, []);
+  const geometries = (0,react.useMemo)(() => {
+    const dict = {};
+    TEMPLATES.forEach((t) => {
+      const shape = buildGearShape(t.t, t.s);
+      const geo = new ExtrudeGeometry(shape, {
+        depth: GEAR_DEPTH,
+        bevelEnabled: true,
+        bevelSize: 0.08,
+        bevelThickness: 0.08,
+        bevelSegments: 1
+        // Optimized for 200+ instances
+      });
+      geo.center();
+      dict[`${t.t}_${t.s}`] = geo;
+    });
+    return dict;
+  }, []);
+  const shafts = (0,react.useMemo)(() => {
+    return allGears.map((g) => ({
+      x: g.x,
+      y: g.y,
+      z: 0,
+      // centered
+      len: 32 + Math.random() * 8
+      // spanning from z=-15 to z=15 approx
+    }));
+  }, [allGears]);
+  const shaftGeo = (0,react.useMemo)(() => new CylinderGeometry(MODULE * 2.2, MODULE * 2.2, 1, 32), []);
+  const shaftMat = (0,react.useMemo)(() => new MeshPhysicalMaterial({ color: "#111", metalness: 0.9, roughness: 0.4 }), []);
+  const tiltX = Math.sin(u * GearCluster_TAU) * 0.05 - 0.1;
+  const tiltY = Math.cos(u * GearCluster_TAU) * 0.08;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, backgroundColor: "#020203" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      shadows: true,
+      camera: { position: [0, -5, 95], fov: 45, near: 1, far: 400 },
+      gl: { antialias: true, alpha: false },
+      style: { background: "#020203" },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(EnvironmentMap, {}),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.4, color: "#ffffff" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [30, 40, 50], intensity: 2.5, color: "#dbeaff", castShadow: true, "shadow-bias": -1e-3 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-40, -30, -20], intensity: 1.5, color: "#ffeedd" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [0, 0, 30], intensity: 1.2, color: "#ffffff" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [40, 20, 10], intensity: 0.8, color: "#aaaaff" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [-40, -20, 10], intensity: 0.8, color: "#ffaaaa" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("group", { rotation: [tiltX, tiltY, 0], children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: [0, 0, 0], children: [
+          allGears.map((g) => /* @__PURE__ */ (0,jsx_runtime.jsx)(SingleGear, { def: g, u, geo: geometries[`${g.t}_${g.s}`] }, g.id)),
+          shafts.map((s, i) => /* @__PURE__ */ (0,jsx_runtime.jsx)(
+            "mesh",
+            {
+              position: [s.x, s.y, s.z],
+              rotation: [Math.PI / 2, 0, 0],
+              geometry: shaftGeo,
+              material: shaftMat,
+              scale: [1, s.len, 1],
+              castShadow: true
+            },
+            `shaft_${i}`
+          ))
+        ] }) })
+      ]
+    }
+  ) });
+};
+
+;// ./src/components/TriangleNodeNetwork.tsx
+
+
+
+
+
+
+
+
+const TriangleNodeNetwork_TAU = Math.PI * 2;
+const N = 10;
+const TriangleNodeNetwork_THEMES = {
+  ghost: {
+    bg: "#f0f2f5",
+    node: "#222222",
+    edge: "#888888",
+    nodeSize: 0.5,
+    edgeSize: 0.15,
+    light: "#ffffff",
+    ambient: 1.5
+  },
+  neon: {
+    bg: "#05050a",
+    node: "#00ffff",
+    edge: "#ff00ff",
+    nodeSize: 0.45,
+    edgeSize: 0.12,
+    light: "#88aaff",
+    ambient: 0.8
+  },
+  gold: {
+    bg: "#0a0805",
+    node: "#ffcc00",
+    edge: "#aa6611",
+    nodeSize: 0.55,
+    edgeSize: 0.15,
+    light: "#ffeecc",
+    ambient: 1
+  }
+};
+const generateNetwork = () => {
+  const scale = 18;
+  const verts = [
+    new Vector3(1, 1, 1),
+    new Vector3(-1, -1, 1),
+    new Vector3(-1, 1, -1),
+    new Vector3(1, -1, -1)
+  ].map((v) => v.normalize().multiplyScalar(scale));
+  const faces = [
+    [verts[0], verts[1], verts[2]],
+    [verts[0], verts[2], verts[3]],
+    [verts[0], verts[3], verts[1]],
+    [verts[1], verts[3], verts[2]]
+  ];
+  const points = [];
+  const eps = 0.01;
+  for (const face of faces) {
+    const [A, B, C] = face;
+    for (let i = 0; i <= N; i++) {
+      for (let j = 0; j <= N - i; j++) {
+        const k = N - i - j;
+        const p = new Vector3().addScaledVector(A, i / N).addScaledVector(B, j / N).addScaledVector(C, k / N);
+        if (!points.some((existing) => existing.distanceTo(p) < eps)) {
+          points.push(p);
+        }
+      }
+    }
+  }
+  const expectedEdgeLen = verts[0].distanceTo(verts[1]) / N;
+  const edgePairs = [];
+  for (let i = 0; i < points.length; i++) {
+    for (let j = i + 1; j < points.length; j++) {
+      if (Math.abs(points[i].distanceTo(points[j]) - expectedEdgeLen) < eps * 10) {
+        edgePairs.push([i, j]);
+      }
+    }
+  }
+  return { points, edgePairs };
+};
+const TriangleNodeNetwork_EnvironmentMap = () => {
+  const { gl, scene } = useThree();
+  (0,react.useMemo)(() => {
+    const pmrem = new PMREMGenerator(gl);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+  }, [gl, scene]);
+  return null;
+};
+const NetworkMesh = ({ theme, u }) => {
+  const t = TriangleNodeNetwork_THEMES[theme];
+  const { points, edgePairs } = (0,react.useMemo)(() => generateNetwork(), []);
+  const nodeMeshRef = (0,react.useRef)(null);
+  const edgeMeshRef = (0,react.useRef)(null);
+  const nodeGeo = (0,react.useMemo)(() => new SphereGeometry(t.nodeSize, 16, 16), [t.nodeSize]);
+  const nodeMat = (0,react.useMemo)(() => new MeshPhysicalMaterial({
+    color: t.node,
+    metalness: 0.6,
+    roughness: 0.2,
+    clearcoat: 0.8
+  }), [t.node]);
+  const edgeGeo = (0,react.useMemo)(() => {
+    const geo = new CylinderGeometry(t.edgeSize, t.edgeSize, 1, 8);
+    geo.rotateX(Math.PI / 2);
+    return geo;
+  }, [t.edgeSize]);
+  const edgeMat = (0,react.useMemo)(() => new MeshPhysicalMaterial({
+    color: t.edge,
+    metalness: 0.8,
+    roughness: 0.3
+  }), [t.edge]);
+  const getAnimatedPoint = (p, progress) => {
+    const px = p.x * 0.4;
+    const py = p.y * 0.4;
+    const pz = p.z * 0.4;
+    const dx = Math.sin(py + progress * TriangleNodeNetwork_TAU * 2) * Math.cos(pz - progress * TriangleNodeNetwork_TAU) * 1.5;
+    const dy = Math.sin(pz + progress * TriangleNodeNetwork_TAU * 3) * Math.cos(px + progress * TriangleNodeNetwork_TAU) * 1.5;
+    const dz = Math.sin(px - progress * TriangleNodeNetwork_TAU * 2) * Math.cos(py + progress * TriangleNodeNetwork_TAU) * 1.5;
+    const struggle = new Vector3(dx, dy, dz);
+    const escapePulse = Math.pow((Math.sin(p.length() * 0.3 - progress * TriangleNodeNetwork_TAU * 2) + 1) / 2, 2) * 1.8;
+    const outward = p.clone().normalize().multiplyScalar(escapePulse);
+    return p.clone().add(struggle).add(outward);
+  };
+  const dummy = (0,react.useMemo)(() => new Object3D(), []);
+  react.useLayoutEffect(() => {
+    if (!nodeMeshRef.current || !edgeMeshRef.current) return;
+    const animatedPoints = points.map((p) => getAnimatedPoint(p, u));
+    animatedPoints.forEach((p, i) => {
+      dummy.position.copy(p);
+      const scalePulse = Math.pow((Math.sin(p.length() * 0.5 - u * TriangleNodeNetwork_TAU * 3) + 1) / 2, 2) * 0.4;
+      const scale = 1 + scalePulse;
+      dummy.scale.set(scale, scale, scale);
+      dummy.updateMatrix();
+      nodeMeshRef.current.setMatrixAt(i, dummy.matrix);
+    });
+    nodeMeshRef.current.instanceMatrix.needsUpdate = true;
+    edgePairs.forEach(([i, j], edgeIdx) => {
+      const p1 = animatedPoints[i];
+      const p2 = animatedPoints[j];
+      const dist = p1.distanceTo(p2);
+      dummy.position.copy(p1).lerp(p2, 0.5);
+      dummy.lookAt(p2);
+      dummy.scale.set(1, 1, dist);
+      dummy.updateMatrix();
+      edgeMeshRef.current.setMatrixAt(edgeIdx, dummy.matrix);
+    });
+    edgeMeshRef.current.instanceMatrix.needsUpdate = true;
+  }, [u, points, edgePairs, dummy]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { rotation: [0.5, 0.6, -0.2], children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      "instancedMesh",
+      {
+        ref: nodeMeshRef,
+        args: [nodeGeo, nodeMat, points.length],
+        castShadow: true,
+        receiveShadow: true,
+        frustumCulled: false
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      "instancedMesh",
+      {
+        ref: edgeMeshRef,
+        args: [edgeGeo, edgeMat, edgePairs.length],
+        castShadow: true,
+        receiveShadow: true,
+        frustumCulled: false
+      }
+    )
+  ] });
+};
+const TriangleNodeNetwork = ({
+  theme,
+  width = 3840,
+  height = 2160,
+  totalFrames = 300,
+  speed = 1
+}) => {
+  const t = TriangleNodeNetwork_THEMES[theme];
+  const frame = (0,esm.useCurrentFrame)();
+  const u = frame / totalFrames * Math.max(1, Math.round(speed));
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, backgroundColor: t.bg }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      shadows: true,
+      camera: { position: [0, 0, 60], fov: 45, near: 1, far: 200 },
+      gl: { antialias: true, alpha: false },
+      style: { background: t.bg },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("color", { attach: "background", args: [t.bg] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(TriangleNodeNetwork_EnvironmentMap, {}),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: t.ambient, color: t.light }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [20, 40, 30], intensity: 2.5, color: t.light, castShadow: true, "shadow-bias": -2e-3 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-20, -30, -20], intensity: 1.5, color: t.light }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [0, 0, 20], intensity: 2, color: t.light }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(NetworkMesh, { theme, u })
+      ]
+    }
+  ) });
+};
+const NodeNetworkGhost = () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TriangleNodeNetwork, { theme: "ghost" });
+const NodeNetworkNeon = () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TriangleNodeNetwork, { theme: "neon" });
+const NodeNetworkGold = () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TriangleNodeNetwork, { theme: "gold" });
+
+;// ./src/components/BarChartRace.tsx
+
+
+
+const ITEMS = [
+  { id: "Indigo", color: "#4F46E5", icon: "\u{1F680}" },
+  { id: "Teal", color: "#0D9488", icon: "\u26A1" },
+  { id: "Amber", color: "#D97706", icon: "\u{1F525}" },
+  { id: "Slate", color: "#0F172A", icon: "\u{1F6E1}\uFE0F" },
+  { id: "Rose", color: "#E11D48", icon: "\u{1F48E}" },
+  { id: "Emerald", color: "#10B981", icon: "\u{1F340}" }
+];
+const DATA = {
+  "Indigo": [100, 120, 200, 300, 450, 500, 600, 750, 800, 900, 1e3],
+  "Teal": [80, 130, 250, 280, 320, 480, 650, 680, 850, 950, 980],
+  "Amber": [120, 140, 160, 350, 400, 550, 580, 600, 700, 850, 1050],
+  "Slate": [60, 90, 180, 200, 250, 300, 400, 500, 650, 700, 800],
+  "Rose": [50, 100, 150, 250, 500, 520, 540, 700, 750, 880, 920],
+  "Emerald": [90, 110, 130, 150, 200, 350, 450, 550, 780, 820, 850]
+};
+const getRankFor = (id, k) => {
+  const myVal = DATA[id][k];
+  let rank = 0;
+  for (const item of ITEMS) {
+    if (item.id === id) continue;
+    const theirVal = DATA[item.id][k];
+    if (theirVal > myVal) {
+      rank++;
+    } else if (theirVal === myVal && ITEMS.indexOf(item) < ITEMS.indexOf(ITEMS.find((i) => i.id === id))) {
+      rank++;
+    }
+  }
+  return rank;
+};
+const BarChartRace = () => {
+  const frame = (0,esm.useCurrentFrame)();
+  const INTERVAL = 30;
+  const k = Math.min(Math.floor(frame / INTERVAL), 9);
+  const progress = (frame - k * INTERVAL) / INTERVAL;
+  const easeSpring = (t) => {
+    const c4 = 2 * Math.PI / 3;
+    return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+  };
+  const easeValue = esm.Easing.inOut(esm.Easing.cubic);
+  const currentValues = ITEMS.map((item) => {
+    return {
+      id: item.id,
+      val: (0,esm.interpolate)(progress, [0, 1], [DATA[item.id][k], DATA[item.id][k + 1]], { easing: easeValue })
+    };
+  });
+  const maxVal = Math.max(...currentValues.map((v) => v.val));
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: { backgroundColor: "#F8FAFC", padding: "100px 120px", fontFamily: "system-ui, -apple-system, sans-serif" }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "80px" }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("h1", { style: { fontSize: "72px", color: "#0F172A", margin: 0, fontWeight: 900, letterSpacing: "-2px" }, children: "Dynamic Bar Chart Race" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("p", { style: { fontSize: "28px", color: "#64748B", margin: "10px 0 0 0", fontWeight: 500 }, children: "Top Metrics Simulation" })
+      ] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("h2", { style: { fontSize: "48px", color: "#64748B", margin: 0, fontWeight: 600 }, children: [
+        "Frame ",
+        frame
+      ] })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { position: "relative", width: "100%", height: "100%" }, children: ITEMS.map((item) => {
+      const rankStart = getRankFor(item.id, k);
+      const rankEnd = getRankFor(item.id, k + 1);
+      const currentRank = (0,esm.interpolate)(progress, [0, 1], [rankStart, rankEnd], { easing: easeSpring });
+      const val = currentValues.find((v) => v.id === item.id).val;
+      const widthPct = val / maxVal * 80;
+      return /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        transform: `translateY(${currentRank * 130}px)`,
+        display: "flex",
+        alignItems: "center"
+      }, children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: {
+          width: `${Math.max(10, widthPct)}%`,
+          // At least 10% to fit icon + label
+          height: "100px",
+          backgroundColor: item.color,
+          borderRadius: "0 50px 50px 0",
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: "30px",
+          color: "white",
+          fontWeight: "bold",
+          fontSize: "36px",
+          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)"
+        }, children: [
+          /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { marginRight: "24px", fontSize: "48px" }, children: item.icon }),
+          /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { letterSpacing: "1px" }, children: item.id })
+        ] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: {
+          marginLeft: "40px",
+          fontSize: "56px",
+          fontWeight: 800,
+          color: "#0F172A",
+          fontVariantNumeric: "tabular-nums"
+          // Keeps numbers from shifting
+        }, children: Math.round(val).toLocaleString() })
+      ] }, item.id);
+    }) })
+  ] });
+};
+
+;// ./src/components/NeuralSynapseCore.tsx
+
+
+
+
+
+
+const NeuralSynapseCore_TAU = Math.PI * 2;
+function NeuralSynapseCore_pseudoRandom(seed) {
+  const x = Math.sin(seed) * 1e4;
+  return x - Math.floor(x);
+}
+function generateNeuralFibers() {
+  const fibers = [];
+  const count = 80;
+  const coreRadius = 3.1;
+  let seed = 303;
+  for (let i = 0; i < count; i++) {
+    const y = 1 - i / (count - 1) * 2;
+    const radiusAtY = Math.sqrt(1 - y * y);
+    const theta = i * Math.PI * (3 - Math.sqrt(5));
+    const nx = Math.cos(theta) * radiusAtY;
+    const ny = y;
+    const nz = Math.sin(theta) * radiusAtY;
+    const normal = new Vector3(nx, ny, nz).normalize();
+    const p0 = normal.clone().multiplyScalar(coreRadius);
+    const up = Math.abs(normal.y) < 0.95 ? new Vector3(0, 1, 0) : new Vector3(1, 0, 0);
+    const t1 = new Vector3().crossVectors(normal, up).normalize();
+    const t2 = new Vector3().crossVectors(normal, t1).normalize();
+    const amp1 = (NeuralSynapseCore_pseudoRandom(seed++) - 0.5) * 2.8;
+    const amp2 = (NeuralSynapseCore_pseudoRandom(seed++) - 0.5) * 2.8;
+    const p1 = normal.clone().multiplyScalar(coreRadius + 2.2).addScaledVector(t1, amp1).addScaledVector(t2, amp2);
+    const amp3 = (NeuralSynapseCore_pseudoRandom(seed++) - 0.5) * 4;
+    const amp4 = (NeuralSynapseCore_pseudoRandom(seed++) - 0.5) * 4;
+    const p2 = normal.clone().multiplyScalar(coreRadius + 5.5).addScaledVector(t1, -amp1 * 0.8 + amp3).addScaledVector(t2, -amp2 * 0.8 + amp4);
+    const amp5 = (NeuralSynapseCore_pseudoRandom(seed++) - 0.5) * 5;
+    const amp6 = (NeuralSynapseCore_pseudoRandom(seed++) - 0.5) * 5;
+    const p3 = normal.clone().multiplyScalar(coreRadius + 9.5).addScaledVector(t1, amp5).addScaledVector(t2, amp6);
+    const stretchX = normal.x > -0.2 ? 4.5 : 1;
+    const p4 = normal.clone().multiplyScalar(coreRadius + 14 + stretchX + NeuralSynapseCore_pseudoRandom(seed++) * 3.5).addScaledVector(t1, amp5 * 1.3).addScaledVector(t2, amp6 * 1.3);
+    const curve = new CatmullRomCurve3([p0, p1, p2, p3, p4], false, "centripetal", 0.5);
+    fibers.push({
+      curve,
+      phase1: NeuralSynapseCore_pseudoRandom(seed++),
+      phase2: (NeuralSynapseCore_pseudoRandom(seed++) + 0.48) % 1
+    });
+  }
+  return fibers;
+}
+const SynapseScene = ({ progress }) => {
+  const fibers = (0,react.useMemo)(() => generateNeuralFibers(), []);
+  const fiberGeometries = (0,react.useMemo)(() => {
+    return fibers.map((f) => new TubeGeometry(f.curve, 40, 0.065, 8, false));
+  }, [fibers]);
+  const particleData = (0,react.useMemo)(() => {
+    const pts = [];
+    let pSeed = 404;
+    for (let i = 0; i < 280; i++) {
+      const u1 = NeuralSynapseCore_pseudoRandom(pSeed++);
+      const u2 = NeuralSynapseCore_pseudoRandom(pSeed++);
+      const radius = 3.6 + NeuralSynapseCore_pseudoRandom(pSeed++) * 16;
+      const theta = u1 * NeuralSynapseCore_TAU;
+      const phi = Math.acos(2 * u2 - 1);
+      const pos = new Vector3(
+        radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.sin(phi) * Math.sin(theta),
+        radius * Math.cos(phi)
+      );
+      pts.push({
+        pos,
+        speed: 1 + Math.floor(NeuralSynapseCore_pseudoRandom(pSeed++) * 3),
+        // Integer multiples ensure perfect 100% loop
+        phase: NeuralSynapseCore_pseudoRandom(pSeed++) * NeuralSynapseCore_TAU,
+        size: 0.025 + NeuralSynapseCore_pseudoRandom(pSeed++) * 0.045
+      });
+    }
+    return pts;
+  }, []);
+  const totalPulses = fibers.length * 2;
+  const pulseMeshRef = (0,react.useRef)(null);
+  const particleMeshRef = (0,react.useRef)(null);
+  const dummy = (0,react.useMemo)(() => new Object3D(), []);
+  const yAxis = (0,react.useMemo)(() => new Vector3(0, 1, 0), []);
+  (0,react.useLayoutEffect)(() => {
+    if (!pulseMeshRef.current || !particleMeshRef.current) return;
+    const CYCLES = 3;
+    let pulseIdx = 0;
+    fibers.forEach((f) => {
+      const t1 = (f.phase1 + progress * CYCLES) % 1;
+      const pos1 = f.curve.getPointAt(t1);
+      const tangent1 = f.curve.getTangentAt(t1);
+      dummy.position.copy(pos1);
+      dummy.quaternion.setFromUnitVectors(yAxis, tangent1);
+      const streakLength1 = 0.5 + Math.sin(t1 * Math.PI) * 0.7;
+      dummy.scale.set(1, streakLength1, 1);
+      dummy.updateMatrix();
+      pulseMeshRef.current.setMatrixAt(pulseIdx++, dummy.matrix);
+      const t2 = (f.phase2 + progress * CYCLES) % 1;
+      const pos2 = f.curve.getPointAt(t2);
+      const tangent2 = f.curve.getTangentAt(t2);
+      dummy.position.copy(pos2);
+      dummy.quaternion.setFromUnitVectors(yAxis, tangent2);
+      const streakLength2 = 0.5 + Math.sin(t2 * Math.PI) * 0.7;
+      dummy.scale.set(1, streakLength2, 1);
+      dummy.updateMatrix();
+      pulseMeshRef.current.setMatrixAt(pulseIdx++, dummy.matrix);
+    });
+    pulseMeshRef.current.instanceMatrix.needsUpdate = true;
+    particleData.forEach((p, i) => {
+      const angle = p.phase + progress * NeuralSynapseCore_TAU * p.speed;
+      const px = p.pos.x + Math.sin(angle) * 0.45;
+      const py = p.pos.y + Math.cos(angle) * 0.45;
+      const pz = p.pos.z + Math.sin(angle * 0.5) * 0.35;
+      dummy.position.set(px, py, pz);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(p.size, p.size, p.size);
+      dummy.updateMatrix();
+      particleMeshRef.current.setMatrixAt(i, dummy.matrix);
+    });
+    particleMeshRef.current.instanceMatrix.needsUpdate = true;
+  }, [progress, fibers, particleData, dummy, yAxis]);
+  const corePulseScale = 1 + 0.07 * Math.sin(progress * NeuralSynapseCore_TAU * 2);
+  const coreEmissive = 4 + 1.5 * Math.sin(progress * NeuralSynapseCore_TAU * 2);
+  const swayY = Math.sin(progress * NeuralSynapseCore_TAU) * 0.1;
+  const swayX = Math.cos(progress * NeuralSynapseCore_TAU) * 0.05;
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: [-2.4, 0, 0], rotation: [0.22 + swayX, -0.32 + swayY, 0.04], children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { scale: [corePulseScale, corePulseScale, corePulseScale], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("sphereGeometry", { args: [2.8, 48, 48] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)(
+        "meshStandardMaterial",
+        {
+          color: "#00F5FF",
+          emissive: "#00F0FF",
+          emissiveIntensity: coreEmissive,
+          roughness: 0.08,
+          metalness: 0.2
+        }
+      )
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { scale: [corePulseScale * 1.07, corePulseScale * 1.07, corePulseScale * 1.07], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("icosahedronGeometry", { args: [2.9, 2] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)(
+        "meshStandardMaterial",
+        {
+          wireframe: true,
+          color: "#38BDF8",
+          emissive: "#0284C7",
+          emissiveIntensity: 2.5,
+          roughness: 0.15,
+          metalness: 0.9
+        }
+      )
+    ] }),
+    fiberGeometries.map((geo, idx) => /* @__PURE__ */ (0,jsx_runtime.jsx)("mesh", { geometry: geo, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      "meshStandardMaterial",
+      {
+        color: "#4338CA",
+        roughness: 0.25,
+        metalness: 0.75,
+        emissive: "#1E1B4B",
+        emissiveIntensity: 0.8
+      }
+    ) }, idx)),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+      "instancedMesh",
+      {
+        ref: pulseMeshRef,
+        args: [void 0, void 0, totalPulses],
+        frustumCulled: false,
+        children: [
+          /* @__PURE__ */ (0,jsx_runtime.jsx)("cylinderGeometry", { args: [0.078, 0.078, 1, 12] }),
+          /* @__PURE__ */ (0,jsx_runtime.jsx)(
+            "meshStandardMaterial",
+            {
+              color: "#F472B6",
+              emissive: "#D946EF",
+              emissiveIntensity: 7,
+              roughness: 0.05
+            }
+          )
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+      "instancedMesh",
+      {
+        ref: particleMeshRef,
+        args: [void 0, void 0, particleData.length],
+        frustumCulled: false,
+        children: [
+          /* @__PURE__ */ (0,jsx_runtime.jsx)("sphereGeometry", { args: [1, 10, 10] }),
+          /* @__PURE__ */ (0,jsx_runtime.jsx)(
+            "meshStandardMaterial",
+            {
+              color: "#E0E7FF",
+              emissive: "#C084FC",
+              emissiveIntensity: 4,
+              roughness: 0.2
+            }
+          )
+        ]
+      }
+    )
+  ] });
+};
+const NeuralSynapseCore = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 600
+  // Exactly 10 Seconds at 60 FPS
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const progress = frame / totalFrames % 1;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, backgroundColor: "#02040A" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      camera: { position: [0, 0, 24.5], fov: 44, near: 1, far: 100 },
+      gl: { antialias: true, alpha: false },
+      style: { background: "#02040A" },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("color", { attach: "background", args: ["#02040A"] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.7, color: "#1E1B4B" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [-2.4, 0, 1], intensity: 12, distance: 22, color: "#00F5FF" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [18, 24, 20], intensity: 3.5, color: "#A5F3FC" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-20, -18, -12], intensity: 2.5, color: "#818CF8" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [0, -20, 15], intensity: 2, color: "#C084FC" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [15, -10, -5], intensity: 5, distance: 40, color: "#D946EF" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(SynapseScene, { progress })
+      ]
+    }
+  ) });
+};
+
+;// ./src/components/QuantumQubitLattice.tsx
+
+
+
+
+
+
+
+
+const QuantumQubitLattice_TAU = Math.PI * 2;
+const QuantumQubitLattice_N = 6;
+const SPACING = 2.6;
+const QuantumQubitLattice_BG = "#0B0F17";
+function QuantumQubitLattice_pseudoRandom(seed) {
+  const x = Math.sin(seed) * 1e4;
+  return x - Math.floor(x);
+}
+const QuantumQubitLattice_EnvironmentMap = () => {
+  const { gl, scene } = useThree();
+  (0,react.useLayoutEffect)(() => {
+    const pmrem = new PMREMGenerator(gl);
+    const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = env;
+    return () => {
+      scene.environment = null;
+      env.dispose();
+      pmrem.dispose();
+    };
+  }, [gl, scene]);
+  return null;
+};
+const buildLattice = () => {
+  const points = [];
+  const idx = (x, y, z) => x * QuantumQubitLattice_N * QuantumQubitLattice_N + y * QuantumQubitLattice_N + z;
+  const half = (QuantumQubitLattice_N - 1) * SPACING / 2;
+  for (let x = 0; x < QuantumQubitLattice_N; x++)
+    for (let y = 0; y < QuantumQubitLattice_N; y++)
+      for (let z = 0; z < QuantumQubitLattice_N; z++)
+        points.push(new Vector3(x * SPACING - half, y * SPACING - half, z * SPACING - half));
+  const edges = [];
+  for (let x = 0; x < QuantumQubitLattice_N; x++)
+    for (let y = 0; y < QuantumQubitLattice_N; y++)
+      for (let z = 0; z < QuantumQubitLattice_N; z++) {
+        if (x < QuantumQubitLattice_N - 1) edges.push([idx(x, y, z), idx(x + 1, y, z)]);
+        if (y < QuantumQubitLattice_N - 1) edges.push([idx(x, y, z), idx(x, y + 1, z)]);
+        if (z < QuantumQubitLattice_N - 1) edges.push([idx(x, y, z), idx(x, y, z + 1)]);
+      }
+  return { points, edges };
+};
+const QuantumQubitLattice_LatticeMesh = ({ u }) => {
+  const { points, edges } = (0,react.useMemo)(buildLattice, []);
+  const nodeRef = (0,react.useRef)(null);
+  const edgeRef = (0,react.useRef)(null);
+  const dustRef = (0,react.useRef)(null);
+  const dummy = (0,react.useMemo)(() => new Object3D(), []);
+  const nodeGeo = (0,react.useMemo)(() => new SphereGeometry(0.46, 32, 32), []);
+  const edgeGeo = (0,react.useMemo)(() => {
+    const g = new CylinderGeometry(0.075, 0.075, 1, 12);
+    g.rotateX(Math.PI / 2);
+    return g;
+  }, []);
+  const dustGeo = (0,react.useMemo)(() => new SphereGeometry(1, 6, 6), []);
+  const dust = (0,react.useMemo)(() => {
+    const arr = [];
+    let s = 77;
+    for (let i = 0; i < 160; i++) {
+      arr.push({
+        pos: new Vector3(
+          (QuantumQubitLattice_pseudoRandom(s++) - 0.5) * 34,
+          (QuantumQubitLattice_pseudoRandom(s++) - 0.5) * 22,
+          (QuantumQubitLattice_pseudoRandom(s++) - 0.5) * 20
+        ),
+        phase: QuantumQubitLattice_pseudoRandom(s++) * QuantumQubitLattice_TAU,
+        speed: 1 + Math.floor(QuantumQubitLattice_pseudoRandom(s++) * 2),
+        size: 0.025 + QuantumQubitLattice_pseudoRandom(s++) * 0.04
+      });
+    }
+    return arr;
+  }, []);
+  const nodeMat = (0,react.useMemo)(
+    () => new MeshStandardMaterial({
+      color: "#F1F5F9",
+      emissive: "#94A3B8",
+      emissiveIntensity: 0.55,
+      metalness: 0.9,
+      roughness: 0.14,
+      envMapIntensity: 3.5
+    }),
+    []
+  );
+  const edgeMat = (0,react.useMemo)(
+    () => new MeshStandardMaterial({
+      color: "#0D9488",
+      emissive: "#10B981",
+      emissiveIntensity: 0.6,
+      metalness: 0.5,
+      roughness: 0.25,
+      envMapIntensity: 1
+    }),
+    []
+  );
+  const dustMat = (0,react.useMemo)(
+    () => new MeshBasicMaterial({ color: "#34D399", transparent: true, opacity: 0.7 }),
+    []
+  );
+  const displaced = (0,react.useMemo)(() => points.map(() => new Vector3()), [points]);
+  (0,react.useLayoutEffect)(() => {
+    if (!nodeRef.current || !edgeRef.current || !dustRef.current) return;
+    const ph = u * QuantumQubitLattice_TAU;
+    points.forEach((p, i) => {
+      const wz = Math.sin(p.x * 0.5 + ph) * Math.cos(p.y * 0.5 - ph) * 0.45;
+      const wx = Math.sin(p.y * 0.45 + ph) * Math.cos(p.z * 0.45 + ph) * 0.14;
+      const wy = Math.sin(p.z * 0.5 - ph) * Math.cos(p.x * 0.5 + ph) * 0.14;
+      displaced[i].set(p.x + wx, p.y + wy, p.z + wz);
+      dummy.position.copy(displaced[i]);
+      dummy.scale.setScalar(1);
+      dummy.rotation.set(0, 0, 0);
+      dummy.updateMatrix();
+      nodeRef.current.setMatrixAt(i, dummy.matrix);
+    });
+    nodeRef.current.instanceMatrix.needsUpdate = true;
+    edges.forEach(([a, b], i) => {
+      const p1 = displaced[a];
+      const p2 = displaced[b];
+      dummy.position.copy(p1).lerp(p2, 0.5);
+      dummy.lookAt(p2);
+      dummy.scale.set(1, 1, p1.distanceTo(p2));
+      dummy.updateMatrix();
+      edgeRef.current.setMatrixAt(i, dummy.matrix);
+    });
+    edgeRef.current.instanceMatrix.needsUpdate = true;
+    dust.forEach((d, i) => {
+      const a = d.phase + ph * d.speed;
+      dummy.position.set(
+        d.pos.x + Math.sin(a) * 0.5,
+        d.pos.y + Math.cos(a) * 0.5,
+        d.pos.z + Math.sin(a * 0.5 + 1) * 0.4
+      );
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.setScalar(d.size);
+      dummy.updateMatrix();
+      dustRef.current.setMatrixAt(i, dummy.matrix);
+    });
+    dustRef.current.instanceMatrix.needsUpdate = true;
+  }, [u, points, edges, displaced, dust, dummy]);
+  const floatY = Math.sin(u * QuantumQubitLattice_TAU) * 0.35;
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)(jsx_runtime.Fragment, { children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: [0, floatY, 0], rotation: [0.36, -0.5, 0], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("instancedMesh", { ref: nodeRef, args: [nodeGeo, nodeMat, points.length], frustumCulled: false }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("instancedMesh", { ref: edgeRef, args: [edgeGeo, edgeMat, edges.length], frustumCulled: false })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("instancedMesh", { ref: dustRef, args: [dustGeo, dustMat, dust.length], frustumCulled: false })
+  ] });
+};
+const QuantumQubitLattice = ({ width = 3840, height = 2160, totalFrames = 600 }) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const u = frame / totalFrames % 1;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, backgroundColor: QuantumQubitLattice_BG }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      camera: { position: [0, 2, 32], fov: 40, near: 1, far: 120 },
+      gl: { antialias: true, alpha: false },
+      style: { background: QuantumQubitLattice_BG },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("color", { attach: "background", args: [QuantumQubitLattice_BG] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(QuantumQubitLattice_EnvironmentMap, {}),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.5, color: "#99F6E4" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [12, 20, 18], intensity: 2.2, color: "#FFFFFF" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-18, -8, 10], intensity: 1.2, color: "#10B981" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [0, 0, 14], intensity: 3, distance: 50, color: "#2DD4BF" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(QuantumQubitLattice_LatticeMesh, { u })
+      ]
+    }
+  ) });
+};
+
+;// ./src/components/CyberShield.tsx
+
+
+
+
+
+
+const CyberShield_TAU = Math.PI * 2;
+const HEX_R = 0.62;
+const makeShieldShape = () => {
+  const s = new Shape();
+  s.moveTo(0, 4);
+  s.quadraticCurveTo(1.8, 3.2, 3.2, 3.4);
+  s.lineTo(3.2, 0.6);
+  s.bezierCurveTo(3.2, -1.8, 1.6, -3.2, 0, -4.2);
+  s.bezierCurveTo(-1.6, -3.2, -3.2, -1.8, -3.2, 0.6);
+  s.lineTo(-3.2, 3.4);
+  s.quadraticCurveTo(-1.8, 3.2, 0, 4);
+  return s;
+};
+const bulgeZ = (x, y) => 0.85 * Math.max(0, 1 - x / 3.5 * (x / 3.5)) * (1 - 0.22 * (y / 4.3) * (y / 4.3));
+const bulgeNormal = (x, y) => {
+  const e = 0.01;
+  const dzdx = (bulgeZ(x + e, y) - bulgeZ(x - e, y)) / (2 * e);
+  const dzdy = (bulgeZ(x, y + e) - bulgeZ(x, y - e)) / (2 * e);
+  return new Vector3(-dzdx, -dzdy, 1).normalize();
+};
+const pointInPoly = (px, py, poly) => {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i].x, yi = poly[i].y, xj = poly[j].x, yj = poly[j].y;
+    if (yi > py !== yj > py && px < (xj - xi) * (py - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+};
+const buildHexGrid = () => {
+  const poly = makeShieldShape().getPoints(60);
+  const centers = [];
+  const dx = Math.sqrt(3) * HEX_R;
+  const dy = 1.5 * HEX_R;
+  for (let row = -8; row <= 8; row++) {
+    for (let col = -8; col <= 8; col++) {
+      const cx = col * dx + (Math.abs(row) % 2 === 1 ? dx / 2 : 0);
+      const cy = row * dy;
+      if (!pointInPoly(cx, cy, poly)) continue;
+      let minD = Infinity;
+      for (const p of poly) minD = Math.min(minD, Math.hypot(p.x - cx, p.y - cy));
+      if (minD < 0.5) continue;
+      centers.push(new Vector2(cx, cy));
+    }
+  }
+  const segs = [];
+  const rr = HEX_R * 0.97;
+  centers.forEach((c) => {
+    for (let k = 0; k < 6; k++) {
+      const a1 = Math.PI / 6 + k * Math.PI / 3;
+      const a2 = Math.PI / 6 + (k + 1) * Math.PI / 3;
+      segs.push({
+        a: new Vector2(c.x + Math.cos(a1) * rr, c.y + Math.sin(a1) * rr),
+        b: new Vector2(c.x + Math.cos(a2) * rr, c.y + Math.sin(a2) * rr)
+      });
+    }
+  });
+  return { centers, segs };
+};
+const makeLockTexture = () => {
+  const c = document.createElement("canvas");
+  c.width = 512;
+  c.height = 440;
+  const g = c.getContext("2d");
+  g.clearRect(0, 0, 512, 440);
+  g.fillStyle = "#1E3A8A";
+  g.font = 'bold 74px "Courier New", monospace';
+  g.textBaseline = "middle";
+  const rows = ["0101001", "100  10", "010  001", "1001011"];
+  rows.forEach((r, i) => {
+    const y = 60 + i * 105;
+    for (let k = 0; k < r.length; k++) {
+      if (r[k] === " ") continue;
+      g.fillText(r[k], 38 + k * 60, y);
+    }
+  });
+  g.fillStyle = "#0B1B4D";
+  g.beginPath();
+  g.arc(256, 190, 42, 0, CyberShield_TAU);
+  g.fill();
+  g.beginPath();
+  g.moveTo(228, 215);
+  g.lineTo(284, 215);
+  g.lineTo(300, 340);
+  g.lineTo(212, 340);
+  g.closePath();
+  g.fill();
+  const t = new CanvasTexture(c);
+  t.anisotropy = 8;
+  return t;
+};
+const makeBinaryTexture = (seed) => {
+  const c = document.createElement("canvas");
+  c.width = 512;
+  c.height = 64;
+  const g = c.getContext("2d");
+  g.clearRect(0, 0, 512, 64);
+  g.fillStyle = "#67E8F9";
+  g.font = 'bold 40px "Courier New", monospace';
+  g.textBaseline = "middle";
+  let s = "";
+  for (let i = 0; i < 20; i++) s += Math.sin(seed * 7.13 + i * 12.9898) > 0 ? "1" : "0";
+  g.fillText(s, 8, 34);
+  const t = new CanvasTexture(c);
+  return t;
+};
+const ShieldScene = ({ u }) => {
+  const hex = (0,react.useMemo)(buildHexGrid, []);
+  const plateRef = (0,react.useRef)(null);
+  const edgeRef = (0,react.useRef)(null);
+  const glowRef = (0,react.useRef)(null);
+  const ringARef = (0,react.useRef)(null);
+  const ringBRef = (0,react.useRef)(null);
+  const dummy = (0,react.useMemo)(() => new Object3D(), []);
+  const color = (0,react.useMemo)(() => new Color(), []);
+  const shieldShape = (0,react.useMemo)(makeShieldShape, []);
+  const backGeo = (0,react.useMemo)(
+    () => new ExtrudeGeometry(shieldShape, { depth: 0.35, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.1, bevelSegments: 3, curveSegments: 40 }),
+    [shieldShape]
+  );
+  const outlineGeo = (0,react.useMemo)(() => {
+    const pts = shieldShape.getPoints(120).map((p) => new Vector3(p.x, p.y, bulgeZ(p.x, p.y) * 0.4 + 0.2));
+    pts.pop();
+    return new TubeGeometry(new CatmullRomCurve3(pts, true), 360, 0.055, 8, true);
+  }, [shieldShape]);
+  const plateGeo = (0,react.useMemo)(() => {
+    const s = new Shape();
+    for (let k = 0; k < 6; k++) {
+      const a = Math.PI / 6 + k * Math.PI / 3;
+      const px = Math.cos(a) * HEX_R * 0.9;
+      const py = Math.sin(a) * HEX_R * 0.9;
+      if (k === 0) s.moveTo(px, py);
+      else s.lineTo(px, py);
+    }
+    s.closePath();
+    return new ExtrudeGeometry(s, { depth: 0.1, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 1 });
+  }, []);
+  const edgeGeo = (0,react.useMemo)(() => {
+    const g = new CylinderGeometry(0.03, 0.03, 1, 6);
+    g.rotateX(Math.PI / 2);
+    return g;
+  }, []);
+  const glowGeo = (0,react.useMemo)(() => {
+    const g = new CylinderGeometry(0.1, 0.1, 1, 6);
+    g.rotateX(Math.PI / 2);
+    return g;
+  }, []);
+  const dashGeo = (0,react.useMemo)(() => new BoxGeometry(0.34, 0.05, 0.05), []);
+  const lockTex = (0,react.useMemo)(makeLockTexture, []);
+  const binTex = (0,react.useMemo)(() => [1, 2, 3, 4, 5, 6, 7, 8].map(makeBinaryTexture), []);
+  const binData = (0,react.useMemo)(
+    () => binTex.map((tex, i) => ({
+      tex,
+      x: (i % 2 === 0 ? -1 : 1) * (4.7 + i % 4 * 0.5),
+      y0: -3.5 + i * 0.9 % 5,
+      phase: i * 0.137 % 1,
+      speed: 1 + i % 2,
+      flip: i % 2 === 0
+    })),
+    [binTex]
+  );
+  const binRefs = (0,react.useRef)([]);
+  (0,react.useLayoutEffect)(() => {
+    const build = (ref, count, r) => {
+      if (!ref.current) return;
+      for (let i = 0; i < count; i++) {
+        const a = i / count * CyberShield_TAU;
+        dummy.position.set(Math.cos(a) * r, Math.sin(a) * r, 0);
+        dummy.rotation.set(0, 0, a + Math.PI / 2);
+        dummy.scale.set(1, 1, 1);
+        dummy.updateMatrix();
+        ref.current.setMatrixAt(i, dummy.matrix);
+      }
+      ref.current.instanceMatrix.needsUpdate = true;
+    };
+    build(ringARef, 72, 2.75);
+    build(ringBRef, 48, 2.2);
+    if (plateRef.current) {
+      const zAxis = new Vector3(0, 0, 1);
+      hex.centers.forEach((c, i) => {
+        const n = bulgeNormal(c.x, c.y);
+        dummy.position.set(c.x, c.y, bulgeZ(c.x, c.y) + 0.12);
+        dummy.quaternion.setFromUnitVectors(zAxis, n);
+        dummy.scale.set(1, 1, 1);
+        dummy.updateMatrix();
+        plateRef.current.setMatrixAt(i, dummy.matrix);
+      });
+      plateRef.current.instanceMatrix.needsUpdate = true;
+    }
+  }, [hex, dummy]);
+  const dim = (0,react.useMemo)(() => new Color("#0A5E86"), []);
+  const bright = (0,react.useMemo)(() => new Color("#9BFCFF"), []);
+  (0,react.useLayoutEffect)(() => {
+    if (!edgeRef.current || !glowRef.current) return;
+    const ph2 = u * CyberShield_TAU;
+    hex.segs.forEach((s, i) => {
+      const p1 = new Vector3(s.a.x, s.a.y, bulgeZ(s.a.x, s.a.y) + 0.24);
+      const p2 = new Vector3(s.b.x, s.b.y, bulgeZ(s.b.x, s.b.y) + 0.24);
+      const mx = (s.a.x + s.b.x) / 2;
+      const my = (s.a.y + s.b.y) / 2;
+      dummy.position.copy(p1).lerp(p2, 0.5);
+      dummy.rotation.set(0, 0, 0);
+      dummy.lookAt(p2.clone().sub(p1).add(dummy.position));
+      dummy.scale.set(1, 1, p1.distanceTo(p2) * 1.04);
+      dummy.updateMatrix();
+      edgeRef.current.setMatrixAt(i, dummy.matrix);
+      glowRef.current.setMatrixAt(i, dummy.matrix);
+      const d = Math.hypot(mx, my * 0.8);
+      const wave = Math.pow((Math.sin(d * 1.7 - ph2 * 2) + 1) / 2, 3);
+      const b = 0.22 + 0.78 * wave;
+      color.copy(dim).lerp(bright, b);
+      edgeRef.current.setColorAt(i, color);
+      color.multiplyScalar(0.45 + 0.9 * wave);
+      glowRef.current.setColorAt(i, color);
+    });
+    edgeRef.current.instanceMatrix.needsUpdate = true;
+    glowRef.current.instanceMatrix.needsUpdate = true;
+    if (edgeRef.current.instanceColor) edgeRef.current.instanceColor.needsUpdate = true;
+    if (glowRef.current.instanceColor) glowRef.current.instanceColor.needsUpdate = true;
+    binData.forEach((b, i) => {
+      const m = binRefs.current[i];
+      if (!m) return;
+      const t = (b.phase + u * b.speed) % 1;
+      m.position.set(b.x, b.y0 + t * 2.2, -0.5);
+      m.material.opacity = Math.sin(Math.PI * t) * 0.75;
+    });
+  }, [u, hex, binData, dummy, color, dim, bright]);
+  const ph = u * CyberShield_TAU;
+  const swing = Math.sin(ph) * 0.24;
+  const tilt = Math.cos(ph) * 0.05;
+  const lift = Math.sin(ph) * 0.12;
+  const lockPulse = 1 + 0.025 * Math.sin(ph * 2);
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: [0, lift, 0], rotation: [tilt, swing, 0], children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("mesh", { geometry: backGeo, position: [0, 0, -0.4], children: /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#1D4ED8", transparent: true, opacity: 0.55, metalness: 0.4, roughness: 0.2, emissive: "#1E3A8A", emissiveIntensity: 0.5, depthWrite: false }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("instancedMesh", { ref: plateRef, args: [plateGeo, void 0, hex.centers.length], frustumCulled: false, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#3B82F6", transparent: true, opacity: 0.5, metalness: 0.5, roughness: 0.15, emissive: "#1D4ED8", emissiveIntensity: 0.45, side: DoubleSide }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("instancedMesh", { ref: edgeRef, args: [edgeGeo, void 0, hex.segs.length], frustumCulled: false, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("meshBasicMaterial", { toneMapped: false }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("instancedMesh", { ref: glowRef, args: [glowGeo, void 0, hex.segs.length], frustumCulled: false, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("meshBasicMaterial", { toneMapped: false, transparent: true, opacity: 0.22, blending: AdditiveBlending, depthWrite: false }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("mesh", { geometry: outlineGeo, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("meshBasicMaterial", { color: "#67E8F9", toneMapped: false }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("group", { position: [0, 0.2, 1.05], rotation: [0, 0, u * CyberShield_TAU], children: /* @__PURE__ */ (0,jsx_runtime.jsx)("instancedMesh", { ref: ringARef, args: [dashGeo, void 0, 72], frustumCulled: false, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("meshBasicMaterial", { color: "#22D3EE", toneMapped: false }) }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("group", { position: [0, 0.2, 1.05], rotation: [0, 0, -u * CyberShield_TAU * 2], children: /* @__PURE__ */ (0,jsx_runtime.jsx)("instancedMesh", { ref: ringBRef, args: [dashGeo, void 0, 48], frustumCulled: false, children: /* @__PURE__ */ (0,jsx_runtime.jsx)("meshBasicMaterial", { color: "#A5F3FC", toneMapped: false }) }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: [0, -0.1, 1.35], scale: [lockPulse, lockPulse, lockPulse], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [0, 0.95, 0.15], children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("torusGeometry", { args: [0.72, 0.17, 20, 48, Math.PI] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#F8FAFC", metalness: 0.7, roughness: 0.2, emissive: "#BAE6FD", emissiveIntensity: 0.35 })
+      ] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [-0.72, 0.8, 0.15], children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("cylinderGeometry", { args: [0.17, 0.17, 0.3, 20] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#F8FAFC", metalness: 0.7, roughness: 0.2, emissive: "#BAE6FD", emissiveIntensity: 0.35 })
+      ] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [0.72, 0.8, 0.15], children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("cylinderGeometry", { args: [0.17, 0.17, 0.3, 20] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#F8FAFC", metalness: 0.7, roughness: 0.2, emissive: "#BAE6FD", emissiveIntensity: 0.35 })
+      ] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [0, 0, 0.15], children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [2.2, 1.9, 0.5] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#F1F5F9", metalness: 0.55, roughness: 0.25, emissive: "#BAE6FD", emissiveIntensity: 0.4 })
+      ] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [0, 0, 0.42], children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("planeGeometry", { args: [2, 1.72] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshBasicMaterial", { map: lockTex, transparent: true, toneMapped: false })
+      ] })
+    ] }),
+    binData.map((b, i) => /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { ref: (el) => {
+      binRefs.current[i] = el;
+    }, rotation: [0, 0, 0], scale: [b.flip ? -1 : 1, 1, 1], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("planeGeometry", { args: [2.6, 0.32] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshBasicMaterial", { map: b.tex, transparent: true, opacity: 0, toneMapped: false, depthWrite: false })
+    ] }, i))
+  ] });
+};
+const CyberShield = ({ width = 3840, height = 2160, totalFrames = 600 }) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const u = frame / totalFrames % 1;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, background: "transparent" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      camera: { position: [0, 0, 17], fov: 40, near: 1, far: 80 },
+      gl: { antialias: true, alpha: true },
+      style: { background: "transparent" },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.9, color: "#BFDBFE" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [8, 10, 14], intensity: 2.4, color: "#FFFFFF" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-10, -6, 8], intensity: 1.2, color: "#38BDF8" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [0, 0, 8], intensity: 18, distance: 30, color: "#22D3EE" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(ShieldScene, { u })
+      ]
+    }
+  ) });
+};
+
+;// ./node_modules/three/examples/jsm/utils/BufferGeometryUtils.js
+/* unused harmony import specifier */ var BufferGeometryUtils_BufferAttribute;
+/* unused harmony import specifier */ var BufferGeometryUtils_InstancedBufferAttribute;
+/* unused harmony import specifier */ var BufferGeometryUtils_InterleavedBuffer;
+/* unused harmony import specifier */ var BufferGeometryUtils_InterleavedBufferAttribute;
+/* unused harmony import specifier */ var BufferGeometryUtils_TrianglesDrawMode;
+/* unused harmony import specifier */ var BufferGeometryUtils_TriangleFanDrawMode;
+/* unused harmony import specifier */ var BufferGeometryUtils_TriangleStripDrawMode;
+/* unused harmony import specifier */ var BufferGeometryUtils_Vector3;
+/* unused harmony import specifier */ var BufferGeometryUtils_Float32BufferAttribute;
+
+
+function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
+
+	if ( ! MikkTSpace || ! MikkTSpace.isReady ) {
+
+		throw new Error( 'BufferGeometryUtils: Initialized MikkTSpace library required.' );
+
+	}
+
+	if ( ! geometry.hasAttribute( 'position' ) || ! geometry.hasAttribute( 'normal' ) || ! geometry.hasAttribute( 'uv' ) ) {
+
+		throw new Error( 'BufferGeometryUtils: Tangents require "position", "normal", and "uv" attributes.' );
+
+	}
+
+	function getAttributeArray( attribute ) {
+
+		if ( attribute.normalized || attribute.isInterleavedBufferAttribute ) {
+
+			const dstArray = new Float32Array( attribute.count * attribute.itemSize );
+
+			for ( let i = 0, j = 0; i < attribute.count; i ++ ) {
+
+				dstArray[ j ++ ] = attribute.getX( i );
+				dstArray[ j ++ ] = attribute.getY( i );
+
+				if ( attribute.itemSize > 2 ) {
+
+					dstArray[ j ++ ] = attribute.getZ( i );
+
+				}
+
+			}
+
+			return dstArray;
+
+		}
+
+		if ( attribute.array instanceof Float32Array ) {
+
+			return attribute.array;
+
+		}
+
+		return new Float32Array( attribute.array );
+
+	}
+
+	// MikkTSpace algorithm requires non-indexed input.
+
+	const _geometry = geometry.index ? geometry.toNonIndexed() : geometry;
+
+	// Compute vertex tangents.
+
+	const tangents = MikkTSpace.generateTangents(
+
+		getAttributeArray( _geometry.attributes.position ),
+		getAttributeArray( _geometry.attributes.normal ),
+		getAttributeArray( _geometry.attributes.uv )
+
+	);
+
+	// Texture coordinate convention of glTF differs from the apparent
+	// default of the MikkTSpace library; .w component must be flipped.
+
+	if ( negateSign ) {
+
+		for ( let i = 3; i < tangents.length; i += 4 ) {
+
+			tangents[ i ] *= - 1;
+
+		}
+
+	}
+
+	//
+
+	_geometry.setAttribute( 'tangent', new BufferGeometryUtils_BufferAttribute( tangents, 4 ) );
+
+	if ( geometry !== _geometry ) {
+
+		geometry.copy( _geometry );
+
+	}
+
+	return geometry;
+
+}
+
+/**
+ * @param  {Array<BufferGeometry>} geometries
+ * @param  {Boolean} useGroups
+ * @return {BufferGeometry}
+ */
+function mergeGeometries( geometries, useGroups = false ) {
+
+	const isIndexed = geometries[ 0 ].index !== null;
+
+	const attributesUsed = new Set( Object.keys( geometries[ 0 ].attributes ) );
+	const morphAttributesUsed = new Set( Object.keys( geometries[ 0 ].morphAttributes ) );
+
+	const attributes = {};
+	const morphAttributes = {};
+
+	const morphTargetsRelative = geometries[ 0 ].morphTargetsRelative;
+
+	const mergedGeometry = new BufferGeometry();
+
+	let offset = 0;
+
+	for ( let i = 0; i < geometries.length; ++ i ) {
+
+		const geometry = geometries[ i ];
+		let attributesCount = 0;
+
+		// ensure that all geometries are indexed, or none
+
+		if ( isIndexed !== ( geometry.index !== null ) ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.' );
+			return null;
+
+		}
+
+		// gather attributes, exit early if they're different
+
+		for ( const name in geometry.attributes ) {
+
+			if ( ! attributesUsed.has( name ) ) {
+
+				console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. All geometries must have compatible attributes; make sure "' + name + '" attribute exists among all geometries, or in none of them.' );
+				return null;
+
+			}
+
+			if ( attributes[ name ] === undefined ) attributes[ name ] = [];
+
+			attributes[ name ].push( geometry.attributes[ name ] );
+
+			attributesCount ++;
+
+		}
+
+		// ensure geometries have the same number of attributes
+
+		if ( attributesCount !== attributesUsed.size ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of attributes.' );
+			return null;
+
+		}
+
+		// gather morph attributes, exit early if they're different
+
+		if ( morphTargetsRelative !== geometry.morphTargetsRelative ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. .morphTargetsRelative must be consistent throughout all geometries.' );
+			return null;
+
+		}
+
+		for ( const name in geometry.morphAttributes ) {
+
+			if ( ! morphAttributesUsed.has( name ) ) {
+
+				console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '.  .morphAttributes must be consistent throughout all geometries.' );
+				return null;
+
+			}
+
+			if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
+
+			morphAttributes[ name ].push( geometry.morphAttributes[ name ] );
+
+		}
+
+		if ( useGroups ) {
+
+			let count;
+
+			if ( isIndexed ) {
+
+				count = geometry.index.count;
+
+			} else if ( geometry.attributes.position !== undefined ) {
+
+				count = geometry.attributes.position.count;
+
+			} else {
+
+				console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. The geometry must have either an index or a position attribute' );
+				return null;
+
+			}
+
+			mergedGeometry.addGroup( offset, count, i );
+
+			offset += count;
+
+		}
+
+	}
+
+	// merge indices
+
+	if ( isIndexed ) {
+
+		let indexOffset = 0;
+		const mergedIndex = [];
+
+		for ( let i = 0; i < geometries.length; ++ i ) {
+
+			const index = geometries[ i ].index;
+
+			for ( let j = 0; j < index.count; ++ j ) {
+
+				mergedIndex.push( index.getX( j ) + indexOffset );
+
+			}
+
+			indexOffset += geometries[ i ].attributes.position.count;
+
+		}
+
+		mergedGeometry.setIndex( mergedIndex );
+
+	}
+
+	// merge attributes
+
+	for ( const name in attributes ) {
+
+		const mergedAttribute = mergeAttributes( attributes[ name ] );
+
+		if ( ! mergedAttribute ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed while trying to merge the ' + name + ' attribute.' );
+			return null;
+
+		}
+
+		mergedGeometry.setAttribute( name, mergedAttribute );
+
+	}
+
+	// merge morph attributes
+
+	for ( const name in morphAttributes ) {
+
+		const numMorphTargets = morphAttributes[ name ][ 0 ].length;
+
+		if ( numMorphTargets === 0 ) break;
+
+		mergedGeometry.morphAttributes = mergedGeometry.morphAttributes || {};
+		mergedGeometry.morphAttributes[ name ] = [];
+
+		for ( let i = 0; i < numMorphTargets; ++ i ) {
+
+			const morphAttributesToMerge = [];
+
+			for ( let j = 0; j < morphAttributes[ name ].length; ++ j ) {
+
+				morphAttributesToMerge.push( morphAttributes[ name ][ j ][ i ] );
+
+			}
+
+			const mergedMorphAttribute = mergeAttributes( morphAttributesToMerge );
+
+			if ( ! mergedMorphAttribute ) {
+
+				console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed while trying to merge the ' + name + ' morphAttribute.' );
+				return null;
+
+			}
+
+			mergedGeometry.morphAttributes[ name ].push( mergedMorphAttribute );
+
+		}
+
+	}
+
+	return mergedGeometry;
+
+}
+
+/**
+ * @param {Array<BufferAttribute>} attributes
+ * @return {BufferAttribute}
+ */
+function mergeAttributes( attributes ) {
+
+	let TypedArray;
+	let itemSize;
+	let normalized;
+	let gpuType = - 1;
+	let arrayLength = 0;
+
+	for ( let i = 0; i < attributes.length; ++ i ) {
+
+		const attribute = attributes[ i ];
+
+		if ( attribute.isInterleavedBufferAttribute ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeAttributes() failed. InterleavedBufferAttributes are not supported.' );
+			return null;
+
+		}
+
+		if ( TypedArray === undefined ) TypedArray = attribute.array.constructor;
+		if ( TypedArray !== attribute.array.constructor ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.array must be of consistent array types across matching attributes.' );
+			return null;
+
+		}
+
+		if ( itemSize === undefined ) itemSize = attribute.itemSize;
+		if ( itemSize !== attribute.itemSize ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.itemSize must be consistent across matching attributes.' );
+			return null;
+
+		}
+
+		if ( normalized === undefined ) normalized = attribute.normalized;
+		if ( normalized !== attribute.normalized ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.normalized must be consistent across matching attributes.' );
+			return null;
+
+		}
+
+		if ( gpuType === - 1 ) gpuType = attribute.gpuType;
+		if ( gpuType !== attribute.gpuType ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.gpuType must be consistent across matching attributes.' );
+			return null;
+
+		}
+
+		arrayLength += attribute.array.length;
+
+	}
+
+	const array = new TypedArray( arrayLength );
+	let offset = 0;
+
+	for ( let i = 0; i < attributes.length; ++ i ) {
+
+		array.set( attributes[ i ].array, offset );
+
+		offset += attributes[ i ].array.length;
+
+	}
+
+	const result = new BufferAttribute( array, itemSize, normalized );
+	if ( gpuType !== undefined ) {
+
+		result.gpuType = gpuType;
+
+	}
+
+	return result;
+
+}
+
+/**
+ * @param {BufferAttribute}
+ * @return {BufferAttribute}
+ */
+function deepCloneAttribute( attribute ) {
+
+	if ( attribute.isInstancedInterleavedBufferAttribute || attribute.isInterleavedBufferAttribute ) {
+
+		return deinterleaveAttribute( attribute );
+
+	}
+
+	if ( attribute.isInstancedBufferAttribute ) {
+
+		return new BufferGeometryUtils_InstancedBufferAttribute().copy( attribute );
+
+	}
+
+	return new BufferGeometryUtils_BufferAttribute().copy( attribute );
+
+}
+
+/**
+ * @param {Array<BufferAttribute>} attributes
+ * @return {Array<InterleavedBufferAttribute>}
+ */
+function interleaveAttributes( attributes ) {
+
+	// Interleaves the provided attributes into an InterleavedBuffer and returns
+	// a set of InterleavedBufferAttributes for each attribute
+	let TypedArray;
+	let arrayLength = 0;
+	let stride = 0;
+
+	// calculate the length and type of the interleavedBuffer
+	for ( let i = 0, l = attributes.length; i < l; ++ i ) {
+
+		const attribute = attributes[ i ];
+
+		if ( TypedArray === undefined ) TypedArray = attribute.array.constructor;
+		if ( TypedArray !== attribute.array.constructor ) {
+
+			console.error( 'AttributeBuffers of different types cannot be interleaved' );
+			return null;
+
+		}
+
+		arrayLength += attribute.array.length;
+		stride += attribute.itemSize;
+
+	}
+
+	// Create the set of buffer attributes
+	const interleavedBuffer = new BufferGeometryUtils_InterleavedBuffer( new TypedArray( arrayLength ), stride );
+	let offset = 0;
+	const res = [];
+	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
+	const setters = [ 'setX', 'setY', 'setZ', 'setW' ];
+
+	for ( let j = 0, l = attributes.length; j < l; j ++ ) {
+
+		const attribute = attributes[ j ];
+		const itemSize = attribute.itemSize;
+		const count = attribute.count;
+		const iba = new BufferGeometryUtils_InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, attribute.normalized );
+		res.push( iba );
+
+		offset += itemSize;
+
+		// Move the data for each attribute into the new interleavedBuffer
+		// at the appropriate offset
+		for ( let c = 0; c < count; c ++ ) {
+
+			for ( let k = 0; k < itemSize; k ++ ) {
+
+				iba[ setters[ k ] ]( c, attribute[ getters[ k ] ]( c ) );
+
+			}
+
+		}
+
+	}
+
+	return res;
+
+}
+
+// returns a new, non-interleaved version of the provided attribute
+function deinterleaveAttribute( attribute ) {
+
+	const cons = attribute.data.array.constructor;
+	const count = attribute.count;
+	const itemSize = attribute.itemSize;
+	const normalized = attribute.normalized;
+
+	const array = new cons( count * itemSize );
+	let newAttribute;
+	if ( attribute.isInstancedInterleavedBufferAttribute ) {
+
+		newAttribute = new BufferGeometryUtils_InstancedBufferAttribute( array, itemSize, normalized, attribute.meshPerAttribute );
+
+	} else {
+
+		newAttribute = new BufferGeometryUtils_BufferAttribute( array, itemSize, normalized );
+
+	}
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		newAttribute.setX( i, attribute.getX( i ) );
+
+		if ( itemSize >= 2 ) {
+
+			newAttribute.setY( i, attribute.getY( i ) );
+
+		}
+
+		if ( itemSize >= 3 ) {
+
+			newAttribute.setZ( i, attribute.getZ( i ) );
+
+		}
+
+		if ( itemSize >= 4 ) {
+
+			newAttribute.setW( i, attribute.getW( i ) );
+
+		}
+
+	}
+
+	return newAttribute;
+
+}
+
+// deinterleaves all attributes on the geometry
+function deinterleaveGeometry( geometry ) {
+
+	const attributes = geometry.attributes;
+	const morphTargets = geometry.morphTargets;
+	const attrMap = new Map();
+
+	for ( const key in attributes ) {
+
+		const attr = attributes[ key ];
+		if ( attr.isInterleavedBufferAttribute ) {
+
+			if ( ! attrMap.has( attr ) ) {
+
+				attrMap.set( attr, deinterleaveAttribute( attr ) );
+
+			}
+
+			attributes[ key ] = attrMap.get( attr );
+
+		}
+
+	}
+
+	for ( const key in morphTargets ) {
+
+		const attr = morphTargets[ key ];
+		if ( attr.isInterleavedBufferAttribute ) {
+
+			if ( ! attrMap.has( attr ) ) {
+
+				attrMap.set( attr, deinterleaveAttribute( attr ) );
+
+			}
+
+			morphTargets[ key ] = attrMap.get( attr );
+
+		}
+
+	}
+
+}
+
+/**
+ * @param {BufferGeometry} geometry
+ * @return {number}
+ */
+function estimateBytesUsed( geometry ) {
+
+	// Return the estimated memory used by this geometry in bytes
+	// Calculate using itemSize, count, and BYTES_PER_ELEMENT to account
+	// for InterleavedBufferAttributes.
+	let mem = 0;
+	for ( const name in geometry.attributes ) {
+
+		const attr = geometry.getAttribute( name );
+		mem += attr.count * attr.itemSize * attr.array.BYTES_PER_ELEMENT;
+
+	}
+
+	const indices = geometry.getIndex();
+	mem += indices ? indices.count * indices.itemSize * indices.array.BYTES_PER_ELEMENT : 0;
+	return mem;
+
+}
+
+/**
+ * @param {BufferGeometry} geometry
+ * @param {number} tolerance
+ * @return {BufferGeometry}
+ */
+function mergeVertices( geometry, tolerance = 1e-4 ) {
+
+	tolerance = Math.max( tolerance, Number.EPSILON );
+
+	// Generate an index buffer if the geometry doesn't have one, or optimize it
+	// if it's already available.
+	const hashToIndex = {};
+	const indices = geometry.getIndex();
+	const positions = geometry.getAttribute( 'position' );
+	const vertexCount = indices ? indices.count : positions.count;
+
+	// next value for triangle indices
+	let nextIndex = 0;
+
+	// attributes and new attribute arrays
+	const attributeNames = Object.keys( geometry.attributes );
+	const tmpAttributes = {};
+	const tmpMorphAttributes = {};
+	const newIndices = [];
+	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
+	const setters = [ 'setX', 'setY', 'setZ', 'setW' ];
+
+	// Initialize the arrays, allocating space conservatively. Extra
+	// space will be trimmed in the last step.
+	for ( let i = 0, l = attributeNames.length; i < l; i ++ ) {
+
+		const name = attributeNames[ i ];
+		const attr = geometry.attributes[ name ];
+
+		tmpAttributes[ name ] = new BufferGeometryUtils_BufferAttribute(
+			new attr.array.constructor( attr.count * attr.itemSize ),
+			attr.itemSize,
+			attr.normalized
+		);
+
+		const morphAttr = geometry.morphAttributes[ name ];
+		if ( morphAttr ) {
+
+			tmpMorphAttributes[ name ] = new BufferGeometryUtils_BufferAttribute(
+				new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize ),
+				morphAttr.itemSize,
+				morphAttr.normalized
+			);
+
+		}
+
+	}
+
+	// convert the error tolerance to an amount of decimal places to truncate to
+	const halfTolerance = tolerance * 0.5;
+	const exponent = Math.log10( 1 / tolerance );
+	const hashMultiplier = Math.pow( 10, exponent );
+	const hashAdditive = halfTolerance * hashMultiplier;
+	for ( let i = 0; i < vertexCount; i ++ ) {
+
+		const index = indices ? indices.getX( i ) : i;
+
+		// Generate a hash for the vertex attributes at the current index 'i'
+		let hash = '';
+		for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
+
+			const name = attributeNames[ j ];
+			const attribute = geometry.getAttribute( name );
+			const itemSize = attribute.itemSize;
+
+			for ( let k = 0; k < itemSize; k ++ ) {
+
+				// double tilde truncates the decimal value
+				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
+
+			}
+
+		}
+
+		// Add another reference to the vertex if it's already
+		// used by another index
+		if ( hash in hashToIndex ) {
+
+			newIndices.push( hashToIndex[ hash ] );
+
+		} else {
+
+			// copy data to the new index in the temporary attributes
+			for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
+
+				const name = attributeNames[ j ];
+				const attribute = geometry.getAttribute( name );
+				const morphAttr = geometry.morphAttributes[ name ];
+				const itemSize = attribute.itemSize;
+				const newarray = tmpAttributes[ name ];
+				const newMorphArrays = tmpMorphAttributes[ name ];
+
+				for ( let k = 0; k < itemSize; k ++ ) {
+
+					const getterFunc = getters[ k ];
+					const setterFunc = setters[ k ];
+					newarray[ setterFunc ]( nextIndex, attribute[ getterFunc ]( index ) );
+
+					if ( morphAttr ) {
+
+						for ( let m = 0, ml = morphAttr.length; m < ml; m ++ ) {
+
+							newMorphArrays[ m ][ setterFunc ]( nextIndex, morphAttr[ m ][ getterFunc ]( index ) );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			hashToIndex[ hash ] = nextIndex;
+			newIndices.push( nextIndex );
+			nextIndex ++;
+
+		}
+
+	}
+
+	// generate result BufferGeometry
+	const result = geometry.clone();
+	for ( const name in geometry.attributes ) {
+
+		const tmpAttribute = tmpAttributes[ name ];
+
+		result.setAttribute( name, new BufferGeometryUtils_BufferAttribute(
+			tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ),
+			tmpAttribute.itemSize,
+			tmpAttribute.normalized,
+		) );
+
+		if ( ! ( name in tmpMorphAttributes ) ) continue;
+
+		for ( let j = 0; j < tmpMorphAttributes[ name ].length; j ++ ) {
+
+			const tmpMorphAttribute = tmpMorphAttributes[ name ][ j ];
+
+			result.morphAttributes[ name ][ j ] = new BufferGeometryUtils_BufferAttribute(
+				tmpMorphAttribute.array.slice( 0, nextIndex * tmpMorphAttribute.itemSize ),
+				tmpMorphAttribute.itemSize,
+				tmpMorphAttribute.normalized,
+			);
+
+		}
+
+	}
+
+	// indices
+
+	result.setIndex( newIndices );
+
+	return result;
+
+}
+
+/**
+ * @param {BufferGeometry} geometry
+ * @param {number} drawMode
+ * @return {BufferGeometry}
+ */
+function toTrianglesDrawMode( geometry, drawMode ) {
+
+	if ( drawMode === BufferGeometryUtils_TrianglesDrawMode ) {
+
+		console.warn( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Geometry already defined as triangles.' );
+		return geometry;
+
+	}
+
+	if ( drawMode === BufferGeometryUtils_TriangleFanDrawMode || drawMode === BufferGeometryUtils_TriangleStripDrawMode ) {
+
+		let index = geometry.getIndex();
+
+		// generate index if not present
+
+		if ( index === null ) {
+
+			const indices = [];
+
+			const position = geometry.getAttribute( 'position' );
+
+			if ( position !== undefined ) {
+
+				for ( let i = 0; i < position.count; i ++ ) {
+
+					indices.push( i );
+
+				}
+
+				geometry.setIndex( indices );
+				index = geometry.getIndex();
+
+			} else {
+
+				console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Undefined position attribute. Processing not possible.' );
+				return geometry;
+
+			}
+
+		}
+
+		//
+
+		const numberOfTriangles = index.count - 2;
+		const newIndices = [];
+
+		if ( drawMode === BufferGeometryUtils_TriangleFanDrawMode ) {
+
+			// gl.TRIANGLE_FAN
+
+			for ( let i = 1; i <= numberOfTriangles; i ++ ) {
+
+				newIndices.push( index.getX( 0 ) );
+				newIndices.push( index.getX( i ) );
+				newIndices.push( index.getX( i + 1 ) );
+
+			}
+
+		} else {
+
+			// gl.TRIANGLE_STRIP
+
+			for ( let i = 0; i < numberOfTriangles; i ++ ) {
+
+				if ( i % 2 === 0 ) {
+
+					newIndices.push( index.getX( i ) );
+					newIndices.push( index.getX( i + 1 ) );
+					newIndices.push( index.getX( i + 2 ) );
+
+				} else {
+
+					newIndices.push( index.getX( i + 2 ) );
+					newIndices.push( index.getX( i + 1 ) );
+					newIndices.push( index.getX( i ) );
+
+				}
+
+			}
+
+		}
+
+		if ( ( newIndices.length / 3 ) !== numberOfTriangles ) {
+
+			console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unable to generate correct amount of triangles.' );
+
+		}
+
+		// build final geometry
+
+		const newGeometry = geometry.clone();
+		newGeometry.setIndex( newIndices );
+		newGeometry.clearGroups();
+
+		return newGeometry;
+
+	} else {
+
+		console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unknown draw mode:', drawMode );
+		return geometry;
+
+	}
+
+}
+
+/**
+ * Calculates the morphed attributes of a morphed/skinned BufferGeometry.
+ * Helpful for Raytracing or Decals.
+ * @param {Mesh | Line | Points} object An instance of Mesh, Line or Points.
+ * @return {Object} An Object with original position/normal attributes and morphed ones.
+ */
+function computeMorphedAttributes( object ) {
+
+	const _vA = new BufferGeometryUtils_Vector3();
+	const _vB = new BufferGeometryUtils_Vector3();
+	const _vC = new BufferGeometryUtils_Vector3();
+
+	const _tempA = new BufferGeometryUtils_Vector3();
+	const _tempB = new BufferGeometryUtils_Vector3();
+	const _tempC = new BufferGeometryUtils_Vector3();
+
+	const _morphA = new BufferGeometryUtils_Vector3();
+	const _morphB = new BufferGeometryUtils_Vector3();
+	const _morphC = new BufferGeometryUtils_Vector3();
+
+	function _calculateMorphedAttributeData(
+		object,
+		attribute,
+		morphAttribute,
+		morphTargetsRelative,
+		a,
+		b,
+		c,
+		modifiedAttributeArray
+	) {
+
+		_vA.fromBufferAttribute( attribute, a );
+		_vB.fromBufferAttribute( attribute, b );
+		_vC.fromBufferAttribute( attribute, c );
+
+		const morphInfluences = object.morphTargetInfluences;
+
+		if ( morphAttribute && morphInfluences ) {
+
+			_morphA.set( 0, 0, 0 );
+			_morphB.set( 0, 0, 0 );
+			_morphC.set( 0, 0, 0 );
+
+			for ( let i = 0, il = morphAttribute.length; i < il; i ++ ) {
+
+				const influence = morphInfluences[ i ];
+				const morph = morphAttribute[ i ];
+
+				if ( influence === 0 ) continue;
+
+				_tempA.fromBufferAttribute( morph, a );
+				_tempB.fromBufferAttribute( morph, b );
+				_tempC.fromBufferAttribute( morph, c );
+
+				if ( morphTargetsRelative ) {
+
+					_morphA.addScaledVector( _tempA, influence );
+					_morphB.addScaledVector( _tempB, influence );
+					_morphC.addScaledVector( _tempC, influence );
+
+				} else {
+
+					_morphA.addScaledVector( _tempA.sub( _vA ), influence );
+					_morphB.addScaledVector( _tempB.sub( _vB ), influence );
+					_morphC.addScaledVector( _tempC.sub( _vC ), influence );
+
+				}
+
+			}
+
+			_vA.add( _morphA );
+			_vB.add( _morphB );
+			_vC.add( _morphC );
+
+		}
+
+		if ( object.isSkinnedMesh ) {
+
+			object.applyBoneTransform( a, _vA );
+			object.applyBoneTransform( b, _vB );
+			object.applyBoneTransform( c, _vC );
+
+		}
+
+		modifiedAttributeArray[ a * 3 + 0 ] = _vA.x;
+		modifiedAttributeArray[ a * 3 + 1 ] = _vA.y;
+		modifiedAttributeArray[ a * 3 + 2 ] = _vA.z;
+		modifiedAttributeArray[ b * 3 + 0 ] = _vB.x;
+		modifiedAttributeArray[ b * 3 + 1 ] = _vB.y;
+		modifiedAttributeArray[ b * 3 + 2 ] = _vB.z;
+		modifiedAttributeArray[ c * 3 + 0 ] = _vC.x;
+		modifiedAttributeArray[ c * 3 + 1 ] = _vC.y;
+		modifiedAttributeArray[ c * 3 + 2 ] = _vC.z;
+
+	}
+
+	const geometry = object.geometry;
+	const material = object.material;
+
+	let a, b, c;
+	const index = geometry.index;
+	const positionAttribute = geometry.attributes.position;
+	const morphPosition = geometry.morphAttributes.position;
+	const morphTargetsRelative = geometry.morphTargetsRelative;
+	const normalAttribute = geometry.attributes.normal;
+	const morphNormal = geometry.morphAttributes.position;
+
+	const groups = geometry.groups;
+	const drawRange = geometry.drawRange;
+	let i, j, il, jl;
+	let group;
+	let start, end;
+
+	const modifiedPosition = new Float32Array( positionAttribute.count * positionAttribute.itemSize );
+	const modifiedNormal = new Float32Array( normalAttribute.count * normalAttribute.itemSize );
+
+	if ( index !== null ) {
+
+		// indexed buffer geometry
+
+		if ( Array.isArray( material ) ) {
+
+			for ( i = 0, il = groups.length; i < il; i ++ ) {
+
+				group = groups[ i ];
+
+				start = Math.max( group.start, drawRange.start );
+				end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+
+				for ( j = start, jl = end; j < jl; j += 3 ) {
+
+					a = index.getX( j );
+					b = index.getX( j + 1 );
+					c = index.getX( j + 2 );
+
+					_calculateMorphedAttributeData(
+						object,
+						positionAttribute,
+						morphPosition,
+						morphTargetsRelative,
+						a, b, c,
+						modifiedPosition
+					);
+
+					_calculateMorphedAttributeData(
+						object,
+						normalAttribute,
+						morphNormal,
+						morphTargetsRelative,
+						a, b, c,
+						modifiedNormal
+					);
+
+				}
+
+			}
+
+		} else {
+
+			start = Math.max( 0, drawRange.start );
+			end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
+
+			for ( i = start, il = end; i < il; i += 3 ) {
+
+				a = index.getX( i );
+				b = index.getX( i + 1 );
+				c = index.getX( i + 2 );
+
+				_calculateMorphedAttributeData(
+					object,
+					positionAttribute,
+					morphPosition,
+					morphTargetsRelative,
+					a, b, c,
+					modifiedPosition
+				);
+
+				_calculateMorphedAttributeData(
+					object,
+					normalAttribute,
+					morphNormal,
+					morphTargetsRelative,
+					a, b, c,
+					modifiedNormal
+				);
+
+			}
+
+		}
+
+	} else {
+
+		// non-indexed buffer geometry
+
+		if ( Array.isArray( material ) ) {
+
+			for ( i = 0, il = groups.length; i < il; i ++ ) {
+
+				group = groups[ i ];
+
+				start = Math.max( group.start, drawRange.start );
+				end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+
+				for ( j = start, jl = end; j < jl; j += 3 ) {
+
+					a = j;
+					b = j + 1;
+					c = j + 2;
+
+					_calculateMorphedAttributeData(
+						object,
+						positionAttribute,
+						morphPosition,
+						morphTargetsRelative,
+						a, b, c,
+						modifiedPosition
+					);
+
+					_calculateMorphedAttributeData(
+						object,
+						normalAttribute,
+						morphNormal,
+						morphTargetsRelative,
+						a, b, c,
+						modifiedNormal
+					);
+
+				}
+
+			}
+
+		} else {
+
+			start = Math.max( 0, drawRange.start );
+			end = Math.min( positionAttribute.count, ( drawRange.start + drawRange.count ) );
+
+			for ( i = start, il = end; i < il; i += 3 ) {
+
+				a = i;
+				b = i + 1;
+				c = i + 2;
+
+				_calculateMorphedAttributeData(
+					object,
+					positionAttribute,
+					morphPosition,
+					morphTargetsRelative,
+					a, b, c,
+					modifiedPosition
+				);
+
+				_calculateMorphedAttributeData(
+					object,
+					normalAttribute,
+					morphNormal,
+					morphTargetsRelative,
+					a, b, c,
+					modifiedNormal
+				);
+
+			}
+
+		}
+
+	}
+
+	const morphedPositionAttribute = new BufferGeometryUtils_Float32BufferAttribute( modifiedPosition, 3 );
+	const morphedNormalAttribute = new BufferGeometryUtils_Float32BufferAttribute( modifiedNormal, 3 );
+
+	return {
+
+		positionAttribute: positionAttribute,
+		normalAttribute: normalAttribute,
+		morphedPositionAttribute: morphedPositionAttribute,
+		morphedNormalAttribute: morphedNormalAttribute
+
+	};
+
+}
+
+function mergeGroups( geometry ) {
+
+	if ( geometry.groups.length === 0 ) {
+
+		console.warn( 'THREE.BufferGeometryUtils.mergeGroups(): No groups are defined. Nothing to merge.' );
+		return geometry;
+
+	}
+
+	let groups = geometry.groups;
+
+	// sort groups by material index
+
+	groups = groups.sort( ( a, b ) => {
+
+		if ( a.materialIndex !== b.materialIndex ) return a.materialIndex - b.materialIndex;
+
+		return a.start - b.start;
+
+	} );
+
+	// create index for non-indexed geometries
+
+	if ( geometry.getIndex() === null ) {
+
+		const positionAttribute = geometry.getAttribute( 'position' );
+		const indices = [];
+
+		for ( let i = 0; i < positionAttribute.count; i += 3 ) {
+
+			indices.push( i, i + 1, i + 2 );
+
+		}
+
+		geometry.setIndex( indices );
+
+	}
+
+	// sort index
+
+	const index = geometry.getIndex();
+
+	const newIndices = [];
+
+	for ( let i = 0; i < groups.length; i ++ ) {
+
+		const group = groups[ i ];
+
+		const groupStart = group.start;
+		const groupLength = groupStart + group.count;
+
+		for ( let j = groupStart; j < groupLength; j ++ ) {
+
+			newIndices.push( index.getX( j ) );
+
+		}
+
+	}
+
+	geometry.dispose(); // Required to force buffer recreation
+	geometry.setIndex( newIndices );
+
+	// update groups indices
+
+	let start = 0;
+
+	for ( let i = 0; i < groups.length; i ++ ) {
+
+		const group = groups[ i ];
+
+		group.start = start;
+		start += group.count;
+
+	}
+
+	// merge groups
+
+	let currentGroup = groups[ 0 ];
+
+	geometry.groups = [ currentGroup ];
+
+	for ( let i = 1; i < groups.length; i ++ ) {
+
+		const group = groups[ i ];
+
+		if ( currentGroup.materialIndex === group.materialIndex ) {
+
+			currentGroup.count += group.count;
+
+		} else {
+
+			currentGroup = group;
+			geometry.groups.push( currentGroup );
+
+		}
+
+	}
+
+	return geometry;
+
+}
+
+
+/**
+ * Modifies the supplied geometry if it is non-indexed, otherwise creates a new,
+ * non-indexed geometry. Returns the geometry with smooth normals everywhere except
+ * faces that meet at an angle greater than the crease angle.
+ *
+ * @param {BufferGeometry} geometry
+ * @param {number} [creaseAngle]
+ * @return {BufferGeometry}
+ */
+function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ ) {
+
+	const creaseDot = Math.cos( creaseAngle );
+	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
+
+	// reusable vectors
+	const verts = [ new BufferGeometryUtils_Vector3(), new BufferGeometryUtils_Vector3(), new BufferGeometryUtils_Vector3() ];
+	const tempVec1 = new BufferGeometryUtils_Vector3();
+	const tempVec2 = new BufferGeometryUtils_Vector3();
+	const tempNorm = new BufferGeometryUtils_Vector3();
+	const tempNorm2 = new BufferGeometryUtils_Vector3();
+
+	// hashes a vector
+	function hashVertex( v ) {
+
+		const x = ~ ~ ( v.x * hashMultiplier );
+		const y = ~ ~ ( v.y * hashMultiplier );
+		const z = ~ ~ ( v.z * hashMultiplier );
+		return `${x},${y},${z}`;
+
+	}
+
+	// BufferGeometry.toNonIndexed() warns if the geometry is non-indexed
+	// and returns the original geometry
+	const resultGeometry = geometry.index ? geometry.toNonIndexed() : geometry;
+	const posAttr = resultGeometry.attributes.position;
+	const vertexMap = {};
+
+	// find all the normals shared by commonly located vertices
+	for ( let i = 0, l = posAttr.count / 3; i < l; i ++ ) {
+
+		const i3 = 3 * i;
+		const a = verts[ 0 ].fromBufferAttribute( posAttr, i3 + 0 );
+		const b = verts[ 1 ].fromBufferAttribute( posAttr, i3 + 1 );
+		const c = verts[ 2 ].fromBufferAttribute( posAttr, i3 + 2 );
+
+		tempVec1.subVectors( c, b );
+		tempVec2.subVectors( a, b );
+
+		// add the normal to the map for all vertices
+		const normal = new BufferGeometryUtils_Vector3().crossVectors( tempVec1, tempVec2 ).normalize();
+		for ( let n = 0; n < 3; n ++ ) {
+
+			const vert = verts[ n ];
+			const hash = hashVertex( vert );
+			if ( ! ( hash in vertexMap ) ) {
+
+				vertexMap[ hash ] = [];
+
+			}
+
+			vertexMap[ hash ].push( normal );
+
+		}
+
+	}
+
+	// average normals from all vertices that share a common location if they are within the
+	// provided crease threshold
+	const normalArray = new Float32Array( posAttr.count * 3 );
+	const normAttr = new BufferGeometryUtils_BufferAttribute( normalArray, 3, false );
+	for ( let i = 0, l = posAttr.count / 3; i < l; i ++ ) {
+
+		// get the face normal for this vertex
+		const i3 = 3 * i;
+		const a = verts[ 0 ].fromBufferAttribute( posAttr, i3 + 0 );
+		const b = verts[ 1 ].fromBufferAttribute( posAttr, i3 + 1 );
+		const c = verts[ 2 ].fromBufferAttribute( posAttr, i3 + 2 );
+
+		tempVec1.subVectors( c, b );
+		tempVec2.subVectors( a, b );
+
+		tempNorm.crossVectors( tempVec1, tempVec2 ).normalize();
+
+		// average all normals that meet the threshold and set the normal value
+		for ( let n = 0; n < 3; n ++ ) {
+
+			const vert = verts[ n ];
+			const hash = hashVertex( vert );
+			const otherNormals = vertexMap[ hash ];
+			tempNorm2.set( 0, 0, 0 );
+
+			for ( let k = 0, lk = otherNormals.length; k < lk; k ++ ) {
+
+				const otherNorm = otherNormals[ k ];
+				if ( tempNorm.dot( otherNorm ) > creaseDot ) {
+
+					tempNorm2.add( otherNorm );
+
+				}
+
+			}
+
+			tempNorm2.normalize();
+			normAttr.setXYZ( i3 + n, tempNorm2.x, tempNorm2.y, tempNorm2.z );
+
+		}
+
+	}
+
+	resultGeometry.setAttribute( 'normal', normAttr );
+	return resultGeometry;
+
+}
+
+function mergeBufferGeometries( geometries, useGroups = false ) {
+
+	console.warn( 'THREE.BufferGeometryUtils: mergeBufferGeometries() has been renamed to mergeGeometries().' ); // @deprecated, r151
+	return mergeGeometries( geometries, useGroups );
+
+}
+
+function mergeBufferAttributes( attributes ) {
+
+	console.warn( 'THREE.BufferGeometryUtils: mergeBufferAttributes() has been renamed to mergeAttributes().' ); // @deprecated, r151
+	return mergeAttributes( attributes );
+
+}
+
+
+
+;// ./src/components/FiberOpticStream.tsx
+
+
+
+
+
+
+
+function FiberOpticStream_seeded(seed) {
+  const x = Math.sin(seed * 91.3458 + 47.123) * 43758.5453;
+  return x - Math.floor(x);
+}
+const TOTAL_STRANDS = 220;
+const SEGMENTS_PER_TUBE = 84;
+const RADIAL_SEGMENTS = 8;
+const TUNNEL_LENGTH = 85;
+class SpiralStrandCurve extends Curve {
+  outerR;
+  innerR;
+  swirlTotal;
+  phase0;
+  length;
+  constructor(outerR, innerR, swirlTotal, phase0, length) {
+    super();
+    this.outerR = outerR;
+    this.innerR = innerR;
+    this.swirlTotal = swirlTotal;
+    this.phase0 = phase0;
+    this.length = length;
+  }
+  getPoint(t, optionalTarget = new Vector3()) {
+    const r = this.innerR + (this.outerR - this.innerR) * Math.pow(1 - t, 1.45);
+    const angle = this.phase0 + this.swirlTotal * Math.pow(t, 0.94);
+    const x = Math.cos(angle) * r;
+    const y = Math.sin(angle) * r;
+    const z = -t * this.length;
+    return optionalTarget.set(x, y, z);
+  }
+}
+const FiberOpticStream = ({ width = 3840, height = 2160, totalFrames = 600 }) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const u = frame / totalFrames % 1;
+  const mergedGeometry = (0,react.useMemo)(() => {
+    const geometries = [];
+    for (let i = 0; i < TOTAL_STRANDS; i++) {
+      const tier = i % 3;
+      let outerR;
+      let innerR;
+      let radiusTube;
+      if (tier === 0) {
+        outerR = 16.5 + FiberOpticStream_seeded(i * 3 + 1) * 5;
+        innerR = 2.4 + FiberOpticStream_seeded(i * 3 + 2) * 0.9;
+        radiusTube = 0.065 + FiberOpticStream_seeded(i * 3 + 3) * 0.025;
+      } else if (tier === 1) {
+        outerR = 12.5 + FiberOpticStream_seeded(i * 5 + 1) * 4.2;
+        innerR = 1.8 + FiberOpticStream_seeded(i * 5 + 2) * 0.7;
+        radiusTube = 0.05 + FiberOpticStream_seeded(i * 5 + 3) * 0.018;
+      } else {
+        outerR = 9.2 + FiberOpticStream_seeded(i * 7 + 1) * 3.6;
+        innerR = 1.3 + FiberOpticStream_seeded(i * 7 + 2) * 0.5;
+        radiusTube = 0.042 + FiberOpticStream_seeded(i * 7 + 3) * 0.015;
+      }
+      const swirlTotal = 2.7 + FiberOpticStream_seeded(i * 11 + 4) * 0.8;
+      const baseAngle = i / TOTAL_STRANDS * Math.PI * 2;
+      const phase0 = baseAngle + (FiberOpticStream_seeded(i * 13 + 5) - 0.5) * 0.05;
+      const curve = new SpiralStrandCurve(outerR, innerR, swirlTotal, phase0, TUNNEL_LENGTH);
+      const tubeGeo = new TubeGeometry(
+        curve,
+        SEGMENTS_PER_TUBE,
+        radiusTube,
+        RADIAL_SEGMENTS,
+        false
+      );
+      const randColor = FiberOpticStream_seeded(i * 17 + 6);
+      const colorType = randColor < 0.52 ? 0 : randColor < 0.94 ? 1 : 2;
+      const pulseSpeed = 2 + Math.floor(FiberOpticStream_seeded(i * 19 + 7) * 4);
+      const pulseOffset = FiberOpticStream_seeded(i * 23 + 8);
+      const pulseDensity = 1 + Math.floor(FiberOpticStream_seeded(i * 29 + 9) * 2);
+      const vertCount = tubeGeo.attributes.position.count;
+      const aColorType = new Float32Array(vertCount);
+      const aStrandMeta = new Float32Array(vertCount * 3);
+      for (let v = 0; v < vertCount; v++) {
+        aColorType[v] = colorType;
+        const idx3 = v * 3;
+        aStrandMeta[idx3 + 0] = pulseSpeed;
+        aStrandMeta[idx3 + 1] = pulseOffset;
+        aStrandMeta[idx3 + 2] = pulseDensity;
+      }
+      tubeGeo.setAttribute("aColorType", new BufferAttribute(aColorType, 1));
+      tubeGeo.setAttribute("aStrandMeta", new BufferAttribute(aStrandMeta, 3));
+      geometries.push(tubeGeo);
+    }
+    return mergeGeometries(geometries, false);
+  }, []);
+  const shaderMaterial = (0,react.useMemo)(() => {
+    return new ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uCyan: { value: new Color("#00F0FF") },
+        uMagenta: { value: new Color("#FF007F") },
+        uIceBlue: { value: new Color("#38BDF8") },
+        uCoreWhite: { value: new Color("#FFFFFF") },
+        uCableDark: { value: new Color("#0C0E14") },
+        uCableRim: { value: new Color("#2A3245") }
+      },
+      vertexShader: `
+        attribute float aColorType;
+        attribute vec3 aStrandMeta;
+
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+        varying vec2 vUv;
+        varying float vColorType;
+        varying vec3 vStrandMeta;
+
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vUv = uv;
+          vColorType = aColorType;
+          vStrandMeta = aStrandMeta;
+
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          vViewPosition = -mvPosition.xyz;
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uCyan;
+        uniform vec3 uMagenta;
+        uniform vec3 uIceBlue;
+        uniform vec3 uCoreWhite;
+        uniform vec3 uCableDark;
+        uniform vec3 uCableRim;
+
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+        varying vec2 vUv;
+        varying float vColorType;
+        varying vec3 vStrandMeta;
+
+        void main() {
+          vec3 N = normalize(vNormal);
+          vec3 V = normalize(vViewPosition);
+
+          // Specular highlights on dark glossy cables
+          vec3 lightDir = normalize(vec3(0.25, 0.45, 0.85));
+          float diff = max(dot(N, lightDir), 0.0);
+          
+          vec3 H = normalize(lightDir + V);
+          float spec = pow(max(dot(N, H), 0.0), 30.0);
+          float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+
+          vec3 cableColor = mix(uCableDark, uCableRim, diff * 0.45 + spec * 0.8 + rim * 0.55);
+
+          // vUv.x is longitudinal along the tube (0.0 to 1.0)
+          float tAlong = vUv.x;
+          float speed = vStrandMeta.x;
+          float offset = vStrandMeta.y;
+          float density = vStrandMeta.z;
+
+          // Seamless loop calculation:
+          // Pulses travel down into the vortex tunnel (towards tAlong = 1.0)
+          float pulseCoord = fract(tAlong * density - uTime * speed + offset);
+
+          // Laser tracer streak profile:
+          // Compact, energetic streak with hot bullet head and tapered glowing tail
+          float head = smoothstep(0.965, 0.995, pulseCoord) * (1.0 - smoothstep(0.995, 1.0, pulseCoord) * 0.9);
+          float tail = smoothstep(0.74, 0.99, pulseCoord) * pow(pulseCoord, 4.0);
+          float aura = smoothstep(0.60, 0.98, pulseCoord) * pow(pulseCoord, 6.0);
+
+          float streakIntensity = head * 14.0 + tail * 4.5 + aura * 1.8;
+
+          // Tiny sharp luminous bead dots on strands
+          float beadCoord = fract(tAlong * 8.0 - uTime * (speed * 0.5) + offset * 4.0);
+          float bead = smoothstep(0.975, 0.992, beadCoord) * (1.0 - smoothstep(0.992, 1.0, beadCoord)) * 4.5;
+
+          // Color selection
+          vec3 beamColor;
+          if (vColorType < 0.5) {
+            beamColor = uCyan;
+          } else if (vColorType < 1.5) {
+            beamColor = uMagenta;
+          } else {
+            beamColor = uIceBlue;
+          }
+
+          // Hot white-core laser head
+          vec3 emissiveLaser = mix(beamColor, uCoreWhite, head * 0.85);
+
+          // Combine cable surface with vibrant laser streak
+          vec3 finalColor = cableColor + emissiveLaser * streakIntensity + beamColor * bead;
+
+          // Ambient colored bleed onto the cable body
+          finalColor += beamColor * aura * 0.8;
+
+          // Dark central void mask: smooth fade to black starting at t = 0.82
+          float voidMask = 1.0 - smoothstep(0.80, 0.95, tAlong);
+          // Entrance fade at near edge
+          float entranceMask = smoothstep(0.015, 0.07, tAlong);
+
+          finalColor *= voidMask * entranceMask;
+
+          gl_FragColor = vec4(finalColor, 1.0);
+        }
+      `,
+      transparent: false
+    });
+  }, []);
+  if (shaderMaterial) {
+    shaderMaterial.uniforms.uTime.value = u;
+  }
+  const particleGeo = (0,react.useMemo)(() => {
+    const count = 600;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const cyan = new Color("#00F0FF");
+    const magenta = new Color("#FF007F");
+    for (let i = 0; i < count; i++) {
+      const t = FiberOpticStream_seeded(i * 11 + 1);
+      const angle = FiberOpticStream_seeded(i * 11 + 2) * Math.PI * 2;
+      const r = (1.6 + FiberOpticStream_seeded(i * 11 + 3) * 13) * (1 - t * 0.65);
+      positions[i * 3 + 0] = Math.cos(angle) * r;
+      positions[i * 3 + 1] = Math.sin(angle) * r;
+      positions[i * 3 + 2] = -t * TUNNEL_LENGTH;
+      const isCyan = FiberOpticStream_seeded(i * 11 + 4) > 0.42;
+      const c = isCyan ? cyan : magenta;
+      colors[i * 3 + 0] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    }
+    const geo = new BufferGeometry();
+    geo.setAttribute("position", new BufferAttribute(positions, 3));
+    geo.setAttribute("color", new BufferAttribute(colors, 3));
+    return geo;
+  }, []);
+  const camAngle = u * Math.PI * 2;
+  const camX = Math.sin(camAngle) * 0.22;
+  const camY = Math.cos(camAngle) * 0.22;
+  const camZ = 1.85 + Math.sin(camAngle * 2) * 0.12;
+  const tunnelRoll = camAngle;
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, background: "#020306", overflow: "hidden" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      camera: { position: [camX, camY, camZ], fov: 56, near: 0.1, far: 200 },
+      gl: { antialias: true, toneMapping: ACESFilmicToneMapping },
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.5, color: "#1E293B" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [0, 0, 6], intensity: 2.2, color: "#E2E8F0" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [0, 0, -3], intensity: 16, distance: 30, color: "#00F0FF" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("pointLight", { position: [0, 0, -20], intensity: 11, distance: 42, color: "#FF007F" }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("group", { rotation: [0, 0, tunnelRoll], children: /* @__PURE__ */ (0,jsx_runtime.jsx)("mesh", { geometry: mergedGeometry, material: shaderMaterial }) }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("points", { geometry: particleGeo, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
+          "pointsMaterial",
+          {
+            size: 0.12,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.88,
+            blending: AdditiveBlending,
+            depthWrite: false
+          }
+        ) })
+      ]
+    }
+  ) });
+};
+
+;// ./src/components/BinaryMatrixWaterfall.tsx
+
+
+
+
+function BinaryMatrixWaterfall_seeded(seed) {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453123;
+  return x - Math.floor(x);
+}
+function createGlyphSprite(char, fontSize, color, glowColor, glowBlur, blurPx = 0) {
+  const pad = Math.ceil(Math.max(glowBlur * 2, blurPx * 3) + 20);
+  const w = Math.ceil(fontSize * 0.95 + pad * 2);
+  const h = Math.ceil(fontSize * 1.55 + pad * 2);
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (blurPx > 0) {
+    ctx.filter = `blur(${blurPx}px)`;
+  }
+  ctx.save();
+  ctx.translate(w * 0.5, h * 0.5);
+  ctx.scale(0.85, 1.25);
+  ctx.font = `bold ${fontSize}px "Consolas", "Courier New", monospace`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  if (glowBlur > 0) {
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = glowBlur;
+  }
+  ctx.fillStyle = color;
+  ctx.fillText(char, 0, 0);
+  if (color === "#FFFFFF") {
+    ctx.fillText(char, 0, 0);
+  }
+  ctx.restore();
+  return canvas;
+}
+const BinaryMatrixWaterfall = ({
+  width = 3840,
+  height = 2160,
+  totalFrames = 600
+}) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const canvasRef = (0,react.useRef)(null);
+  const u = frame / totalFrames % 1;
+  const sprites = (0,react.useMemo)(() => {
+    if (typeof document === "undefined") return null;
+    return {
+      // 1. Foreground giant bokeh blur sprites (matching left side of reference image)
+      fg_0: createGlyphSprite("0", 165, "#34D399", "#10B981", 28, 7.5),
+      fg_1: createGlyphSprite("1", 165, "#34D399", "#10B981", 28, 7.5),
+      // 2. White-hot leader heads (midground)
+      head_0: createGlyphSprite("0", 64, "#FFFFFF", "#34D399", 26, 0),
+      head_1: createGlyphSprite("1", 64, "#FFFFFF", "#34D399", 26, 0),
+      // 3. Vibrant neon emerald upper trail
+      bright_0: createGlyphSprite("0", 64, "#34D399", "#10B981", 18, 0),
+      bright_1: createGlyphSprite("1", 64, "#34D399", "#10B981", 18, 0),
+      // 4. Emerald body stream
+      body_0: createGlyphSprite("0", 64, "#10B981", "#059669", 9, 0),
+      body_1: createGlyphSprite("1", 64, "#10B981", "#059669", 9, 0),
+      // 5. Mint tail stream
+      tail_0: createGlyphSprite("0", 64, "#059669", "transparent", 0, 0),
+      tail_1: createGlyphSprite("1", 64, "#059669", "transparent", 0, 0),
+      // 6. Dark pine ambient characters
+      dim_0: createGlyphSprite("0", 64, "#047857", "transparent", 0, 0),
+      dim_1: createGlyphSprite("1", 64, "#047857", "transparent", 0, 0),
+      // 7. Background small streams
+      bg_head_0: createGlyphSprite("0", 36, "#A7F3D0", "#10B981", 12, 0),
+      bg_head_1: createGlyphSprite("1", 36, "#A7F3D0", "#10B981", 12, 0),
+      bg_body_0: createGlyphSprite("0", 36, "#059669", "#047857", 5, 0),
+      bg_body_1: createGlyphSprite("1", 36, "#059669", "#047857", 5, 0),
+      bg_dim_0: createGlyphSprite("0", 36, "#064E3B", "transparent", 0, 0),
+      bg_dim_1: createGlyphSprite("1", 36, "#064E3B", "transparent", 0, 0)
+    };
+  }, []);
+  const columns = (0,react.useMemo)(() => {
+    const list = [];
+    const laneWidth = 62;
+    const numLanes = Math.floor(width / laneWidth);
+    const fgLane1 = Math.floor(numLanes * 0.24);
+    const fgLane2 = Math.floor(numLanes * 0.82);
+    for (let lane = 0; lane < numLanes; lane++) {
+      const xPos = lane * laneWidth + laneWidth * 0.5;
+      if (lane === fgLane1 || lane === fgLane2) {
+        list.push({
+          xPos,
+          tier: "fg",
+          charCount: 36,
+          rowSpacing: 185,
+          speedCycles: lane === fgLane1 ? 1 : 2,
+          leadCycles: lane === fgLane1 ? 2 : 3,
+          trailLength: 16,
+          seed: lane * 881 + 19,
+          opacity: 0.88
+        });
+        continue;
+      }
+      const skipRand = BinaryMatrixWaterfall_seeded(lane * 17 + 3);
+      if (skipRand < 0.14) continue;
+      const isBg = BinaryMatrixWaterfall_seeded(lane * 23 + 7) > 0.65;
+      const speedCycles = isBg ? 1 + Math.floor(BinaryMatrixWaterfall_seeded(lane * 29 + 11) * 2) : 1 + Math.floor(BinaryMatrixWaterfall_seeded(lane * 31 + 13) * 3);
+      const leadCycles = speedCycles + 1 + Math.floor(BinaryMatrixWaterfall_seeded(lane * 37 + 17) * 2);
+      const trailLength = isBg ? 10 + Math.floor(BinaryMatrixWaterfall_seeded(lane * 41 + 19) * 14) : 14 + Math.floor(BinaryMatrixWaterfall_seeded(lane * 43 + 23) * 20);
+      list.push({
+        xPos,
+        tier: isBg ? "bg" : "mid",
+        charCount: isBg ? 64 : 46,
+        rowSpacing: isBg ? 52 : 86,
+        speedCycles,
+        leadCycles,
+        trailLength,
+        seed: lane * 313 + 47,
+        opacity: isBg ? 0.52 : 0.96
+      });
+    }
+    return list.sort((a, b) => {
+      const order = { bg: 0, mid: 1, fg: 2 };
+      return order[a.tier] - order[b.tier];
+    });
+  }, [width]);
+  (0,react.useEffect)(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !sprites) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(0, 0, width, height);
+    const bgGrad = ctx.createRadialGradient(
+      width * 0.5,
+      height * 0.48,
+      140,
+      width * 0.5,
+      height * 0.5,
+      width * 0.88
+    );
+    bgGrad.addColorStop(0, "rgba(4, 36, 24, 0.38)");
+    bgGrad.addColorStop(0.55, "rgba(2, 18, 12, 0.18)");
+    bgGrad.addColorStop(1, "rgba(2, 6, 23, 0)");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+    const camAngle = u * Math.PI * 2;
+    const camParallaxX = Math.sin(camAngle) * 26;
+    for (const col of columns) {
+      const isFg = col.tier === "fg";
+      const isBg = col.tier === "bg";
+      const depthMul = isFg ? 1.7 : isBg ? 0.35 : 1;
+      const xPixel = col.xPos + camParallaxX * depthMul;
+      const totalColHeight = col.charCount * col.rowSpacing;
+      const streamOffset = u * col.speedCycles * totalColHeight % totalColHeight;
+      const leaderOffset = u * col.leadCycles * totalColHeight % totalColHeight;
+      const leaderRow = Math.floor(leaderOffset / col.rowSpacing);
+      ctx.save();
+      ctx.globalAlpha = col.opacity;
+      for (let r = 0; r < col.charCount; r++) {
+        let yPixel = (r * col.rowSpacing + streamOffset) % totalColHeight;
+        if (yPixel > totalColHeight - col.rowSpacing * 2) {
+          yPixel -= totalColHeight;
+        }
+        if (yPixel < -col.rowSpacing || yPixel > height + col.rowSpacing) {
+          continue;
+        }
+        const flipCycles = 8;
+        const staggeredU = (u + r * 1.37 / col.charCount) % 1;
+        const flipPhase = Math.floor(staggeredU * flipCycles);
+        const charSeed = col.seed + r * 17 + flipPhase % flipCycles * 97;
+        const isOne = BinaryMatrixWaterfall_seeded(charSeed) > 0.5;
+        const distFromLeader = ((r - leaderRow) % col.charCount + col.charCount) % col.charCount;
+        let sprite;
+        if (isFg) {
+          sprite = isOne ? sprites.fg_1 : sprites.fg_0;
+        } else if (isBg) {
+          if (distFromLeader === 0) {
+            sprite = isOne ? sprites.bg_head_1 : sprites.bg_head_0;
+          } else if (distFromLeader < col.trailLength) {
+            sprite = isOne ? sprites.bg_body_1 : sprites.bg_body_0;
+          } else {
+            sprite = isOne ? sprites.bg_dim_1 : sprites.bg_dim_0;
+          }
+        } else {
+          if (distFromLeader === 0) {
+            sprite = isOne ? sprites.head_1 : sprites.head_0;
+          } else if (distFromLeader === 1 || distFromLeader === 2) {
+            sprite = isOne ? sprites.bright_1 : sprites.bright_0;
+          } else if (distFromLeader < col.trailLength) {
+            const frac = distFromLeader / col.trailLength;
+            if (frac < 0.6) {
+              sprite = isOne ? sprites.body_1 : sprites.body_0;
+            } else {
+              sprite = isOne ? sprites.tail_1 : sprites.tail_0;
+            }
+          } else {
+            const ambient = BinaryMatrixWaterfall_seeded(col.seed + r * 37);
+            if (ambient > 0.88) {
+              sprite = isOne ? sprites.bright_1 : sprites.bright_0;
+            } else if (ambient > 0.5) {
+              sprite = isOne ? sprites.body_1 : sprites.body_0;
+            } else {
+              sprite = isOne ? sprites.dim_1 : sprites.dim_0;
+            }
+          }
+        }
+        ctx.drawImage(
+          sprite,
+          xPixel - sprite.width * 0.5,
+          yPixel - sprite.height * 0.5
+        );
+      }
+      ctx.restore();
+    }
+  }, [u, width, height, sprites, columns]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", background: "#020617" }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
+    "canvas",
+    {
+      ref: canvasRef,
+      width,
+      height,
+      style: { display: "block", width: "100%", height: "100%" }
+    }
+  ) });
+};
+
+;// ./src/components/MicrochipCircuit.tsx
+
+
+
+
+
+
+
+const TILE_SIZE = 80;
+function createCircuitTexture(size = 1024) {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return new Texture();
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, size, size);
+  ctx.lineWidth = 6;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+  const paths = [];
+  const numPaths = 150;
+  const grid = 32;
+  const step = size / grid;
+  let seed = 98765;
+  const random = () => {
+    seed = seed * 16807 % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
+  for (let i = 0; i < numPaths; i++) {
+    let x = Math.floor(random() * grid) * step;
+    let y = Math.floor(random() * grid) * step;
+    const path = [{ x, y, segLen: 0 }];
+    let totalLen = 0;
+    const segments = 5 + Math.floor(random() * 10);
+    let dir = Math.floor(random() * 4);
+    for (let j = 0; j < segments; j++) {
+      const isDiag = random() < 0.3;
+      let nx = x, ny = y;
+      const dist = (2 + Math.floor(random() * 4)) * step;
+      if (isDiag) {
+        const dx = random() < 0.5 ? 1 : -1;
+        const dy = random() < 0.5 ? 1 : -1;
+        nx += dx * dist;
+        ny += dy * dist;
+      } else {
+        if (dir === 0) ny -= dist;
+        if (dir === 1) nx += dist;
+        if (dir === 2) ny += dist;
+        if (dir === 3) nx -= dist;
+      }
+      const segLen = Math.hypot(nx - x, ny - y);
+      totalLen += segLen;
+      path.push({ x: nx, y: ny, segLen });
+      x = nx;
+      y = ny;
+      dir = (dir + (random() < 0.5 ? 1 : -1) + 4) % 4;
+    }
+    paths.push({ id: random(), nodes: path, totalLen: Math.max(1, totalLen) });
+  }
+  for (let ox = -1; ox <= 1; ox++) {
+    for (let oy = -1; oy <= 1; oy++) {
+      ctx.save();
+      ctx.translate(ox * size, oy * size);
+      for (const p of paths) {
+        let curDist = 0;
+        for (let j = 0; j < p.nodes.length - 1; j++) {
+          const n1 = p.nodes[j];
+          const n2 = p.nodes[j + 1];
+          if (n1.x === n2.x && n1.y === n2.y) continue;
+          const grad = ctx.createLinearGradient(n1.x, n1.y, n2.x, n2.y);
+          const r1 = Math.floor(curDist / p.totalLen * 255);
+          const g1 = Math.floor(p.id * 255);
+          curDist += n2.segLen;
+          const r2 = Math.floor(curDist / p.totalLen * 255);
+          grad.addColorStop(0, `rgb(${r1}, ${g1}, 255)`);
+          grad.addColorStop(1, `rgb(${r2}, ${g1}, 255)`);
+          ctx.strokeStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(n1.x, n1.y);
+          ctx.lineTo(n2.x, n2.y);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+  }
+  const tex = new CanvasTexture(canvas);
+  tex.wrapS = RepeatWrapping;
+  tex.wrapT = RepeatWrapping;
+  return tex;
+}
+const Board = ({ size, uTimeUniform }) => {
+  const flowTexture = (0,react.useMemo)(() => createCircuitTexture(1024), []);
+  const materialRef = (0,react.useRef)(null);
+  (0,react.useEffect)(() => {
+    if (materialRef.current) {
+      materialRef.current.onBeforeCompile = (shader) => {
+        shader.uniforms.uTime = uTimeUniform;
+        shader.uniforms.tFlow = { value: flowTexture };
+        shader.fragmentShader = `
+          uniform float uTime;
+          uniform sampler2D tFlow;
+          ${shader.fragmentShader}
+        `;
+        shader.fragmentShader = shader.fragmentShader.replace(
+          "#include <color_fragment>",
+          `
+          #include <color_fragment>
+          vec2 uv = vUv * 5.0; // 5x5 grid repeat
+          vec4 flowTex = texture2D(tFlow, uv);
+          float isTrace = flowTex.b;
+          vec3 gold = vec3(0.5, 0.35, 0.05); // dark gold traces
+          diffuseColor.rgb = mix(diffuseColor.rgb, gold, isTrace);
+          `
+        );
+        shader.fragmentShader = shader.fragmentShader.replace(
+          "#include <emissivemap_fragment>",
+          `
+          #include <emissivemap_fragment>
+          vec2 uvE = vUv * 5.0;
+          vec4 flowTexE = texture2D(tFlow, uvE);
+          float isTraceE = flowTexE.b;
+          float dist = flowTexE.r;
+          float id = flowTexE.g;
+          
+          // Animate the pulses! uTime * 2.0 = 2 cycles per 10s (perfect integer for loop)
+          float p = fract(dist * 6.0 - uTime * 2.0 + id * 23.7);
+          float glow = smoothstep(0.7, 0.95, p) * smoothstep(1.0, 0.95, p);
+          
+          vec3 pulseColor = vec3(1.0, 0.65, 0.1) * 3.5; 
+          totalEmissiveRadiance += pulseColor * glow * isTraceE;
+          `
+        );
+        shader.fragmentShader = shader.fragmentShader.replace(
+          "#include <normal_fragment_begin>",
+          `
+          #include <normal_fragment_begin>
+          float eps = 0.002;
+          vec2 uvN = vUv * 5.0;
+          float tr = texture2D(tFlow, uvN).b;
+          float tx = texture2D(tFlow, uvN + vec2(eps, 0.0)).b;
+          float ty = texture2D(tFlow, uvN + vec2(0.0, eps)).b;
+          // fake bump map for traces
+          vec3 traceNormal = normalize(vec3((tr - tx) * 8.0, (tr - ty) * 8.0, 1.0));
+          normal = normalize(normal + traceNormal);
+          `
+        );
+      };
+      materialRef.current.needsUpdate = true;
+    }
+  }, [flowTexture, uTimeUniform]);
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { rotation: [-Math.PI / 2, 0, 0], receiveShadow: true, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("planeGeometry", { args: [size * 5, size * 5] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { ref: materialRef, color: "#101014", roughness: 0.7, metalness: 0.3 })
+  ] });
+};
+const Tile = ({ offset }) => {
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: offset, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: [20, 0, 20], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [0, 1, 0], children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [22, 2, 22] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#18181B", roughness: 0.9 })
+      ] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [0, 2.1, 0], children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [16, 0.5, 16] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#71717A", metalness: 0.9, roughness: 0.3 })
+      ] })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [-20, 0.75, 10], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [8, 1.5, 12] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#09090B", roughness: 0.85 })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [-10, 0.75, -25], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [14, 1.5, 6] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#09090B", roughness: 0.85 })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [15, 0.6, -15], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [6, 1.2, 6] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#09090B", roughness: 0.85 })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [0, 0.5, 5], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [2, 1, 3] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#D4D4D8", metalness: 0.9, roughness: 0.4 })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [0, 0.5, 9], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [2, 1, 3] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#D4D4D8", metalness: 0.9, roughness: 0.4 })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [4, 0.5, 7], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [2, 1, 3] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#D4D4D8", metalness: 0.9, roughness: 0.4 })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { castShadow: true, receiveShadow: true, position: [-30, 1, -10], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [3, 2, 3] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#71717A", metalness: 0.5, roughness: 0.6 })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [-5, 0.5, 15], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [1, 1, 1] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#60A5FA", emissive: "#3B82F6", emissiveIntensity: 6, toneMapped: false })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [30, 0.5, -5], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [1, 1, 1] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#60A5FA", emissive: "#3B82F6", emissiveIntensity: 6, toneMapped: false })
+    ] }),
+    /* @__PURE__ */ (0,jsx_runtime.jsxs)("mesh", { position: [-25, 0.5, -20], children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("boxGeometry", { args: [1, 1, 1] }),
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("meshStandardMaterial", { color: "#60A5FA", emissive: "#3B82F6", emissiveIntensity: 6, toneMapped: false })
+    ] })
+  ] });
+};
+const TargetCamera = () => {
+  useThree(({ camera }) => {
+    camera.lookAt(10, 0, 10);
+  });
+  return null;
+};
+const MicrochipProcessorCircuit = ({ width = 3840, height = 2160, totalFrames = 600 }) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const u = frame / totalFrames % 1;
+  const uTimeUniform = (0,react.useMemo)(() => new Uniform(0), []);
+  uTimeUniform.value = u;
+  const groupOffset = [-u * TILE_SIZE, 0, -u * TILE_SIZE];
+  const tiles = (0,react.useMemo)(() => {
+    const arr = [];
+    for (let x = -2; x <= 2; x++) {
+      for (let z = -2; z <= 2; z++) {
+        arr.push([x * TILE_SIZE, 0, z * TILE_SIZE]);
+      }
+    }
+    return arr;
+  }, []);
+  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { backgroundColor: "#090D16" }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)(
+    ThreeCanvas,
+    {
+      width,
+      height,
+      camera: { position: [-30, 40, 30], fov: 45 },
+      shadows: true,
+      children: [
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("ambientLight", { intensity: 0.5 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(
+          "directionalLight",
+          {
+            position: [60, 80, 20],
+            intensity: 1.8,
+            castShadow: true,
+            "shadow-mapSize": [2048, 2048],
+            "shadow-camera-left": -150,
+            "shadow-camera-right": 150,
+            "shadow-camera-top": 150,
+            "shadow-camera-bottom": -150,
+            "shadow-bias": -5e-4
+          }
+        ),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("directionalLight", { position: [-40, 20, -40], intensity: 0.4 }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)(TargetCamera, {}),
+        /* @__PURE__ */ (0,jsx_runtime.jsxs)("group", { position: groupOffset, children: [
+          /* @__PURE__ */ (0,jsx_runtime.jsx)(Board, { size: TILE_SIZE, uTimeUniform }),
+          tiles.map((pos, i) => /* @__PURE__ */ (0,jsx_runtime.jsx)(Tile, { offset: pos }, i))
+        ] }),
+        /* @__PURE__ */ (0,jsx_runtime.jsx)("fog", { attach: "fog", args: ["#090D16", 70, 140] })
+      ]
+    }
+  ) });
+};
+
 ;// ./src/Root.tsx
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -75206,7 +80529,7 @@ const RemotionRoot = () => {
       {
         id: "GridWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GridDots, { palette: palettes.ocean, rows: 20, cols: 35, speed: 1, width: 3840, height: 2160, dotSize: 12, totalFrames: Root_DURATION }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75217,7 +80540,7 @@ const RemotionRoot = () => {
       {
         id: "GridWaveNeon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GridDots, { palette: palettes.neon, rows: 20, cols: 35, speed: 1, width: 3840, height: 2160, dotSize: 12, totalFrames: Root_DURATION }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75228,7 +80551,7 @@ const RemotionRoot = () => {
       {
         id: "SphereRipple",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SphereRipple, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75239,7 +80562,7 @@ const RemotionRoot = () => {
       {
         id: "NeonPurpleSphere",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SphereRipple, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neonPurple" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75250,7 +80573,7 @@ const RemotionRoot = () => {
       {
         id: "SunsetGoldSphere",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SphereRipple, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunsetGold" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75261,7 +80584,7 @@ const RemotionRoot = () => {
       {
         id: "DiamondKaleidoscope",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DiamondKaleidoscope, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75272,7 +80595,7 @@ const RemotionRoot = () => {
       {
         id: "PlexusNetwork",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlexusNetwork, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75283,7 +80606,7 @@ const RemotionRoot = () => {
       {
         id: "VortexTunnel",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VortexTunnel, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyan" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75294,7 +80617,7 @@ const RemotionRoot = () => {
       {
         id: "FireVortex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VortexTunnel, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neonPink" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75305,7 +80628,7 @@ const RemotionRoot = () => {
       {
         id: "AuroraVortex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VortexTunnel, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "toxicGreen" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75316,7 +80639,7 @@ const RemotionRoot = () => {
       {
         id: "PastelFluidWaves",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelFluidWaves, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75327,7 +80650,7 @@ const RemotionRoot = () => {
       {
         id: "HexagonalWave3D",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexagonalWave3D, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyan" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75338,7 +80661,7 @@ const RemotionRoot = () => {
       {
         id: "MagmaHex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexagonalWave3D, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "magma" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75349,7 +80672,7 @@ const RemotionRoot = () => {
       {
         id: "AuroraHex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexagonalWave3D, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "aurora" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75360,7 +80683,7 @@ const RemotionRoot = () => {
       {
         id: "BreathingMeshBlue",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BreathingMesh, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "blueOcean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75371,7 +80694,7 @@ const RemotionRoot = () => {
       {
         id: "BreathingMeshSteel",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BreathingMesh, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "steel" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75382,7 +80705,7 @@ const RemotionRoot = () => {
       {
         id: "BreathingMeshDeepSea",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BreathingMesh, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "deepSea" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75393,7 +80716,7 @@ const RemotionRoot = () => {
       {
         id: "HypnoSpiralClassic",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HypnoSpiral, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "classic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75404,7 +80727,7 @@ const RemotionRoot = () => {
       {
         id: "HypnoSpiralNeon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HypnoSpiral, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75415,7 +80738,7 @@ const RemotionRoot = () => {
       {
         id: "HypnoSpiralSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HypnoSpiral, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75426,7 +80749,7 @@ const RemotionRoot = () => {
       {
         id: "TorusKnot",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(components_TorusKnot, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75437,7 +80760,7 @@ const RemotionRoot = () => {
       {
         id: "PurpleCubes",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PurpleCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "purple" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75448,7 +80771,7 @@ const RemotionRoot = () => {
       {
         id: "NeonCubes",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PurpleCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75459,7 +80782,7 @@ const RemotionRoot = () => {
       {
         id: "MagmaCubes",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PurpleCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "magma" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75470,7 +80793,7 @@ const RemotionRoot = () => {
       {
         id: "EmeraldHex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75481,7 +80804,7 @@ const RemotionRoot = () => {
       {
         id: "OceanHex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75492,7 +80815,7 @@ const RemotionRoot = () => {
       {
         id: "LavaHex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "lava" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75503,7 +80826,7 @@ const RemotionRoot = () => {
       {
         id: "RadialHex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RadialHex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "blue" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75514,7 +80837,7 @@ const RemotionRoot = () => {
       {
         id: "RadialHexRed",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RadialHex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "red" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75525,7 +80848,7 @@ const RemotionRoot = () => {
       {
         id: "RadialHexGreen",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RadialHex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "green" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75536,7 +80859,7 @@ const RemotionRoot = () => {
       {
         id: "RetroWaves",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(components_RetroWaves, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "classic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75547,7 +80870,7 @@ const RemotionRoot = () => {
       {
         id: "RetroWavesCandy",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(components_RetroWaves, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "candy" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75558,7 +80881,7 @@ const RemotionRoot = () => {
       {
         id: "RetroWavesMiami",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(components_RetroWaves, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "miami" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75569,7 +80892,7 @@ const RemotionRoot = () => {
       {
         id: "TriMeshOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TriMesh, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75580,7 +80903,7 @@ const RemotionRoot = () => {
       {
         id: "TriMeshSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TriMesh, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75591,7 +80914,7 @@ const RemotionRoot = () => {
       {
         id: "TriMeshNeon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TriMesh, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75602,7 +80925,7 @@ const RemotionRoot = () => {
       {
         id: "FiberOptic",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FiberOptic, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75613,7 +80936,7 @@ const RemotionRoot = () => {
       {
         id: "WaveSpectrum",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveSpectrum, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75624,7 +80947,7 @@ const RemotionRoot = () => {
       {
         id: "SilkWavesRainbow",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkWaves, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rainbow" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75635,7 +80958,7 @@ const RemotionRoot = () => {
       {
         id: "SilkWavesAurora",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkWaves, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "aurora" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75646,7 +80969,7 @@ const RemotionRoot = () => {
       {
         id: "SilkWavesFire",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkWaves, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "fire" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75657,7 +80980,7 @@ const RemotionRoot = () => {
       {
         id: "SilkWavesOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkWaves, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75668,7 +80991,7 @@ const RemotionRoot = () => {
       {
         id: "Inferno",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(Inferno, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "inferno" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75679,7 +81002,7 @@ const RemotionRoot = () => {
       {
         id: "InfernoBlueFire",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(Inferno, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "bluefire" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75690,7 +81013,7 @@ const RemotionRoot = () => {
       {
         id: "InfernoToxic",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(Inferno, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "toxic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75701,7 +81024,7 @@ const RemotionRoot = () => {
       {
         id: "InfernoVoid",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(Inferno, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "void" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75712,7 +81035,7 @@ const RemotionRoot = () => {
       {
         id: "InfernoSolar",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(Inferno, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "solar" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75723,7 +81046,7 @@ const RemotionRoot = () => {
       {
         id: "AuroraFlow",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AuroraFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75734,7 +81057,7 @@ const RemotionRoot = () => {
       {
         id: "AuroraFlowSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AuroraFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75745,7 +81068,7 @@ const RemotionRoot = () => {
       {
         id: "AuroraFlowArctic",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AuroraFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "arctic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75756,7 +81079,7 @@ const RemotionRoot = () => {
       {
         id: "AuroraFlowForest",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AuroraFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "forest" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75767,7 +81090,7 @@ const RemotionRoot = () => {
       {
         id: "AuroraFlowGolden",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AuroraFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "golden" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75778,7 +81101,7 @@ const RemotionRoot = () => {
       {
         id: "GlitterFlow",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlitterFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75789,7 +81112,7 @@ const RemotionRoot = () => {
       {
         id: "LavaVeins",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LavaVeins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "lava" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75800,7 +81123,7 @@ const RemotionRoot = () => {
       {
         id: "LavaVeinsIce",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LavaVeins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ice" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75811,7 +81134,7 @@ const RemotionRoot = () => {
       {
         id: "LavaVeinsToxic",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LavaVeins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "toxic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75822,7 +81145,7 @@ const RemotionRoot = () => {
       {
         id: "LavaVeinsVoid",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LavaVeins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "void" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75833,7 +81156,7 @@ const RemotionRoot = () => {
       {
         id: "LavaVeinsSolar",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LavaVeins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "solar" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75844,7 +81167,7 @@ const RemotionRoot = () => {
       {
         id: "MarbleFlow",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MarbleFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "classic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75855,7 +81178,7 @@ const RemotionRoot = () => {
       {
         id: "MarbleFlowNoir",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MarbleFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "noir" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75866,7 +81189,7 @@ const RemotionRoot = () => {
       {
         id: "MarbleFlowRosa",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MarbleFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rosa" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75877,7 +81200,7 @@ const RemotionRoot = () => {
       {
         id: "MarbleFlowVerde",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MarbleFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "verde" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75888,7 +81211,7 @@ const RemotionRoot = () => {
       {
         id: "MarbleFlowRoyal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MarbleFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "royal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75899,7 +81222,7 @@ const RemotionRoot = () => {
       {
         id: "UnderwaterCaustics",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(UnderwaterCaustics, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "tropical" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75910,7 +81233,7 @@ const RemotionRoot = () => {
       {
         id: "UnderwaterCausticsDeepOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(UnderwaterCaustics, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "deepOcean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75921,7 +81244,7 @@ const RemotionRoot = () => {
       {
         id: "UnderwaterCausticsCoral",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(UnderwaterCaustics, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "coral" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75932,7 +81255,7 @@ const RemotionRoot = () => {
       {
         id: "UnderwaterCausticsKelp",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(UnderwaterCaustics, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "kelp" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75943,7 +81266,7 @@ const RemotionRoot = () => {
       {
         id: "UnderwaterCausticsAbyss",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(UnderwaterCaustics, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "abyss" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75954,7 +81277,7 @@ const RemotionRoot = () => {
       {
         id: "FrostCrystal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FrostCrystal, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "arctic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75965,7 +81288,7 @@ const RemotionRoot = () => {
       {
         id: "FrostCrystalAurora",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FrostCrystal, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "aurora" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75976,7 +81299,7 @@ const RemotionRoot = () => {
       {
         id: "FrostCrystalEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FrostCrystal, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75987,7 +81310,7 @@ const RemotionRoot = () => {
       {
         id: "FrostCrystalVoid",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FrostCrystal, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "void" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -75998,7 +81321,7 @@ const RemotionRoot = () => {
       {
         id: "FrostCrystalEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FrostCrystal, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76009,7 +81332,7 @@ const RemotionRoot = () => {
       {
         id: "DiagonalFlow",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DiagonalFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76020,7 +81343,7 @@ const RemotionRoot = () => {
       {
         id: "BubbleDrift",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BubbleDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "silver" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76031,7 +81354,7 @@ const RemotionRoot = () => {
       {
         id: "BubbleDriftGold",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BubbleDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76042,7 +81365,7 @@ const RemotionRoot = () => {
       {
         id: "BubbleDriftOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BubbleDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76053,7 +81376,7 @@ const RemotionRoot = () => {
       {
         id: "BubbleDriftRose",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BubbleDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76064,7 +81387,7 @@ const RemotionRoot = () => {
       {
         id: "BubbleDriftEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BubbleDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76075,7 +81398,7 @@ const RemotionRoot = () => {
       {
         id: "PoolRipples",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PoolRipples, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "tropical" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76086,7 +81409,7 @@ const RemotionRoot = () => {
       {
         id: "PoolRipplesLagoon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PoolRipples, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "lagoon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76097,7 +81420,7 @@ const RemotionRoot = () => {
       {
         id: "PoolRipplesSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PoolRipples, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76108,7 +81431,7 @@ const RemotionRoot = () => {
       {
         id: "PoolRipplesMidnight",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PoolRipples, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "midnight" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76119,7 +81442,7 @@ const RemotionRoot = () => {
       {
         id: "PoolRipplesEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PoolRipples, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76130,7 +81453,7 @@ const RemotionRoot = () => {
       {
         id: "BokehGlow",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BokehGlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "aqua" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76141,7 +81464,7 @@ const RemotionRoot = () => {
       {
         id: "BokehGlowViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BokehGlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76152,7 +81475,7 @@ const RemotionRoot = () => {
       {
         id: "BokehGlowRose",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BokehGlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76163,7 +81486,7 @@ const RemotionRoot = () => {
       {
         id: "BokehGlowGold",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BokehGlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76174,7 +81497,7 @@ const RemotionRoot = () => {
       {
         id: "BokehGlowEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BokehGlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76185,7 +81508,7 @@ const RemotionRoot = () => {
       {
         id: "FlowLines",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FlowLines, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76196,7 +81519,7 @@ const RemotionRoot = () => {
       {
         id: "NeonTubes",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonTubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76207,7 +81530,7 @@ const RemotionRoot = () => {
       {
         id: "PurpleTubes",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonTubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "purple" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76218,7 +81541,7 @@ const RemotionRoot = () => {
       {
         id: "MagmaTubes",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonTubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "magma" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76229,7 +81552,7 @@ const RemotionRoot = () => {
       {
         id: "HexStone",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexStone, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "carbon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76240,7 +81563,7 @@ const RemotionRoot = () => {
       {
         id: "HexStoneGraphite",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexStone, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "graphite" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76251,7 +81574,7 @@ const RemotionRoot = () => {
       {
         id: "HexStoneSand",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexStone, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sandstone" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76262,7 +81585,7 @@ const RemotionRoot = () => {
       {
         id: "HexStoneSlate",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexStone, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "slate" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76273,7 +81596,7 @@ const RemotionRoot = () => {
       {
         id: "HexStoneBronze",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexStone, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "bronze" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76284,7 +81607,7 @@ const RemotionRoot = () => {
       {
         id: "HexStoneMidnight",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexStone, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "midnight" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76295,7 +81618,7 @@ const RemotionRoot = () => {
       {
         id: "WireWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WireWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mono" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76306,7 +81629,7 @@ const RemotionRoot = () => {
       {
         id: "WireWaveEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WireWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76317,7 +81640,7 @@ const RemotionRoot = () => {
       {
         id: "WireWaveAbyss",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WireWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "abyss" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76328,7 +81651,7 @@ const RemotionRoot = () => {
       {
         id: "WireWaveMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WireWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76339,7 +81662,7 @@ const RemotionRoot = () => {
       {
         id: "WireWaveRoyal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WireWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "royal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76350,7 +81673,7 @@ const RemotionRoot = () => {
       {
         id: "PlushFur",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlushFur, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "pink" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76361,7 +81684,7 @@ const RemotionRoot = () => {
       {
         id: "PlushFurCream",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlushFur, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cream" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76372,7 +81695,7 @@ const RemotionRoot = () => {
       {
         id: "PlushFurLavender",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlushFur, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "lavender" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76383,7 +81706,7 @@ const RemotionRoot = () => {
       {
         id: "PlushFurMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlushFur, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76394,7 +81717,7 @@ const RemotionRoot = () => {
       {
         id: "PlushFurSky",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlushFur, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sky" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76405,7 +81728,7 @@ const RemotionRoot = () => {
       {
         id: "PlasmaVortex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlasmaVortex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76416,7 +81739,7 @@ const RemotionRoot = () => {
       {
         id: "PlasmaVortexCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlasmaVortex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76427,7 +81750,7 @@ const RemotionRoot = () => {
       {
         id: "PlasmaVortexAbyss",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlasmaVortex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "abyss" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76438,7 +81761,7 @@ const RemotionRoot = () => {
       {
         id: "PlasmaVortexInferno",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlasmaVortex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "inferno" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76449,7 +81772,7 @@ const RemotionRoot = () => {
       {
         id: "PlasmaVortexVenom",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PlasmaVortex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "venom" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76460,7 +81783,7 @@ const RemotionRoot = () => {
       {
         id: "SilkGradient",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkGradient, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "dusk" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76471,7 +81794,7 @@ const RemotionRoot = () => {
       {
         id: "SilkGradientSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkGradient, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76482,7 +81805,7 @@ const RemotionRoot = () => {
       {
         id: "SilkGradientLagoon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkGradient, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "lagoon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76493,7 +81816,7 @@ const RemotionRoot = () => {
       {
         id: "SilkGradientRose",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkGradient, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76504,7 +81827,7 @@ const RemotionRoot = () => {
       {
         id: "SilkGradientMidnight",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SilkGradient, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "midnight" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76515,7 +81838,7 @@ const RemotionRoot = () => {
       {
         id: "SmokeWisps",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SmokeWisps, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mono" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76526,7 +81849,7 @@ const RemotionRoot = () => {
       {
         id: "SmokeWispsEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SmokeWisps, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76537,7 +81860,7 @@ const RemotionRoot = () => {
       {
         id: "SmokeWispsAbyss",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SmokeWisps, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "abyss" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76548,7 +81871,7 @@ const RemotionRoot = () => {
       {
         id: "SmokeWispsMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SmokeWisps, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76559,7 +81882,7 @@ const RemotionRoot = () => {
       {
         id: "SmokeWispsRoyal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SmokeWisps, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "royal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76570,7 +81893,7 @@ const RemotionRoot = () => {
       {
         id: "FlowingLines",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FlowingLines, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mono" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76581,7 +81904,7 @@ const RemotionRoot = () => {
       {
         id: "FlowingLinesCyan",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FlowingLines, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyan" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76592,7 +81915,7 @@ const RemotionRoot = () => {
       {
         id: "FlowingLinesGold",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FlowingLines, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76603,7 +81926,7 @@ const RemotionRoot = () => {
       {
         id: "FlowingLinesNeon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FlowingLines, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76614,7 +81937,7 @@ const RemotionRoot = () => {
       {
         id: "FlowingLinesMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FlowingLines, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76625,7 +81948,7 @@ const RemotionRoot = () => {
       {
         id: "BlueFire",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlueFire, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "blue" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76636,7 +81959,7 @@ const RemotionRoot = () => {
       {
         id: "BlueFireCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlueFire, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76647,7 +81970,7 @@ const RemotionRoot = () => {
       {
         id: "BlueFireToxic",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlueFire, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "toxic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76658,7 +81981,7 @@ const RemotionRoot = () => {
       {
         id: "BlueFireViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlueFire, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76669,7 +81992,7 @@ const RemotionRoot = () => {
       {
         id: "BlueFireSolar",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlueFire, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "solar" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76680,7 +82003,7 @@ const RemotionRoot = () => {
       {
         id: "TitaniumRibs",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TitaniumRibs, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76691,7 +82014,7 @@ const RemotionRoot = () => {
       {
         id: "BlueLens",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlueLens, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76702,7 +82025,7 @@ const RemotionRoot = () => {
       {
         id: "EmeraldLens",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ConcentricLens, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76713,7 +82036,7 @@ const RemotionRoot = () => {
       {
         id: "VioletLens",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ConcentricLens, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76724,7 +82047,7 @@ const RemotionRoot = () => {
       {
         id: "SolarLens",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ConcentricLens, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "solar" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76735,7 +82058,7 @@ const RemotionRoot = () => {
       {
         id: "RoseLens",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ConcentricLens, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76746,7 +82069,7 @@ const RemotionRoot = () => {
       {
         id: "FacetedMosaic",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FacetedMosaic, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76757,7 +82080,7 @@ const RemotionRoot = () => {
       {
         id: "GoldFacet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ColorFacet, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76768,7 +82091,7 @@ const RemotionRoot = () => {
       {
         id: "RoseFacet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ColorFacet, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76779,7 +82102,7 @@ const RemotionRoot = () => {
       {
         id: "EmeraldFacet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ColorFacet, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76790,7 +82113,7 @@ const RemotionRoot = () => {
       {
         id: "VioletFacet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ColorFacet, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76801,7 +82124,7 @@ const RemotionRoot = () => {
       {
         id: "GoldHexWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GoldHexWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76812,7 +82135,7 @@ const RemotionRoot = () => {
       {
         id: "CrimsonHexWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76823,7 +82146,7 @@ const RemotionRoot = () => {
       {
         id: "EmeraldHexWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76834,7 +82157,7 @@ const RemotionRoot = () => {
       {
         id: "VioletHexWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76845,7 +82168,7 @@ const RemotionRoot = () => {
       {
         id: "OceanHexWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76856,7 +82179,7 @@ const RemotionRoot = () => {
       {
         id: "RetroSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RetroPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76867,7 +82190,7 @@ const RemotionRoot = () => {
       {
         id: "RetroCandy",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RetroPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "candy" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76878,7 +82201,7 @@ const RemotionRoot = () => {
       {
         id: "RetroWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RetroPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "wave" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76889,7 +82212,7 @@ const RemotionRoot = () => {
       {
         id: "RetroPop",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RetroPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "pop" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76900,7 +82223,7 @@ const RemotionRoot = () => {
       {
         id: "RetroMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RetroPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76911,7 +82234,7 @@ const RemotionRoot = () => {
       {
         id: "RetroDusk",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RetroPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "dusk" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76922,7 +82245,7 @@ const RemotionRoot = () => {
       {
         id: "PastelPeach",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "peach" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76933,7 +82256,7 @@ const RemotionRoot = () => {
       {
         id: "PastelLavender",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "lavender" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76944,7 +82267,7 @@ const RemotionRoot = () => {
       {
         id: "PastelMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76955,7 +82278,7 @@ const RemotionRoot = () => {
       {
         id: "PastelSky",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sky" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76966,7 +82289,7 @@ const RemotionRoot = () => {
       {
         id: "PastelRose",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelDrift, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76977,7 +82300,7 @@ const RemotionRoot = () => {
       {
         id: "InkBloom",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(InkBloom, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76988,7 +82311,7 @@ const RemotionRoot = () => {
       {
         id: "DiscoPixel",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DiscoPixel, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -76999,7 +82322,7 @@ const RemotionRoot = () => {
       {
         id: "DiscoOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DiscoTiles, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77010,7 +82333,7 @@ const RemotionRoot = () => {
       {
         id: "DiscoCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DiscoTiles, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77021,7 +82344,7 @@ const RemotionRoot = () => {
       {
         id: "DiscoEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DiscoTiles, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77032,7 +82355,7 @@ const RemotionRoot = () => {
       {
         id: "DiscoSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DiscoTiles, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77043,7 +82366,7 @@ const RemotionRoot = () => {
       {
         id: "CubeField",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CubeField, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77054,7 +82377,7 @@ const RemotionRoot = () => {
       {
         id: "CubeOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CubeBlocks, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77065,7 +82388,7 @@ const RemotionRoot = () => {
       {
         id: "CubeCandy",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CubeBlocks, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "candy" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77076,7 +82399,7 @@ const RemotionRoot = () => {
       {
         id: "CubeMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CubeBlocks, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77087,7 +82410,7 @@ const RemotionRoot = () => {
       {
         id: "CubeSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CubeBlocks, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77098,7 +82421,7 @@ const RemotionRoot = () => {
       {
         id: "RainbowVortex",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RainbowVortex, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77109,7 +82432,7 @@ const RemotionRoot = () => {
       {
         id: "VioletFan",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VioletFan, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77120,7 +82443,7 @@ const RemotionRoot = () => {
       {
         id: "FanCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FanBlades, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77131,7 +82454,7 @@ const RemotionRoot = () => {
       {
         id: "FanOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FanBlades, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77142,7 +82465,7 @@ const RemotionRoot = () => {
       {
         id: "FanEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FanBlades, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77153,7 +82476,7 @@ const RemotionRoot = () => {
       {
         id: "FanAmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(FanBlades, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "amber" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77164,7 +82487,7 @@ const RemotionRoot = () => {
       {
         id: "NeonStrings",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonStrings, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77175,7 +82498,7 @@ const RemotionRoot = () => {
       {
         id: "NeonStringsCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonStrings, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77186,7 +82509,7 @@ const RemotionRoot = () => {
       {
         id: "NeonStringsOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonStrings, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77197,7 +82520,7 @@ const RemotionRoot = () => {
       {
         id: "NeonStringsEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonStrings, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77208,7 +82531,7 @@ const RemotionRoot = () => {
       {
         id: "NeonStringsSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonStrings, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77219,7 +82542,7 @@ const RemotionRoot = () => {
       {
         id: "NeonTerrain",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonTerrain, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77230,7 +82553,7 @@ const RemotionRoot = () => {
       {
         id: "MoltenGold",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MoltenGold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77241,7 +82564,7 @@ const RemotionRoot = () => {
       {
         id: "MoltenSilver",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MoltenGold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "silver" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77252,7 +82575,7 @@ const RemotionRoot = () => {
       {
         id: "MoltenCopper",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MoltenGold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "copper" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77263,7 +82586,7 @@ const RemotionRoot = () => {
       {
         id: "MoltenOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MoltenGold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77274,7 +82597,7 @@ const RemotionRoot = () => {
       {
         id: "MoltenCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MoltenGold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77285,7 +82608,7 @@ const RemotionRoot = () => {
       {
         id: "HoloMarble",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HoloMarble, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77296,7 +82619,7 @@ const RemotionRoot = () => {
       {
         id: "HoloAurora",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HoloMarble, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "aurora" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77307,7 +82630,7 @@ const RemotionRoot = () => {
       {
         id: "HoloSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HoloMarble, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77318,7 +82641,7 @@ const RemotionRoot = () => {
       {
         id: "HoloOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HoloMarble, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77329,7 +82652,7 @@ const RemotionRoot = () => {
       {
         id: "HoloForest",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HoloMarble, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "forest" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77340,7 +82663,7 @@ const RemotionRoot = () => {
       {
         id: "LiquidChrome",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LiquidChrome, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77351,7 +82674,7 @@ const RemotionRoot = () => {
       {
         id: "LiquidGold",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LiquidChrome, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77362,7 +82685,7 @@ const RemotionRoot = () => {
       {
         id: "LiquidRose",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LiquidChrome, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77373,7 +82696,7 @@ const RemotionRoot = () => {
       {
         id: "LiquidOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LiquidChrome, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77384,7 +82707,7 @@ const RemotionRoot = () => {
       {
         id: "LiquidEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LiquidChrome, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77395,7 +82718,7 @@ const RemotionRoot = () => {
       {
         id: "GlassBlocks",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlassBlocks, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77406,7 +82729,7 @@ const RemotionRoot = () => {
       {
         id: "HexSphere",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexSphere, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77417,7 +82740,7 @@ const RemotionRoot = () => {
       {
         id: "HexTeal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexSphere, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "teal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77428,7 +82751,7 @@ const RemotionRoot = () => {
       {
         id: "HexViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexSphere, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77439,7 +82762,7 @@ const RemotionRoot = () => {
       {
         id: "HexAmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexSphere, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "amber" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77450,7 +82773,7 @@ const RemotionRoot = () => {
       {
         id: "HexRose",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HexSphere, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77461,7 +82784,7 @@ const RemotionRoot = () => {
       {
         id: "PastelCubes",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77472,7 +82795,7 @@ const RemotionRoot = () => {
       {
         id: "PastelSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77483,7 +82806,7 @@ const RemotionRoot = () => {
       {
         id: "PastelOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77494,7 +82817,7 @@ const RemotionRoot = () => {
       {
         id: "PastelCandy",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "candy" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77505,7 +82828,7 @@ const RemotionRoot = () => {
       {
         id: "PastelForest",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelCubes, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "forest" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77516,7 +82839,7 @@ const RemotionRoot = () => {
       {
         id: "PolyPlates",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyPlates, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77527,7 +82850,7 @@ const RemotionRoot = () => {
       {
         id: "PlateWarm",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyPlates, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "warm" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77538,7 +82861,7 @@ const RemotionRoot = () => {
       {
         id: "PlateCool",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyPlates, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cool" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77549,7 +82872,7 @@ const RemotionRoot = () => {
       {
         id: "PlateRose",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyPlates, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77560,7 +82883,7 @@ const RemotionRoot = () => {
       {
         id: "PlateSage",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyPlates, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sage" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77571,7 +82894,7 @@ const RemotionRoot = () => {
       {
         id: "CrystalShards",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CrystalShards, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77582,7 +82905,7 @@ const RemotionRoot = () => {
       {
         id: "ShardGold",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CrystalShards, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77593,7 +82916,7 @@ const RemotionRoot = () => {
       {
         id: "ShardIce",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CrystalShards, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ice" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77604,7 +82927,7 @@ const RemotionRoot = () => {
       {
         id: "ShardRose",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CrystalShards, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77615,7 +82938,7 @@ const RemotionRoot = () => {
       {
         id: "ShardEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CrystalShards, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77626,7 +82949,7 @@ const RemotionRoot = () => {
       {
         id: "WaveFins",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveFins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77637,7 +82960,7 @@ const RemotionRoot = () => {
       {
         id: "FinEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveFins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77648,7 +82971,7 @@ const RemotionRoot = () => {
       {
         id: "FinOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveFins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77659,7 +82982,7 @@ const RemotionRoot = () => {
       {
         id: "FinViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveFins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77670,7 +82993,7 @@ const RemotionRoot = () => {
       {
         id: "FinEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveFins, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77681,7 +83004,7 @@ const RemotionRoot = () => {
       {
         id: "NavyGrunge",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NavyGrunge, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77692,7 +83015,7 @@ const RemotionRoot = () => {
       {
         id: "GrungeCharcoal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NavyGrunge, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "charcoal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77703,7 +83026,7 @@ const RemotionRoot = () => {
       {
         id: "GrungeWine",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NavyGrunge, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "wine" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77714,7 +83037,7 @@ const RemotionRoot = () => {
       {
         id: "GrungeForest",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NavyGrunge, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "forest" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77725,7 +83048,7 @@ const RemotionRoot = () => {
       {
         id: "GrungeEspresso",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NavyGrunge, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "espresso" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77736,7 +83059,7 @@ const RemotionRoot = () => {
       {
         id: "CandyCheck",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CandyCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77747,7 +83070,7 @@ const RemotionRoot = () => {
       {
         id: "CheckOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CandyCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77758,7 +83081,7 @@ const RemotionRoot = () => {
       {
         id: "CheckGrape",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CandyCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "grape" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77769,7 +83092,7 @@ const RemotionRoot = () => {
       {
         id: "CheckTangerine",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CandyCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "tangerine" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77780,7 +83103,7 @@ const RemotionRoot = () => {
       {
         id: "CheckMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CandyCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77791,7 +83114,7 @@ const RemotionRoot = () => {
       {
         id: "PastelPoly",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77802,7 +83125,7 @@ const RemotionRoot = () => {
       {
         id: "PolyMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77813,7 +83136,7 @@ const RemotionRoot = () => {
       {
         id: "PolySunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77824,7 +83147,7 @@ const RemotionRoot = () => {
       {
         id: "PolyOcean",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77835,7 +83158,7 @@ const RemotionRoot = () => {
       {
         id: "PolyGrape",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PastelPoly, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "grape" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77846,7 +83169,7 @@ const RemotionRoot = () => {
       {
         id: "Globe",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(Globe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77857,7 +83180,7 @@ const RemotionRoot = () => {
       {
         id: "GlobeArcs",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlobeArcs, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77868,7 +83191,7 @@ const RemotionRoot = () => {
       {
         id: "GlobeNight",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlobeNight, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77879,7 +83202,7 @@ const RemotionRoot = () => {
       {
         id: "GlobeHolo",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlobeHolo, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77890,7 +83213,7 @@ const RemotionRoot = () => {
       {
         id: "GlobeOrbit",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlobeOrbit, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77901,7 +83224,7 @@ const RemotionRoot = () => {
       {
         id: "AmericaSignal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AmericaSignal, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77912,7 +83235,7 @@ const RemotionRoot = () => {
       {
         id: "DustParticles",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DustParticles, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77923,7 +83246,7 @@ const RemotionRoot = () => {
       {
         id: "HudRadar",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HudRadar, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77934,7 +83257,7 @@ const RemotionRoot = () => {
       {
         id: "HoloGlobe",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HoloGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "teal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77945,7 +83268,7 @@ const RemotionRoot = () => {
       {
         id: "HoloGlobeViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HoloGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77956,7 +83279,7 @@ const RemotionRoot = () => {
       {
         id: "HoloGlobeAmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(HoloGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "amber" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77967,7 +83290,7 @@ const RemotionRoot = () => {
       {
         id: "AnalyticsBoard",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AnalyticsBoard, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "blue" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77978,7 +83301,7 @@ const RemotionRoot = () => {
       {
         id: "AnalyticsBoardIndigo",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AnalyticsBoard, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "indigo" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -77989,7 +83312,7 @@ const RemotionRoot = () => {
       {
         id: "AnalyticsBoardTeal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AnalyticsBoard, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "teal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78000,7 +83323,7 @@ const RemotionRoot = () => {
       {
         id: "BigDataHud",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BigDataHud, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyan" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78011,7 +83334,7 @@ const RemotionRoot = () => {
       {
         id: "BigDataHudViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BigDataHud, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78022,7 +83345,7 @@ const RemotionRoot = () => {
       {
         id: "BigDataHudEmerald",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BigDataHud, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78033,7 +83356,7 @@ const RemotionRoot = () => {
       {
         id: "ParticleOrb",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ParticleOrb, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "rose" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78044,7 +83367,7 @@ const RemotionRoot = () => {
       {
         id: "ParticleOrbIce",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ParticleOrb, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ice" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78055,7 +83378,7 @@ const RemotionRoot = () => {
       {
         id: "ParticleOrbEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ParticleOrb, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78066,7 +83389,7 @@ const RemotionRoot = () => {
       {
         id: "DeformOrbCyan",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DeformOrb, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyan" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78077,7 +83400,7 @@ const RemotionRoot = () => {
       {
         id: "DeformOrbViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DeformOrb, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78088,7 +83411,7 @@ const RemotionRoot = () => {
       {
         id: "DeformOrbEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(DeformOrb, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78099,7 +83422,7 @@ const RemotionRoot = () => {
       {
         id: "NeonSpiral",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonSpiral, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "hot" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78110,7 +83433,7 @@ const RemotionRoot = () => {
       {
         id: "NeonSpiralCool",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonSpiral, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cool" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78121,7 +83444,7 @@ const RemotionRoot = () => {
       {
         id: "NeonSpiralAcid",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeonSpiral, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "acid" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78132,7 +83455,7 @@ const RemotionRoot = () => {
       {
         id: "BatFlock",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BatFlock, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "classic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78143,7 +83466,7 @@ const RemotionRoot = () => {
       {
         id: "BatFlockMoon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BatFlock, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "moon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78154,7 +83477,7 @@ const RemotionRoot = () => {
       {
         id: "BatFlockBlood",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BatFlock, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "blood" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78165,7 +83488,7 @@ const RemotionRoot = () => {
       {
         id: "BatSwarm",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BatSwarm, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "classic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78176,7 +83499,7 @@ const RemotionRoot = () => {
       {
         id: "BatSwarmMoon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BatSwarm, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "moon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78187,7 +83510,7 @@ const RemotionRoot = () => {
       {
         id: "BatSwarmBlood",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BatSwarm, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "blood" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78198,7 +83521,7 @@ const RemotionRoot = () => {
       {
         id: "PerforatedSheet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PerforatedSheet, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "azure" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78209,7 +83532,7 @@ const RemotionRoot = () => {
       {
         id: "PerforatedSheetViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PerforatedSheet, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78220,7 +83543,7 @@ const RemotionRoot = () => {
       {
         id: "PerforatedSheetMagenta",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PerforatedSheet, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "magenta" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78231,7 +83554,7 @@ const RemotionRoot = () => {
       {
         id: "GlassOrbs",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlassOrbs, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "noir" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78242,7 +83565,7 @@ const RemotionRoot = () => {
       {
         id: "GlassOrbsIce",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlassOrbs, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ice" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78253,7 +83576,7 @@ const RemotionRoot = () => {
       {
         id: "GlassOrbsEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GlassOrbs, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78264,7 +83587,7 @@ const RemotionRoot = () => {
       {
         id: "ChromeRibbons",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ChromeRibbons, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "prismatic" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78275,7 +83598,7 @@ const RemotionRoot = () => {
       {
         id: "ChromeRibbonsIce",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ChromeRibbons, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ice" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78286,7 +83609,7 @@ const RemotionRoot = () => {
       {
         id: "ChromeRibbonsEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(ChromeRibbons, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78297,7 +83620,7 @@ const RemotionRoot = () => {
       {
         id: "TechGears",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TechGears, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "blue" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78308,7 +83631,7 @@ const RemotionRoot = () => {
       {
         id: "TechGearsGraphite",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TechGears, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "graphite" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78319,7 +83642,7 @@ const RemotionRoot = () => {
       {
         id: "TechGearsTeal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(TechGears, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "teal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78330,7 +83653,7 @@ const RemotionRoot = () => {
       {
         id: "PointWave",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PointWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyan" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78341,7 +83664,7 @@ const RemotionRoot = () => {
       {
         id: "PointWaveMagenta",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PointWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "magenta" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78352,7 +83675,7 @@ const RemotionRoot = () => {
       {
         id: "PointWaveMint",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PointWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mint" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78363,7 +83686,7 @@ const RemotionRoot = () => {
       {
         id: "NebulaFlow",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NebulaFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "nebula" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78374,7 +83697,7 @@ const RemotionRoot = () => {
       {
         id: "NebulaFlowAurora",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NebulaFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "aurora" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78385,7 +83708,7 @@ const RemotionRoot = () => {
       {
         id: "NebulaFlowEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NebulaFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78396,7 +83719,7 @@ const RemotionRoot = () => {
       {
         id: "CandleWind",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CandleWind, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "taper" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78407,7 +83730,7 @@ const RemotionRoot = () => {
       {
         id: "CandleWindBeeswax",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CandleWind, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "beeswax" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78418,7 +83741,7 @@ const RemotionRoot = () => {
       {
         id: "CandleWindBordeaux",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CandleWind, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "bordeaux" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78429,7 +83752,7 @@ const RemotionRoot = () => {
       {
         id: "GrowthChart",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GrowthChart, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "spectrum" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78440,7 +83763,7 @@ const RemotionRoot = () => {
       {
         id: "GrowthChartGlacier",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GrowthChart, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "glacier" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78451,7 +83774,7 @@ const RemotionRoot = () => {
       {
         id: "GrowthChartEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GrowthChart, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78462,7 +83785,7 @@ const RemotionRoot = () => {
       {
         id: "BeamLattice",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BeamLattice, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "steel" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78473,7 +83796,7 @@ const RemotionRoot = () => {
       {
         id: "BeamLatticeAbyss",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BeamLattice, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "abyss" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78484,7 +83807,7 @@ const RemotionRoot = () => {
       {
         id: "LandDebug",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LandDebug, {}),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3200,
         height: 1800
@@ -78495,7 +83818,7 @@ const RemotionRoot = () => {
       {
         id: "SignalGlobe",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SignalGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78506,7 +83829,7 @@ const RemotionRoot = () => {
       {
         id: "SignalGlobeIndigo",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SignalGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "indigo" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78517,7 +83840,7 @@ const RemotionRoot = () => {
       {
         id: "SignalGlobeCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SignalGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78528,7 +83851,7 @@ const RemotionRoot = () => {
       {
         id: "BeamLatticeEmber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BeamLattice, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78539,7 +83862,7 @@ const RemotionRoot = () => {
       {
         id: "VelvetCheckCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VelvetCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78550,7 +83873,7 @@ const RemotionRoot = () => {
       {
         id: "VelvetCheckMidnight",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VelvetCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "midnight" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78561,7 +83884,7 @@ const RemotionRoot = () => {
       {
         id: "VelvetCheckForest",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VelvetCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "forest" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78572,7 +83895,7 @@ const RemotionRoot = () => {
       {
         id: "VelvetCheckRoyal",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VelvetCheck, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "royal" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78583,7 +83906,7 @@ const RemotionRoot = () => {
       {
         id: "NexusGlobeAmethyst",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NexusGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "amethyst" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78594,7 +83917,7 @@ const RemotionRoot = () => {
       {
         id: "NexusGlobeViolet",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NexusGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78605,7 +83928,7 @@ const RemotionRoot = () => {
       {
         id: "NexusGlobeSapphire",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NexusGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sapphire" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78616,7 +83939,7 @@ const RemotionRoot = () => {
       {
         id: "NexusGlobeCrimson",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NexusGlobe, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78627,7 +83950,7 @@ const RemotionRoot = () => {
       {
         id: "PrismFoldNeon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PrismFold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78638,7 +83961,7 @@ const RemotionRoot = () => {
       {
         id: "PrismFoldCyber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PrismFold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyber" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78649,7 +83972,7 @@ const RemotionRoot = () => {
       {
         id: "PrismFoldAurora",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PrismFold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "aurora" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78660,7 +83983,7 @@ const RemotionRoot = () => {
       {
         id: "PrismFoldSunset",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PrismFold, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78671,7 +83994,7 @@ const RemotionRoot = () => {
       {
         id: "PolyTunnelNeon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyTunnel, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78682,7 +84005,7 @@ const RemotionRoot = () => {
       {
         id: "PolyTunnelCyber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyTunnel, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyber" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78693,7 +84016,7 @@ const RemotionRoot = () => {
       {
         id: "PolyTunnelPlasma",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyTunnel, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "plasma" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78704,7 +84027,7 @@ const RemotionRoot = () => {
       {
         id: "PolyTunnelMono",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(PolyTunnel, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "mono" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78715,7 +84038,7 @@ const RemotionRoot = () => {
       {
         id: "NeuralNexusNeon",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeuralNexus, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78726,7 +84049,7 @@ const RemotionRoot = () => {
       {
         id: "NeuralNexusCyber",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeuralNexus, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyber" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
@@ -78737,12 +84060,258 @@ const RemotionRoot = () => {
       {
         id: "NeuralNexusAurora",
         component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NeuralNexus, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "aurora" }),
-        durationInFrames: Root_DURATION + 1,
+        durationInFrames: Root_DURATION,
         fps: FPS,
         width: 3840,
         height: 2160
       }
-    )
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "BlockWaveLilac",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlockWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "lilac" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "BlockWaveOcean",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlockWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "BlockWaveSunset",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(BlockWave, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "sunset" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "SpiralRingOcean",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SpiralRing, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ocean" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "SpiralRingAmethyst",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SpiralRing, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "amethyst" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "SpiralRingEmerald",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(SpiralRing, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "emerald" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "CrystalClusterIridescent",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CrystalCluster, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "iridescent" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "CrystalClusterNeon",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CrystalCluster, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "CrystalClusterObsidian",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(CrystalCluster, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "obsidian" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "RibbonFlowCoral",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RibbonFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "coral" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "RibbonFlowAbyss",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RibbonFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "abyss" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "RibbonFlowFlora",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(RibbonFlow, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "flora" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "LotusBloomLotus",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LotusBloom, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "lotus" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "LotusBloomCrystal",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LotusBloom, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crystal" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "LotusBloomEmber",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(LotusBloom, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "ember" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "VelvetDahliaViolet",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VelvetDahlia, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "violet" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "VelvetDahliaCrimson",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VelvetDahlia, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "crimson" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "VelvetDahliaGold",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(VelvetDahlia, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "AtomicStructureClassic",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AtomicStructure, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "classic" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "AtomicStructureNeon",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AtomicStructure, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "neon" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.Composition,
+      {
+        id: "AtomicStructureGold",
+        component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(AtomicStructure, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }),
+        durationInFrames: Root_DURATION,
+        fps: FPS,
+        width: 3840,
+        height: 2160
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "MolecularNetwork", component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(MolecularNetwork, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }), durationInFrames: Root_DURATION, fps: FPS, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "WaveLatticeOlive", component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveLattice, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "olive" }), durationInFrames: Root_DURATION, fps: FPS, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "WaveLatticeCyber", component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveLattice, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "cyber" }), durationInFrames: Root_DURATION, fps: FPS, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "WaveLatticeGold", component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(WaveLattice, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1, scheme: "gold" }), durationInFrames: Root_DURATION, fps: FPS, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "GearCluster", component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(GearCluster, { width: 3840, height: 2160, totalFrames: Root_DURATION, speed: 1 }), durationInFrames: Root_DURATION, fps: FPS, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "NodeNetworkGhost", component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NodeNetworkGhost, {}), durationInFrames: Root_DURATION, fps: FPS, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "NodeNetworkNeon", component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NodeNetworkNeon, {}), durationInFrames: Root_DURATION, fps: FPS, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "NodeNetworkGold", component: () => /* @__PURE__ */ (0,jsx_runtime.jsx)(NodeNetworkGold, {}), durationInFrames: Root_DURATION, fps: FPS, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "BarChartRace", component: BarChartRace, durationInFrames: 300, fps: FPS, width: 1920, height: 1080 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "NeuralSynapseCore", component: NeuralSynapseCore, durationInFrames: 600, fps: 60, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "QuantumQubitLattice", component: QuantumQubitLattice, durationInFrames: 600, fps: 60, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "CyberShield", component: CyberShield, durationInFrames: 600, fps: 60, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "FiberOpticStream", component: FiberOpticStream, durationInFrames: 600, fps: 60, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "BinaryMatrixWaterfall", component: BinaryMatrixWaterfall, durationInFrames: 600, fps: 60, width: 3840, height: 2160 }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Composition, { id: "MicrochipProcessorCircuit", component: MicrochipProcessorCircuit, durationInFrames: 600, fps: 60, width: 3840, height: 2160 })
   ] });
 };
 
@@ -97730,7 +103299,7 @@ var NoReactInternals = {
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	__webpack_require__(6507);
 /******/ 	__webpack_require__(3999);
-/******/ 	__webpack_require__(9969);
+/******/ 	__webpack_require__(5728);
 /******/ 	__webpack_require__(3610);
 /******/ 	var __webpack_exports__ = __webpack_require__(3482);
 /******/ 	

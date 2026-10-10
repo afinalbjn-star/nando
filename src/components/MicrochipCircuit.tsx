@@ -90,8 +90,8 @@ function createCircuitTexture(size = 1024) {
           curDist += n2.segLen;
           const r2 = Math.floor((curDist / p.totalLen) * 255);
           
-          grad.addColorStop(0, \`rgb(\${r1}, \${g1}, 255)\`);
-          grad.addColorStop(1, \`rgb(\${r2}, \${g1}, 255)\`);
+          grad.addColorStop(0, `rgb(${r1}, ${g1}, 255)`);
+          grad.addColorStop(1, `rgb(${r2}, ${g1}, 255)`);
           
           ctx.strokeStyle = grad;
           ctx.beginPath();
@@ -120,27 +120,27 @@ const Board = ({ size, uTimeUniform }: { size: number, uTimeUniform: THREE.IUnif
         shader.uniforms.uTime = uTimeUniform;
         shader.uniforms.tFlow = { value: flowTexture };
         
-        shader.fragmentShader = \`
+        shader.fragmentShader = `
           uniform float uTime;
           uniform sampler2D tFlow;
-          \${shader.fragmentShader}
-        \`;
+          ${shader.fragmentShader}
+        `;
         
         shader.fragmentShader = shader.fragmentShader.replace(
           '#include <color_fragment>',
-          \`
+          `
           #include <color_fragment>
           vec2 uv = vUv * 5.0; // 5x5 grid repeat
           vec4 flowTex = texture2D(tFlow, uv);
           float isTrace = flowTex.b;
           vec3 gold = vec3(0.5, 0.35, 0.05); // dark gold traces
           diffuseColor.rgb = mix(diffuseColor.rgb, gold, isTrace);
-          \`
+          `
         );
         
         shader.fragmentShader = shader.fragmentShader.replace(
           '#include <emissivemap_fragment>',
-          \`
+          `
           #include <emissivemap_fragment>
           vec2 uvE = vUv * 5.0;
           vec4 flowTexE = texture2D(tFlow, uvE);
@@ -154,12 +154,12 @@ const Board = ({ size, uTimeUniform }: { size: number, uTimeUniform: THREE.IUnif
           
           vec3 pulseColor = vec3(1.0, 0.65, 0.1) * 3.5; 
           totalEmissiveRadiance += pulseColor * glow * isTraceE;
-          \`
+          `
         );
         
         shader.fragmentShader = shader.fragmentShader.replace(
           '#include <normal_fragment_begin>',
-          \`
+          `
           #include <normal_fragment_begin>
           float eps = 0.002;
           vec2 uvN = vUv * 5.0;
@@ -169,7 +169,7 @@ const Board = ({ size, uTimeUniform }: { size: number, uTimeUniform: THREE.IUnif
           // fake bump map for traces
           vec3 traceNormal = normalize(vec3((tr - tx) * 8.0, (tr - ty) * 8.0, 1.0));
           normal = normalize(normal + traceNormal);
-          \`
+          `
         );
       };
       materialRef.current.needsUpdate = true;
