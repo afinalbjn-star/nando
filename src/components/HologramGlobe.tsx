@@ -15,86 +15,62 @@ function mulberry32(a: number) {
   }
 }
 
-const Globe = ({ u, mapData }: { u: number, mapData: ImageData }) => {
-  const rnd = useMemo(() => mulberry32(8888), []);
+const Globe = ({ u, mapData, earthTex }: { u: number, mapData: ImageData, earthTex: THREE.Texture }) => {
+  const rnd = useMemo(() => mulberry32(1111), []);
   const uTimeUniform = useMemo(() => new THREE.Uniform(0), []);
   uTimeUniform.value = u;
   
-  const { continentGeo, cities, connectionsGeo, hubCity } = useMemo(() => {
-     // High detail for crisp Earth continents
-     const baseIco = new THREE.IcosahedronGeometry(R, 45).toNonIndexed();
-     const pos = baseIco.attributes.position.array;
-     
-     const keptPositions: number[] = [];
-     const centerPoints: THREE.Vector3[] = [];
-     
-     for(let i=0; i<pos.length; i+=9) {
-        const v1 = new THREE.Vector3(pos[i], pos[i+1], pos[i+2]);
-        const v2 = new THREE.Vector3(pos[i+3], pos[i+4], pos[i+5]);
-        const v3 = new THREE.Vector3(pos[i+6], pos[i+7], pos[i+8]);
-        
-        const center = new THREE.Vector3().addVectors(v1, v2).add(v3).divideScalar(3);
-        
-        const lat = Math.asin(center.y / R); 
-        const lon = Math.atan2(center.z, center.x);
-        
-        let v = 0.5 - lat / Math.PI;
-        let u_tex = (lon + Math.PI) / (2 * Math.PI);
-        // Align texture offset to put Americas/Europe in good viewing position initially
-        u_tex = (u_tex + 0.25) % 1.0; 
-        
-        const px = Math.floor(u_tex * mapData.width);
-        const py = Math.floor(v * mapData.height);
-        const idx = (py * mapData.width + px) * 4;
-        
-        const r = mapData.data[idx];
-        const g = mapData.data[idx+1];
-        const b = mapData.data[idx+2];
-        
-        const isOcean = b > r * 1.1 && b > 30; 
-        const isLand = !isOcean && (r + g + b > 50); 
-        
-        if (isLand) {
-           const normal = center.clone().normalize();
-           const extrude = 0.5;
-           v1.add(normal.clone().multiplyScalar(extrude));
-           v2.add(normal.clone().multiplyScalar(extrude));
-           v3.add(normal.clone().multiplyScalar(extrude));
-
-           keptPositions.push(
-             v1.x, v1.y, v1.z,
-             v2.x, v2.y, v2.z,
-             v3.x, v3.y, v3.z
-           );
-           centerPoints.push(center.add(normal.multiplyScalar(extrude)));
-        }
-     }
-     
-     const cGeo = new THREE.BufferGeometry();
-     cGeo.setAttribute('position', new THREE.Float32BufferAttribute(keptPositions, 3));
-     cGeo.computeVertexNormals();
-     
+  const { cities, connectionsGeo, hubCity } = useMemo(() => {
      const validCities: THREE.Vector3[] = [];
-     for(let i=0; i<400; i++) {
-        const idx = Math.floor(rnd() * centerPoints.length);
-        if (centerPoints[idx]) validCities.push(centerPoints[idx]);
-     }
      
-     // Find the best hub: highest Y and front-facing (positive Z)
-     let hub = validCities[0];
-     let bestScore = -Infinity;
-     for (const c of validCities) {
-        const score = c.y * 1.5 + c.z;
-        if (score > bestScore) {
-           bestScore = score;
-           hub = c;
+     for (let latDeg = -80; latDeg <= 80; latDeg += 3) {
+        for (let lonDeg = -180; lonDeg <= 180; lonDeg += 3) {
+           const lat = latDeg * Math.PI / 180;
+           const lon = lonDeg * Math.PI / 180;
+           
+           let v = 0.5 - lat / Math.PI;
+           let u_tex = (lon + Math.PI) / (2 * Math.PI);
+           
+           const px = Math.floor(u_tex * mapData.width);
+           const py = Math.floor(v * mapData.height);
+           const idx = (py * mapData.width + px) * 4;
+           
+           const r = mapData.data[idx];
+           const g = mapData.data[idx+1];
+           const b = mapData.data[idx+2];
+           
+           const isOcean = b > r * 1.1 && b > 30; 
+           const isLand = !isOcean && (r + g + b > 50); 
+           
+           if (isLand && rnd() > 0.7) { 
+               // Map to spherical coords
+               // The three.js default UV mapping for Icosahedron aligns prime meridian to +Z (if unrotated)
+               // Let's match the standard: x = sin(theta)*sin(phi), y = cos(phi), z = cos(theta)*sin(phi)
+               const phi = Math.PI / 2 - lat;
+               const theta = lon + Math.PI / 2; // Offset by 90deg to align with UV seam
+               const x = R * Math.sin(phi) * Math.sin(theta);
+               const y = R * Math.cos(phi);
+               const z = R * Math.sin(phi) * Math.cos(theta);
+               validCities.push(new THREE.Vector3(x, y, z));
+           }
         }
      }
+     
+     // Set Hub City to approximate New York
+     const hubLat = 40.7 * Math.PI / 180;
+     const hubLon = -74.0 * Math.PI / 180;
+     const hPhi = Math.PI / 2 - hubLat;
+     const hTheta = hubLon + Math.PI / 2;
+     const hub = new THREE.Vector3(
+        R * Math.sin(hPhi) * Math.sin(hTheta),
+        R * Math.cos(hPhi),
+        R * Math.sin(hPhi) * Math.cos(hTheta)
+     );
      
      const connsPositions = [];
      const connsUvs = [];
      
-     for(let i=0; i<150; i++) {
+     for(let i=0; i<100; i++) {
         const c1 = validCities[Math.floor(rnd() * validCities.length)];
         const c2 = hub;
         if (!c1 || c1 === c2) continue;
@@ -103,7 +79,7 @@ const Globe = ({ u, mapData }: { u: number, mapData: ImageData }) => {
         if (dist < R * 0.2) continue; 
         
         const mid = new THREE.Vector3().addVectors(c1, c2).multiplyScalar(0.5);
-        mid.normalize().multiplyScalar(R + dist * 0.4); 
+        mid.normalize().multiplyScalar(R + dist * 0.35); 
         
         const curve = new THREE.QuadraticBezierCurve3(c1, mid, c2);
         const points = curve.getPoints(50);
@@ -119,7 +95,7 @@ const Globe = ({ u, mapData }: { u: number, mapData: ImageData }) => {
      connGeo.setAttribute('position', new THREE.Float32BufferAttribute(connsPositions, 3));
      connGeo.setAttribute('aProgress', new THREE.Float32BufferAttribute(connsUvs, 1));
      
-     return { continentGeo: cGeo, cities: validCities, connectionsGeo: connGeo, hubCity: hub };
+     return { cities: validCities, connectionsGeo: connGeo, hubCity: hub };
   }, [mapData, rnd]);
   
   const connMat = useMemo(() => {
@@ -137,10 +113,10 @@ const Globe = ({ u, mapData }: { u: number, mapData: ImageData }) => {
             '#include <color_fragment>',
             `
             #include <color_fragment>
-            float pulse = fract(vProgress * 1.0 - uTime * 3.0);
-            float glow = smoothstep(0.7, 1.0, pulse) * smoothstep(1.0, 0.9, pulse);
-            diffuseColor.rgb += vec3(0.5, 1.0, 0.8) * glow * 8.0;
-            diffuseColor.a *= (0.1 + glow * 2.0);
+            float pulse = fract(vProgress * 1.5 - uTime * 4.0);
+            float glow = smoothstep(0.6, 1.0, pulse) * smoothstep(1.0, 0.9, pulse);
+            diffuseColor.rgb += vec3(0.5, 1.0, 0.9) * glow * 10.0;
+            diffuseColor.a *= (0.1 + glow * 1.5);
             `
             );
       };
@@ -149,8 +125,8 @@ const Globe = ({ u, mapData }: { u: number, mapData: ImageData }) => {
 
   const citiesMesh = useMemo(() => {
      if (!cities) return null;
-     const geo = new THREE.SphereGeometry(0.3, 8, 8);
-     const mat = new THREE.MeshBasicMaterial({ color: '#A3E635' });
+     const geo = new THREE.SphereGeometry(0.2, 8, 8);
+     const mat = new THREE.MeshBasicMaterial({ color: '#A3E635' }); 
      const im = new THREE.InstancedMesh(geo, mat, cities.length);
      const dummy = new THREE.Object3D();
      cities.forEach((p, i) => {
@@ -161,24 +137,99 @@ const Globe = ({ u, mapData }: { u: number, mapData: ImageData }) => {
      return im;
   }, [cities]);
 
-  if (!continentGeo) return null;
+  const continentMaterial = useMemo(() => {
+     return new THREE.ShaderMaterial({
+        uniforms: {
+           tEarth: { value: earthTex },
+           uColor: { value: new THREE.Color("#0A2540") }, 
+           uGlow: { value: new THREE.Color("#38BDF8") }
+        },
+        vertexShader: `
+           varying vec2 vUv;
+           varying vec3 vNormal;
+           void main() {
+              vUv = uv;
+              vNormal = normalize(normalMatrix * normal);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+           }
+        `,
+        fragmentShader: `
+           uniform sampler2D tEarth;
+           uniform vec3 uColor;
+           uniform vec3 uGlow;
+           varying vec2 vUv;
+           varying vec3 vNormal;
+           void main() {
+              // The texture's prime meridian might be offset by 0.25 (90deg) compared to the geometry
+              vec2 uv = vec2(fract(vUv.x + 0.25), vUv.y);
+              vec4 tex = texture2D(tEarth, uv);
+              float r = tex.r;
+              float g = tex.g;
+              float b = tex.b;
+              
+              bool isOcean = (b > r * 1.1) && (b > 0.1);
+              bool isLand = !isOcean && (r + g + b > 0.15);
+              
+              if (!isLand) discard;
+              
+              float rim = 1.0 - max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
+              vec3 finalColor = uColor + uGlow * pow(rim, 3.0) * 0.8;
+              
+              gl_FragColor = vec4(finalColor, 0.9);
+           }
+        `,
+        transparent: true,
+        side: THREE.DoubleSide
+     });
+  }, [earthTex]);
 
+  const wireframeMaterial = useMemo(() => {
+     return new THREE.ShaderMaterial({
+        uniforms: {
+           tEarth: { value: earthTex },
+           uColor: { value: new THREE.Color("#38BDF8") }
+        },
+        vertexShader: `
+           varying vec2 vUv;
+           void main() {
+              vUv = uv;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+           }
+        `,
+        fragmentShader: `
+           uniform sampler2D tEarth;
+           uniform vec3 uColor;
+           varying vec2 vUv;
+           void main() {
+              vec2 uv = vec2(fract(vUv.x + 0.25), vUv.y);
+              vec4 tex = texture2D(tEarth, uv);
+              bool isOcean = (tex.b > tex.r * 1.1) && (tex.b > 0.1);
+              bool isLand = !isOcean && (tex.r + tex.g + tex.b > 0.15);
+              if (!isLand) discard;
+              gl_FragColor = vec4(uColor, 0.4);
+           }
+        `,
+        transparent: true,
+        wireframe: true,
+        blending: THREE.AdditiveBlending
+     });
+  }, [earthTex]);
+
+  // Adjust initial rotation so the Americas are facing the camera
   return (
-    <group rotation={[0, u * Math.PI * 2, 0]}>
+    <group rotation={[0, u * Math.PI * 2 + Math.PI/1.5, 0]}>
       {/* Continents Solid Base */}
-      <mesh geometry={continentGeo}>
-         <meshStandardMaterial color="#0A1A4A" roughness={0.5} metalness={0.8} transparent opacity={0.9} side={THREE.DoubleSide} />
+      <mesh material={continentMaterial}>
+         <icosahedronGeometry args={[R, 20]} /> 
       </mesh>
       
       {/* Continents Low-Poly Wireframe */}
-      <mesh geometry={continentGeo}>
-         <meshBasicMaterial color="#38BDF8" wireframe transparent opacity={0.3} blending={THREE.AdditiveBlending} />
+      <mesh material={wireframeMaterial}>
+         <icosahedronGeometry args={[R, 20]} />
       </mesh>
       
-      {/* City Dots */}
       {citiesMesh && <primitive object={citiesMesh} />}
       
-      {/* Central Server Hub Glowing Beacon */}
       <mesh position={hubCity}>
          <sphereGeometry args={[0.8, 16, 16]} />
          <meshBasicMaterial color="#FDE047" />
@@ -188,35 +239,21 @@ const Globe = ({ u, mapData }: { u: number, mapData: ImageData }) => {
          <meshBasicMaterial color="#FDE047" transparent opacity={0.4} blending={THREE.AdditiveBlending} />
       </mesh>
       
-      {/* Parabolic Connection Arcs */}
       <lineSegments geometry={connectionsGeo} material={connMat} />
       
-      {/* Inner Ocean Core */}
       <mesh>
          <sphereGeometry args={[R - 0.5, 64, 64]} />
-         <meshBasicMaterial color="#020617" transparent opacity={0.95} />
+         <meshBasicMaterial color="#020617" transparent opacity={0.8} />
       </mesh>
       
-      {/* Outer Atmosphere Glow */}
       <mesh>
          <sphereGeometry args={[R + 1.0, 64, 64]} />
          <meshBasicMaterial color="#1D4ED8" transparent opacity={0.15} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
       </mesh>
       
-      {/* Lat/Lon Wireframe Grid */}
       <mesh>
-         <sphereGeometry args={[R + 1.2, 32, 32]} />
-         <meshBasicMaterial color="#22D3EE" wireframe transparent opacity={0.06} blending={THREE.AdditiveBlending} />
-      </mesh>
-      
-      {/* Decorative Outer Rings */}
-      <mesh rotation={[Math.PI/2, 0, 0]}>
-         <ringGeometry args={[R + 4, R + 4.1, 64]} />
-         <meshBasicMaterial color="#00FFFF" transparent opacity={0.15} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
-      </mesh>
-      <mesh rotation={[Math.PI/3, Math.PI/4, 0]}>
-         <ringGeometry args={[R + 7, R + 7.1, 64]} />
-         <meshBasicMaterial color="#38BDF8" transparent opacity={0.08} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
+         <sphereGeometry args={[R + 0.1, 24, 24]} />
+         <meshBasicMaterial color="#22D3EE" wireframe transparent opacity={0.03} blending={THREE.AdditiveBlending} />
       </mesh>
     </group>
   );
@@ -249,8 +286,7 @@ const SpaceBackground = () => {
 const TargetCamera = () => {
   useThree(({ camera }) => {
     camera.position.set(0, 0, 95);
-    // Pointing camera right (X=25) shifts the scene left, creating 50% empty space on the right
-    camera.lookAt(28, 0, 0);
+    camera.lookAt(28, 0, 0); // Globe moves to the left (50% negative space on right)
   });
   return null;
 };
@@ -264,11 +300,12 @@ export const HologramGlobe: React.FC<{
   const u = (frame / totalFrames) % 1.0;
   
   const [mapData, setMapData] = useState<ImageData | null>(null);
+  const [earthTex, setEarthTex] = useState<THREE.Texture | null>(null);
 
   useEffect(() => {
      const img = new Image();
      img.crossOrigin = "anonymous";
-     img.src = staticFile("earth.jpg"); // Uses the downloaded map in public/
+     img.src = staticFile("earth.jpg");
      img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
@@ -277,13 +314,17 @@ export const HologramGlobe: React.FC<{
         if (ctx) {
            ctx.drawImage(img, 0, 0);
            setMapData(ctx.getImageData(0, 0, img.width, img.height));
+           
+           const tex = new THREE.Texture(img);
+           tex.needsUpdate = true;
+           setEarthTex(tex);
         }
      };
   }, []);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#020617' }}>
-      {mapData ? (
+      {mapData && earthTex ? (
         <ThreeCanvas
           width={width}
           height={height}
@@ -294,7 +335,7 @@ export const HologramGlobe: React.FC<{
           
           <TargetCamera />
           <SpaceBackground />
-          <Globe u={u} mapData={mapData} />
+          <Globe u={u} mapData={mapData} earthTex={earthTex} />
           
           <fog attach="fog" args={['#020617', 60, 200]} />
         </ThreeCanvas>
