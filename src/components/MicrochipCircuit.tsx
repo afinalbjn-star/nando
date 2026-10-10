@@ -17,10 +17,10 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
   const mesh = useMemo(() => {
     const geo = new THREE.BoxGeometry(1, 1, 1);
     const mat = new THREE.MeshStandardMaterial({ 
-      color: '#D97706', 
-      roughness: 0.3, 
-      metalness: 1.0,
-      vertexColors: true // Enables USE_COLOR
+      color: '#FFAA00', 
+      roughness: 0.5, 
+      metalness: 0.2,
+      vertexColors: true
     });
     
     mat.onBeforeCompile = (shader) => {
@@ -32,7 +32,7 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
         `
         #include <color_fragment>
         #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
-          diffuseColor.rgb = vec3(0.85, 0.46, 0.02); // Restore Gold!
+          diffuseColor.rgb = vec3(1.0, 0.75, 0.1); // Bright Gold!
         #endif
         `
       );
