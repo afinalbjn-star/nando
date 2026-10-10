@@ -1,5 +1,6 @@
 import React from 'react';
 import { HolographicRadarHUD } from './components/HolographicRadarHUD';
+import { HologramGlobe } from './components/HologramGlobe';
 import { Composition } from 'remotion';
 import { GridDots } from './components/GridDots';
 import { SphereRipple } from './components/SphereRipple';
@@ -3630,6 +3631,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="BinaryMatrixWaterfall" component={BinaryMatrixWaterfall} durationInFrames={600} fps={60} width={3840} height={2160} />
       <Composition id="MicrochipProcessorCircuit" component={MicrochipProcessorCircuit} durationInFrames={600} fps={60} width={3840} height={2160} />
       <Composition id="HolographicRadarHUD" component={HolographicRadarHUD} durationInFrames={600} fps={60} width={3840} height={2160} />
+      <Composition id="HologramGlobe" component={HologramGlobe} durationInFrames={600} fps={60} width={3840} height={2160} />
     </>
   );
 };
