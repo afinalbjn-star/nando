@@ -164,6 +164,7 @@ import { NeuralSynapseCore } from './components/NeuralSynapseCore';
 import { QuantumQubitLattice } from './components/QuantumQubitLattice';
 import { CyberShield } from './components/CyberShield';
 import { FiberOpticStream } from './components/FiberOpticStream';
+import { BinaryMatrixWaterfall } from './components/BinaryMatrixWaterfall';
 import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
 
@@ -3624,6 +3625,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="QuantumQubitLattice" component={QuantumQubitLattice} durationInFrames={600} fps={60} width={3840} height={2160} />
       <Composition id="CyberShield" component={CyberShield} durationInFrames={600} fps={60} width={3840} height={2160} />
       <Composition id="FiberOpticStream" component={FiberOpticStream} durationInFrames={600} fps={60} width={3840} height={2160} />
+      <Composition id="BinaryMatrixWaterfall" component={BinaryMatrixWaterfall} durationInFrames={600} fps={60} width={3840} height={2160} />
     </>
   );
 };
