@@ -17,10 +17,10 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
   const mesh = useMemo(() => {
     const geo = new THREE.BoxGeometry(1, 1, 1);
     const mat = new THREE.MeshStandardMaterial({ 
-      color: '#FFAA00', 
-      roughness: 0.5, 
-      metalness: 0.2,
-      vertexColors: true
+      color: '#FFB800', 
+      roughness: 0.4, 
+      metalness: 0.4, 
+      vertexColors: true 
     });
     mat.defines = { USE_UV: '' };
     
@@ -33,7 +33,7 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
         `
         #include <color_fragment>
         #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
-          diffuseColor.rgb = vec3(1.0, 0.75, 0.1); // Bright Gold!
+          diffuseColor.rgb = vec3(1.0, 0.72, 0.0);
         #endif
         `
       );
@@ -44,9 +44,9 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
         #include <emissivemap_fragment>
         #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
           float traceId = vColor.r;
-          float p = fract(vUv.x * 3.0 - uTime * 2.0 + traceId * 23.7);
+          float p = fract(vUv.x * 2.0 - uTime * 2.0 + traceId * 23.7);
           float glow = smoothstep(0.7, 0.95, p) * smoothstep(1.0, 0.95, p);
-          totalEmissiveRadiance += vec3(1.0, 0.5, 0.05) * glow * 20.0;
+          totalEmissiveRadiance += vec3(1.0, 0.5, 0.05) * glow * 15.0;
         #endif
         `
       );
@@ -103,16 +103,17 @@ const LEDs = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.IUn
       toneMapped: false, 
       vertexColors: true 
     });
+    mat.defines = { USE_UV: '' };
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = uTimeUniform;
       shader.fragmentShader = `uniform float uTime;\n` + shader.fragmentShader;
-
+      
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <color_fragment>',
         `
         #include <color_fragment>
         #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
-          diffuseColor.rgb = vec3(0.37, 0.64, 0.97); // Restore Blue!
+          diffuseColor.rgb = vec3(0.37, 0.64, 0.97);
         #endif
         `
       );
@@ -150,33 +151,77 @@ const LEDs = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.IUn
 const CPUs = ({ offsets }: { offsets: [number, number, number][] }) => {
   const mesh = useMemo(() => {
     const geo = new THREE.BoxGeometry(1, 1, 1);
+    
     const matBase = new THREE.MeshStandardMaterial({ color: '#18181B', roughness: 0.9 });
-    const imBase = new THREE.InstancedMesh(geo, matBase, offsets.length);
+    const imBase = new THREE.InstancedMesh(geo, matBase, offsets.length * 2);
     imBase.castShadow = true;
     imBase.receiveShadow = true;
     
     const matTop = new THREE.MeshStandardMaterial({ color: '#A1A1AA', roughness: 0.3, metalness: 0.9 });
-    const imTop = new THREE.InstancedMesh(geo, matTop, offsets.length);
+    const imTop = new THREE.InstancedMesh(geo, matTop, offsets.length * 2);
     imTop.castShadow = true;
     imTop.receiveShadow = true;
 
+    const matPin = new THREE.MeshStandardMaterial({ color: '#D4D4D8', roughness: 0.3, metalness: 0.9 });
+    const imPin = new THREE.InstancedMesh(geo, matPin, offsets.length * 2 * 60);
+    imPin.castShadow = true;
+
     const dummy = new THREE.Object3D();
-    offsets.forEach((offset, i) => {
-      dummy.position.set(20 + offset[0], 1, 20 + offset[2]);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(28, 2, 28);
-      dummy.updateMatrix();
-      imBase.setMatrixAt(i, dummy.matrix);
+    let cpuIdx = 0;
+    let pinIdx = 0;
+    
+    offsets.forEach((offset) => {
+      const positions = [[20, 20], [-20, -20]];
       
-      dummy.position.set(20 + offset[0], 2.1, 20 + offset[2]);
-      dummy.scale.set(20, 0.5, 20);
-      dummy.updateMatrix();
-      imTop.setMatrixAt(i, dummy.matrix);
+      positions.forEach(([cx, cz]) => {
+        // Base
+        dummy.position.set(cx + offset[0], 1, cz + offset[2]);
+        dummy.rotation.set(0, 0, 0);
+        dummy.scale.set(24, 2, 24);
+        dummy.updateMatrix();
+        imBase.setMatrixAt(cpuIdx, dummy.matrix);
+        
+        // Top
+        dummy.position.set(cx + offset[0], 2.1, cz + offset[2]);
+        dummy.scale.set(18, 0.5, 18);
+        dummy.updateMatrix();
+        imTop.setMatrixAt(cpuIdx, dummy.matrix);
+        cpuIdx++;
+        
+        // Pins (Left & Right)
+        for(let p=0; p<15; p++) {
+           let z = cz - 10 + p * 1.43;
+           dummy.position.set(cx - 12.5 + offset[0], 0.5, z + offset[2]);
+           dummy.scale.set(1.5, 0.2, 0.6);
+           dummy.updateMatrix();
+           imPin.setMatrixAt(pinIdx++, dummy.matrix);
+           
+           dummy.position.set(cx + 12.5 + offset[0], 0.5, z + offset[2]);
+           dummy.scale.set(1.5, 0.2, 0.6);
+           dummy.updateMatrix();
+           imPin.setMatrixAt(pinIdx++, dummy.matrix);
+        }
+        
+        // Pins (Top & Bottom)
+        for(let p=0; p<15; p++) {
+           let x = cx - 10 + p * 1.43;
+           dummy.position.set(x + offset[0], 0.5, cz - 12.5 + offset[2]);
+           dummy.scale.set(0.6, 0.2, 1.5);
+           dummy.updateMatrix();
+           imPin.setMatrixAt(pinIdx++, dummy.matrix);
+           
+           dummy.position.set(x + offset[0], 0.5, cz + 12.5 + offset[2]);
+           dummy.scale.set(0.6, 0.2, 1.5);
+           dummy.updateMatrix();
+           imPin.setMatrixAt(pinIdx++, dummy.matrix);
+        }
+      });
     });
     
     const group = new THREE.Group();
     group.add(imBase);
     group.add(imTop);
+    group.add(imPin);
     return group;
   }, [offsets]);
   
@@ -208,30 +253,64 @@ export const MicrochipProcessorCircuit: React.FC<{
     const smdData: BoxData[] = [];
     const ledData: BoxData[] = [];
     
-    let seed = 12345;
+    let seed = 9999;
     const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
     
-    const gridSize = 40;
-    const step = TILE_SIZE / gridSize;
-    
-    for(let i=0; i<600; i++) {
-      const x = Math.floor(rnd() * gridSize) * step - TILE_SIZE/2;
-      const z = Math.floor(rnd() * gridSize) * step - TILE_SIZE/2;
-      const len = (4 + Math.floor(rnd() * 12)) * step;
-      const type = Math.floor(rnd() * 3);
-      
-      if (type === 0) {
-        traceData.push({ pos: [x + len/2, 0.1, z], rot: [0,0,0], scale: [len, 0.2, 0.6], id: i });
-        if (rnd() < 0.2) smdData.push({ pos: [x + len, 0.3, z], rot: [0,0,0], scale: [1.2, 0.6, 1.2] });
-      } else if (type === 1) {
-        traceData.push({ pos: [x, 0.1, z + len/2], rot: [0,0,0], scale: [0.6, 0.2, len], id: i });
-        if (rnd() < 0.2) smdData.push({ pos: [x, 0.3, z + len], rot: [0,0,0], scale: [1.2, 0.6, 1.2] });
-      } else {
-        const dLen = len * 1.414;
-        const dir = rnd() < 0.5 ? 1 : -1;
-        traceData.push({ pos: [x + len/2, 0.1, z + (len/2)*dir], rot: [0, dir * Math.PI/4, 0], scale: [dLen, 0.2, 0.6], id: i });
+    class PathBuilder {
+      x: number;
+      z: number;
+      id: number;
+      constructor(x: number, z: number, id: number) { this.x = x; this.z = z; this.id = id; }
+      go(len: number, angleDeg: number) {
+        if (len <= 0) return this;
+        const angle = angleDeg * Math.PI / 180;
+        const dx = Math.cos(angle) * len;
+        const dz = Math.sin(angle) * len;
+        traceData.push({ 
+           pos: [this.x + dx/2, 0.1, this.z + dz/2], 
+           rot: [0, -angle, 0], 
+           scale: [len + 0.4, 0.15, 0.4], 
+           id: this.id 
+        });
+        this.x += dx;
+        this.z += dz;
+        return this;
       }
-      if (rnd() < 0.05) ledData.push({ pos: [x, 0.5, z], rot: [0,0,0], scale: [1.2, 1.2, 1.2], id: i });
+    }
+
+    // Generate highly structured parallel buses!
+    for (let b = 0; b < 60; b++) {
+      let startX = Math.floor(rnd() * 40) * 2 - 40;
+      let startZ = Math.floor(rnd() * 40) * 2 - 40;
+      let numLines = 3 + Math.floor(rnd() * 7); 
+      
+      let dirs: {angle: number, len: number}[] = [];
+      let currentDir = Math.floor(rnd() * 4) * 90; 
+      
+      for(let s=0; s<4; s++) {
+         let len = 10 + Math.floor(rnd() * 25);
+         dirs.push({ angle: currentDir, len });
+         currentDir += (rnd() < 0.5 ? 45 : -45);
+      }
+      
+      let perpAngle = (dirs[0].angle + 90) * Math.PI / 180;
+      
+      for (let l = 0; l < numLines; l++) {
+         let px = startX + Math.cos(perpAngle) * l * 1.0; // 1.0 spacing
+         let pz = startZ + Math.sin(perpAngle) * l * 1.0;
+         let pb = new PathBuilder(px, pz, (b * 10) + l);
+         
+         for(let d of dirs) {
+            pb.go(d.len, d.angle);
+         }
+         
+         if (rnd() < 0.25) {
+            smdData.push({ pos: [pb.x, 0.2, pb.z], rot: [0, -dirs[dirs.length-1].angle * Math.PI/180, 0], scale: [1.2, 0.4, 0.8] });
+         }
+         if (rnd() < 0.05) {
+            ledData.push({ pos: [pb.x, 0.25, pb.z], rot: [0,0,0], scale: [0.6, 0.6, 0.6], id: (b * 10) + l });
+         }
+      }
     }
     
     const offsets: [number, number, number][] = [];
@@ -262,7 +341,7 @@ export const MicrochipProcessorCircuit: React.FC<{
         camera={{ position: [-35, 45, 30], fov: 40 }}
         shadows
       >
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={0.4} />
         <directionalLight 
           position={[60, 80, 20]} 
           intensity={1.8} 
