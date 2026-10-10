@@ -230,21 +230,29 @@ export const BinaryMatrixWaterfall: React.FC<BinaryMatrixWaterfallProps> = ({
       ctx.save();
       ctx.globalAlpha = col.opacity;
 
-      const visibleRows = Math.ceil(height / col.rowSpacing) + 4;
+      for (let r = 0; r < col.charCount; r++) {
+        let yPixel = (r * col.rowSpacing + streamOffset) % totalColHeight;
 
-      for (let r = -2; r < visibleRows; r++) {
-        const yPixel = ((r * col.rowSpacing + streamOffset) % (height + col.rowSpacing * 3)) - col.rowSpacing;
+        // Wrap around to handle the top edge entering seamlessly
+        if (yPixel > totalColHeight - col.rowSpacing * 2) {
+          yPixel -= totalColHeight;
+        }
+
+        // Only draw if visible
+        if (yPixel < -col.rowSpacing || yPixel > height + col.rowSpacing) {
+          continue;
+        }
 
         // Deterministic character: 0 or 1
-        // Periodic flip seed ensures frame 0 and frame 600 are 100% IDENTICAL
+        // Stagger the flip time using row index to prevent global frame blink, while retaining 100% loop
         const flipCycles = 8;
-        const flipPhase = Math.floor(u * flipCycles);
+        const staggeredU = (u + (r * 1.37) / col.charCount) % 1.0;
+        const flipPhase = Math.floor(staggeredU * flipCycles);
         const charSeed = col.seed + r * 17 + (flipPhase % flipCycles) * 97;
         const isOne = seeded(charSeed) > 0.5;
 
         // Distance from descending leader head
-        const rowInLoop = ((r % col.charCount) + col.charCount) % col.charCount;
-        const distFromLeader = ((rowInLoop - leaderRow) % col.charCount + col.charCount) % col.charCount;
+        const distFromLeader = ((r - leaderRow) % col.charCount + col.charCount) % col.charCount;
 
         // Select sprite
         let sprite: HTMLCanvasElement;
