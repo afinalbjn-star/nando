@@ -142,8 +142,8 @@ export const BinaryMatrixWaterfall: React.FC<BinaryMatrixWaterfallProps> = ({
           tier: 'fg',
           charCount: 36,
           rowSpacing: 185,
-          speedCycles: lane === fgLane1 ? 4 : 5,
-          leadCycles: lane === fgLane1 ? 6 : 7,
+          speedCycles: lane === fgLane1 ? 1 : 2,
+          leadCycles: lane === fgLane1 ? 2 : 3,
           trailLength: 16,
           seed: lane * 881 + 19,
           opacity: 0.88,
@@ -157,10 +157,10 @@ export const BinaryMatrixWaterfall: React.FC<BinaryMatrixWaterfallProps> = ({
 
       const isBg = seeded(lane * 23 + 7) > 0.65;
       const speedCycles = isBg
-        ? 2 + Math.floor(seeded(lane * 29 + 11) * 4) // 2 to 5 cycles
-        : 3 + Math.floor(seeded(lane * 31 + 13) * 6); // 3 to 8 cycles
+        ? 1 + Math.floor(seeded(lane * 29 + 11) * 2) // 1 to 2 cycles
+        : 1 + Math.floor(seeded(lane * 31 + 13) * 3); // 1 to 3 cycles
 
-      const leadCycles = speedCycles + 2 + Math.floor(seeded(lane * 37 + 17) * 3);
+      const leadCycles = speedCycles + 1 + Math.floor(seeded(lane * 37 + 17) * 2);
       const trailLength = isBg ? 10 + Math.floor(seeded(lane * 41 + 19) * 14) : 14 + Math.floor(seeded(lane * 43 + 23) * 20);
 
       list.push({
