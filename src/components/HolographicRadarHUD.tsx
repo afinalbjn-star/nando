@@ -124,7 +124,7 @@ export const HolographicRadarHUD: React.FC<{
   }, [u, cx, cy, R]);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: '#020617', overflow: 'hidden' }}>
+    <AbsoluteFill style={{ backgroundColor: 'transparent', overflow: 'hidden' }}>
       
       {/* Background Grid */}
       <div style={{
