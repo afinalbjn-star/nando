@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import React, { useMemo, useState, useEffect } from 'react';
+import { AbsoluteFill, useCurrentFrame, staticFile } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -15,59 +15,14 @@ function mulberry32(a: number) {
   }
 }
 
-function hash(x: number, y: number, z: number) {
-    let n = x * 137.0 + y * 289.0 + z * 341.0;
-    n = Math.sin(n) * 43758.5453;
-    return n - Math.floor(n);
-}
-
-function noise(x: number, y: number, z: number) {
-    const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z);
-    const fx = x - ix, fy = y - iy, fz = z - iz;
-    
-    const ux = fx * fx * (3.0 - 2.0 * fx);
-    const uy = fy * fy * (3.0 - 2.0 * fy);
-    const uz = fz * fz * (3.0 - 2.0 * fz);
-    
-    const n000 = hash(ix, iy, iz);
-    const n100 = hash(ix+1, iy, iz);
-    const n010 = hash(ix, iy+1, iz);
-    const n110 = hash(ix+1, iy+1, iz);
-    const n001 = hash(ix, iy, iz+1);
-    const n101 = hash(ix+1, iy, iz+1);
-    const n011 = hash(ix, iy+1, iz+1);
-    const n111 = hash(ix+1, iy+1, iz+1);
-    
-    const mix00 = n000 * (1 - ux) + n100 * ux;
-    const mix10 = n010 * (1 - ux) + n110 * ux;
-    const mix01 = n001 * (1 - ux) + n101 * ux;
-    const mix11 = n011 * (1 - ux) + n111 * ux;
-    
-    const mix0 = mix00 * (1 - uy) + mix10 * uy;
-    const mix1 = mix01 * (1 - uy) + mix11 * uy;
-    
-    return mix0 * (1 - uz) + mix1 * uz;
-}
-
-function fbm(x: number, y: number, z: number) {
-    let value = 0.0;
-    let amplitude = 0.5;
-    let frequency = 1.0;
-    for (let i = 0; i < 4; i++) {
-        value += amplitude * noise(x * frequency, y * frequency, z * frequency);
-        frequency *= 2.0;
-        amplitude *= 0.5;
-    }
-    return value;
-}
-
-const Globe = ({ u }: { u: number }) => {
-  const rnd = useMemo(() => mulberry32(123456), []);
+const Globe = ({ u, mapData }: { u: number, mapData: ImageData }) => {
+  const rnd = useMemo(() => mulberry32(8888), []);
   const uTimeUniform = useMemo(() => new THREE.Uniform(0), []);
   uTimeUniform.value = u;
   
-  const { continentGeo, cities, connectionsGeo } = useMemo(() => {
-     const baseIco = new THREE.IcosahedronGeometry(R, 30).toNonIndexed();
+  const { continentGeo, cities, connectionsGeo, hubCity } = useMemo(() => {
+     // High detail for crisp Earth continents
+     const baseIco = new THREE.IcosahedronGeometry(R, 45).toNonIndexed();
      const pos = baseIco.attributes.position.array;
      
      const keptPositions: number[] = [];
@@ -80,22 +35,38 @@ const Globe = ({ u }: { u: number }) => {
         
         const center = new THREE.Vector3().addVectors(v1, v2).add(v3).divideScalar(3);
         
-        const lat = Math.asin(center.y / R);
+        const lat = Math.asin(center.y / R); 
         const lon = Math.atan2(center.z, center.x);
         
-        const nx = Math.cos(lat) * Math.cos(lon * 1.5);
-        const ny = Math.sin(lat * 1.2);
-        const nz = Math.cos(lat) * Math.sin(lon * 1.5);
+        let v = 0.5 - lat / Math.PI;
+        let u_tex = (lon + Math.PI) / (2 * Math.PI);
+        // Align texture offset to put Americas/Europe in good viewing position initially
+        u_tex = (u_tex + 0.25) % 1.0; 
         
-        const nval = fbm(nx * 2.2, ny * 2.2, nz * 2.2) + fbm(nx * 5.0, ny * 5.0, nz * 5.0) * 0.3;
+        const px = Math.floor(u_tex * mapData.width);
+        const py = Math.floor(v * mapData.height);
+        const idx = (py * mapData.width + px) * 4;
         
-        if (nval > 0.45) {
+        const r = mapData.data[idx];
+        const g = mapData.data[idx+1];
+        const b = mapData.data[idx+2];
+        
+        const isOcean = b > r * 1.1 && b > 30; 
+        const isLand = !isOcean && (r + g + b > 50); 
+        
+        if (isLand) {
+           const normal = center.clone().normalize();
+           const extrude = 0.5;
+           v1.add(normal.clone().multiplyScalar(extrude));
+           v2.add(normal.clone().multiplyScalar(extrude));
+           v3.add(normal.clone().multiplyScalar(extrude));
+
            keptPositions.push(
              v1.x, v1.y, v1.z,
              v2.x, v2.y, v2.z,
              v3.x, v3.y, v3.z
            );
-           centerPoints.push(center);
+           centerPoints.push(center.add(normal.multiplyScalar(extrude)));
         }
      }
      
@@ -104,24 +75,35 @@ const Globe = ({ u }: { u: number }) => {
      cGeo.computeVertexNormals();
      
      const validCities: THREE.Vector3[] = [];
-     for(let i=0; i<150; i++) {
+     for(let i=0; i<400; i++) {
         const idx = Math.floor(rnd() * centerPoints.length);
         if (centerPoints[idx]) validCities.push(centerPoints[idx]);
+     }
+     
+     // Find the best hub: highest Y and front-facing (positive Z)
+     let hub = validCities[0];
+     let bestScore = -Infinity;
+     for (const c of validCities) {
+        const score = c.y * 1.5 + c.z;
+        if (score > bestScore) {
+           bestScore = score;
+           hub = c;
+        }
      }
      
      const connsPositions = [];
      const connsUvs = [];
      
-     for(let i=0; i<80; i++) {
+     for(let i=0; i<150; i++) {
         const c1 = validCities[Math.floor(rnd() * validCities.length)];
-        const c2 = validCities[Math.floor(rnd() * validCities.length)];
-        if (!c1 || !c2 || c1 === c2) continue;
+        const c2 = hub;
+        if (!c1 || c1 === c2) continue;
         
         const dist = c1.distanceTo(c2);
-        if (dist < R * 0.4) continue;
+        if (dist < R * 0.2) continue; 
         
         const mid = new THREE.Vector3().addVectors(c1, c2).multiplyScalar(0.5);
-        mid.normalize().multiplyScalar(R + dist * 0.25); 
+        mid.normalize().multiplyScalar(R + dist * 0.4); 
         
         const curve = new THREE.QuadraticBezierCurve3(c1, mid, c2);
         const points = curve.getPoints(50);
@@ -137,11 +119,11 @@ const Globe = ({ u }: { u: number }) => {
      connGeo.setAttribute('position', new THREE.Float32BufferAttribute(connsPositions, 3));
      connGeo.setAttribute('aProgress', new THREE.Float32BufferAttribute(connsUvs, 1));
      
-     return { continentGeo: cGeo, cities: validCities, connectionsGeo: connGeo };
-  }, [rnd]);
+     return { continentGeo: cGeo, cities: validCities, connectionsGeo: connGeo, hubCity: hub };
+  }, [mapData, rnd]);
   
   const connMat = useMemo(() => {
-      const mat = new THREE.LineBasicMaterial({ color: '#2DD4BF', transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+      const mat = new THREE.LineBasicMaterial({ color: '#2DD4BF', transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
       mat.onBeforeCompile = (shader) => {
          shader.uniforms.uTime = uTimeUniform;
          shader.vertexShader = `
@@ -155,10 +137,10 @@ const Globe = ({ u }: { u: number }) => {
             '#include <color_fragment>',
             `
             #include <color_fragment>
-            float pulse = fract(vProgress * 2.0 - uTime * 3.0);
-            float glow = smoothstep(0.8, 1.0, pulse) * smoothstep(1.0, 0.95, pulse);
-            diffuseColor.rgb += vec3(0.5, 1.0, 0.8) * glow * 10.0;
-            diffuseColor.a *= (0.1 + glow);
+            float pulse = fract(vProgress * 1.0 - uTime * 3.0);
+            float glow = smoothstep(0.7, 1.0, pulse) * smoothstep(1.0, 0.9, pulse);
+            diffuseColor.rgb += vec3(0.5, 1.0, 0.8) * glow * 8.0;
+            diffuseColor.a *= (0.1 + glow * 2.0);
             `
             );
       };
@@ -166,6 +148,7 @@ const Globe = ({ u }: { u: number }) => {
   }, [uTimeUniform]);
 
   const citiesMesh = useMemo(() => {
+     if (!cities) return null;
      const geo = new THREE.SphereGeometry(0.3, 8, 8);
      const mat = new THREE.MeshBasicMaterial({ color: '#A3E635' });
      const im = new THREE.InstancedMesh(geo, mat, cities.length);
@@ -178,31 +161,62 @@ const Globe = ({ u }: { u: number }) => {
      return im;
   }, [cities]);
 
+  if (!continentGeo) return null;
+
   return (
     <group rotation={[0, u * Math.PI * 2, 0]}>
+      {/* Continents Solid Base */}
       <mesh geometry={continentGeo}>
-         <meshStandardMaterial color="#1E3A8A" roughness={0.7} metalness={0.2} transparent opacity={0.75} side={THREE.DoubleSide} />
-      </mesh>
-      <mesh geometry={continentGeo}>
-         <meshBasicMaterial color="#60A5FA" wireframe transparent opacity={0.2} blending={THREE.AdditiveBlending} />
+         <meshStandardMaterial color="#0A1A4A" roughness={0.5} metalness={0.8} transparent opacity={0.9} side={THREE.DoubleSide} />
       </mesh>
       
-      <primitive object={citiesMesh} />
+      {/* Continents Low-Poly Wireframe */}
+      <mesh geometry={continentGeo}>
+         <meshBasicMaterial color="#38BDF8" wireframe transparent opacity={0.3} blending={THREE.AdditiveBlending} />
+      </mesh>
+      
+      {/* City Dots */}
+      {citiesMesh && <primitive object={citiesMesh} />}
+      
+      {/* Central Server Hub Glowing Beacon */}
+      <mesh position={hubCity}>
+         <sphereGeometry args={[0.8, 16, 16]} />
+         <meshBasicMaterial color="#FDE047" />
+      </mesh>
+      <mesh position={hubCity}>
+         <sphereGeometry args={[2.5, 16, 16]} />
+         <meshBasicMaterial color="#FDE047" transparent opacity={0.4} blending={THREE.AdditiveBlending} />
+      </mesh>
+      
+      {/* Parabolic Connection Arcs */}
       <lineSegments geometry={connectionsGeo} material={connMat} />
       
+      {/* Inner Ocean Core */}
       <mesh>
-         <sphereGeometry args={[R - 0.2, 64, 64]} />
-         <meshBasicMaterial color="#041235" transparent opacity={0.9} />
+         <sphereGeometry args={[R - 0.5, 64, 64]} />
+         <meshBasicMaterial color="#020617" transparent opacity={0.95} />
       </mesh>
       
+      {/* Outer Atmosphere Glow */}
       <mesh>
          <sphereGeometry args={[R + 1.0, 64, 64]} />
-         <meshBasicMaterial color="#3B82F6" transparent opacity={0.15} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
+         <meshBasicMaterial color="#1D4ED8" transparent opacity={0.15} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
       </mesh>
       
+      {/* Lat/Lon Wireframe Grid */}
       <mesh>
-         <icosahedronGeometry args={[R + 1.5, 4]} />
-         <meshBasicMaterial color="#22D3EE" wireframe transparent opacity={0.08} blending={THREE.AdditiveBlending} />
+         <sphereGeometry args={[R + 1.2, 32, 32]} />
+         <meshBasicMaterial color="#22D3EE" wireframe transparent opacity={0.06} blending={THREE.AdditiveBlending} />
+      </mesh>
+      
+      {/* Decorative Outer Rings */}
+      <mesh rotation={[Math.PI/2, 0, 0]}>
+         <ringGeometry args={[R + 4, R + 4.1, 64]} />
+         <meshBasicMaterial color="#00FFFF" transparent opacity={0.15} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
+      </mesh>
+      <mesh rotation={[Math.PI/3, Math.PI/4, 0]}>
+         <ringGeometry args={[R + 7, R + 7.1, 64]} />
+         <meshBasicMaterial color="#38BDF8" transparent opacity={0.08} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
       </mesh>
     </group>
   );
@@ -234,8 +248,9 @@ const SpaceBackground = () => {
 
 const TargetCamera = () => {
   useThree(({ camera }) => {
-    camera.position.set(0, 5, 80);
-    camera.lookAt(15, 0, 0);
+    camera.position.set(0, 0, 95);
+    // Pointing camera right (X=25) shifts the scene left, creating 50% empty space on the right
+    camera.lookAt(28, 0, 0);
   });
   return null;
 };
@@ -247,23 +262,47 @@ export const HologramGlobe: React.FC<{
 }> = ({ width = 3840, height = 2160, totalFrames = 600 }) => {
   const frame = useCurrentFrame();
   const u = (frame / totalFrames) % 1.0;
+  
+  const [mapData, setMapData] = useState<ImageData | null>(null);
+
+  useEffect(() => {
+     const img = new Image();
+     img.crossOrigin = "anonymous";
+     img.src = staticFile("earth.jpg"); // Uses the downloaded map in public/
+     img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+           ctx.drawImage(img, 0, 0);
+           setMapData(ctx.getImageData(0, 0, img.width, img.height));
+        }
+     };
+  }, []);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#020617' }}>
-      <ThreeCanvas
-        width={width}
-        height={height}
-        camera={{ fov: 45 }}
-      >
-        <ambientLight intensity={1.5} />
-        <directionalLight position={[10, 20, 50]} intensity={2.0} />
-        
-        <TargetCamera />
-        <SpaceBackground />
-        <Globe u={u} />
-        
-        <fog attach="fog" args={['#020617', 50, 200]} />
-      </ThreeCanvas>
+      {mapData ? (
+        <ThreeCanvas
+          width={width}
+          height={height}
+          camera={{ fov: 45 }}
+        >
+          <ambientLight intensity={1.5} />
+          <directionalLight position={[20, 20, 50]} intensity={2.5} />
+          
+          <TargetCamera />
+          <SpaceBackground />
+          <Globe u={u} mapData={mapData} />
+          
+          <fog attach="fog" args={['#020617', 60, 200]} />
+        </ThreeCanvas>
+      ) : (
+        <div style={{ color: 'white', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontFamily: 'monospace', fontSize: 24 }}>
+           INITIALIZING GLOBAL NETWORK...
+        </div>
+      )}
     </AbsoluteFill>
   );
 };
