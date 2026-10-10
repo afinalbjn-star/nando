@@ -22,6 +22,7 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
       metalness: 0.2,
       vertexColors: true
     });
+    mat.defines = { USE_UV: '' };
     
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = uTimeUniform;
