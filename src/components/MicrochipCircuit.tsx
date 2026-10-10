@@ -17,9 +17,9 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
   const mesh = useMemo(() => {
     const geo = new THREE.BoxGeometry(1, 1, 1);
     const mat = new THREE.MeshStandardMaterial({ 
-      color: '#FFB800', 
-      roughness: 0.4, 
-      metalness: 0.4, 
+      color: '#B45309', 
+      roughness: 0.5, 
+      metalness: 0.8, 
       vertexColors: true 
     });
     mat.defines = { USE_UV: '' };
@@ -33,7 +33,8 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
         `
         #include <color_fragment>
         #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
-          diffuseColor.rgb = vec3(1.0, 0.72, 0.0);
+          // Dark, realistic copper base
+          diffuseColor.rgb = vec3(0.4, 0.22, 0.03);
         #endif
         `
       );
@@ -44,9 +45,10 @@ const Traces = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.I
         #include <emissivemap_fragment>
         #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
           float traceId = vColor.r;
-          float p = fract(vUv.x * 2.0 - uTime * 2.0 + traceId * 23.7);
-          float glow = smoothstep(0.7, 0.95, p) * smoothstep(1.0, 0.95, p);
-          totalEmissiveRadiance += vec3(1.0, 0.5, 0.05) * glow * 15.0;
+          float p = fract(vUv.x * 1.5 - uTime * 2.0 + traceId * 23.7);
+          float glow = smoothstep(0.8, 0.95, p) * smoothstep(1.0, 0.95, p);
+          // Bright electric gold pulse
+          totalEmissiveRadiance += vec3(1.0, 0.7, 0.1) * glow * 12.0;
         #endif
         `
       );
@@ -113,7 +115,7 @@ const LEDs = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.IUn
         `
         #include <color_fragment>
         #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
-          diffuseColor.rgb = vec3(0.37, 0.64, 0.97);
+          diffuseColor.rgb = vec3(0.1, 0.4, 0.8);
         #endif
         `
       );
@@ -123,7 +125,7 @@ const LEDs = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.IUn
         `
         #include <emissivemap_fragment>
         #if defined(USE_COLOR) || defined(USE_INSTANCING_COLOR)
-          float blink = step(0.8, fract(uTime * 4.0 + vColor.r * 17.0));
+          float blink = step(0.9, fract(uTime * 4.0 + vColor.r * 17.0));
           totalEmissiveRadiance *= blink;
         #endif
         `
@@ -152,76 +154,43 @@ const CPUs = ({ offsets }: { offsets: [number, number, number][] }) => {
   const mesh = useMemo(() => {
     const geo = new THREE.BoxGeometry(1, 1, 1);
     
-    const matBase = new THREE.MeshStandardMaterial({ color: '#18181B', roughness: 0.9 });
-    const imBase = new THREE.InstancedMesh(geo, matBase, offsets.length * 2);
+    const matBase = new THREE.MeshStandardMaterial({ color: '#111111', roughness: 0.9 });
+    const imBase = new THREE.InstancedMesh(geo, matBase, offsets.length * 4);
     imBase.castShadow = true;
     imBase.receiveShadow = true;
     
-    const matTop = new THREE.MeshStandardMaterial({ color: '#A1A1AA', roughness: 0.3, metalness: 0.9 });
-    const imTop = new THREE.InstancedMesh(geo, matTop, offsets.length * 2);
+    const matTop = new THREE.MeshStandardMaterial({ color: '#444444', roughness: 0.4, metalness: 0.6 });
+    const imTop = new THREE.InstancedMesh(geo, matTop, offsets.length * 4);
     imTop.castShadow = true;
     imTop.receiveShadow = true;
 
-    const matPin = new THREE.MeshStandardMaterial({ color: '#D4D4D8', roughness: 0.3, metalness: 0.9 });
-    const imPin = new THREE.InstancedMesh(geo, matPin, offsets.length * 2 * 60);
-    imPin.castShadow = true;
-
     const dummy = new THREE.Object3D();
     let cpuIdx = 0;
-    let pinIdx = 0;
     
     offsets.forEach((offset) => {
-      const positions = [[20, 20], [-20, -20]];
+      const positions = [
+        [20, 20, 24], [-20, -20, 24],
+        [-25, 15, 12], [15, -25, 12]
+      ];
       
-      positions.forEach(([cx, cz]) => {
-        // Base
-        dummy.position.set(cx + offset[0], 1, cz + offset[2]);
+      positions.forEach(([cx, cz, size]) => {
+        dummy.position.set(cx + offset[0], 0.5, cz + offset[2]);
         dummy.rotation.set(0, 0, 0);
-        dummy.scale.set(24, 2, 24);
+        dummy.scale.set(size, 1.0, size);
         dummy.updateMatrix();
         imBase.setMatrixAt(cpuIdx, dummy.matrix);
         
-        // Top
-        dummy.position.set(cx + offset[0], 2.1, cz + offset[2]);
-        dummy.scale.set(18, 0.5, 18);
+        dummy.position.set(cx + offset[0], 1.05, cz + offset[2]);
+        dummy.scale.set(size - 4, 0.2, size - 4);
         dummy.updateMatrix();
         imTop.setMatrixAt(cpuIdx, dummy.matrix);
         cpuIdx++;
-        
-        // Pins (Left & Right)
-        for(let p=0; p<15; p++) {
-           let z = cz - 10 + p * 1.43;
-           dummy.position.set(cx - 12.5 + offset[0], 0.5, z + offset[2]);
-           dummy.scale.set(1.5, 0.2, 0.6);
-           dummy.updateMatrix();
-           imPin.setMatrixAt(pinIdx++, dummy.matrix);
-           
-           dummy.position.set(cx + 12.5 + offset[0], 0.5, z + offset[2]);
-           dummy.scale.set(1.5, 0.2, 0.6);
-           dummy.updateMatrix();
-           imPin.setMatrixAt(pinIdx++, dummy.matrix);
-        }
-        
-        // Pins (Top & Bottom)
-        for(let p=0; p<15; p++) {
-           let x = cx - 10 + p * 1.43;
-           dummy.position.set(x + offset[0], 0.5, cz - 12.5 + offset[2]);
-           dummy.scale.set(0.6, 0.2, 1.5);
-           dummy.updateMatrix();
-           imPin.setMatrixAt(pinIdx++, dummy.matrix);
-           
-           dummy.position.set(x + offset[0], 0.5, cz + 12.5 + offset[2]);
-           dummy.scale.set(0.6, 0.2, 1.5);
-           dummy.updateMatrix();
-           imPin.setMatrixAt(pinIdx++, dummy.matrix);
-        }
       });
     });
     
     const group = new THREE.Group();
     group.add(imBase);
     group.add(imTop);
-    group.add(imPin);
     return group;
   }, [offsets]);
   
@@ -253,64 +222,133 @@ export const MicrochipProcessorCircuit: React.FC<{
     const smdData: BoxData[] = [];
     const ledData: BoxData[] = [];
     
-    let seed = 9999;
+    let seed = 4242;
     const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
     
-    class PathBuilder {
-      x: number;
-      z: number;
-      id: number;
-      constructor(x: number, z: number, id: number) { this.x = x; this.z = z; this.id = id; }
-      go(len: number, angleDeg: number) {
-        if (len <= 0) return this;
-        const angle = angleDeg * Math.PI / 180;
-        const dx = Math.cos(angle) * len;
-        const dz = Math.sin(angle) * len;
-        traceData.push({ 
-           pos: [this.x + dx/2, 0.1, this.z + dz/2], 
-           rot: [0, -angle, 0], 
-           scale: [len + 0.4, 0.15, 0.4], 
-           id: this.id 
-        });
-        this.x += dx;
-        this.z += dz;
-        return this;
-      }
+    const GRID_RES = 100;
+    const STEP = TILE_SIZE / GRID_RES;
+    const grid = new Array(GRID_RES * GRID_RES).fill(0);
+    
+    const getGrid = (x: number, z: number) => grid[((z % GRID_RES + GRID_RES) % GRID_RES) * GRID_RES + ((x % GRID_RES + GRID_RES) % GRID_RES)];
+    const setGrid = (x: number, z: number, val: number) => { grid[((z % GRID_RES + GRID_RES) % GRID_RES) * GRID_RES + ((x % GRID_RES + GRID_RES) % GRID_RES)] = val; };
+    
+    const blockArea = (x: number, z: number, w: number, h: number) => {
+       const gx = Math.floor((x + 40) / STEP);
+       const gz = Math.floor((z + 40) / STEP);
+       const gw = Math.floor(w / STEP);
+       const gh = Math.floor(h / STEP);
+       for(let i=-1; i<=gw; i++) {
+         for(let j=-1; j<=gh; j++) {
+           setGrid(gx + i, gz + j, 1);
+         }
+       }
+    };
+    
+    blockArea(20 - 12, 20 - 12, 24, 24);
+    blockArea(-20 - 12, -20 - 12, 24, 24);
+    blockArea(-25 - 6, 15 - 6, 12, 12);
+    blockArea(15 - 6, -25 - 6, 12, 12);
+
+    for(let i=0; i<150; i++) {
+       let gx = Math.floor(rnd() * GRID_RES);
+       let gz = Math.floor(rnd() * GRID_RES);
+       if (getGrid(gx, gz) === 0) {
+          setGrid(gx, gz, 1);
+          smdData.push({
+             pos: [gx * STEP - 40 + STEP/2, 0.2, gz * STEP - 40 + STEP/2],
+             rot: [0, 0, 0],
+             scale: [STEP*1.2, 0.4, STEP*1.2]
+          });
+       }
+    }
+    
+    for(let i=0; i<80; i++) {
+       let gx = Math.floor(rnd() * GRID_RES);
+       let gz = Math.floor(rnd() * GRID_RES);
+       if (getGrid(gx, gz) === 0) {
+          setGrid(gx, gz, 1);
+          ledData.push({
+             pos: [gx * STEP - 40 + STEP/2, 0.15, gz * STEP - 40 + STEP/2],
+             rot: [0, 0, 0],
+             scale: [STEP*0.8, 0.3, STEP*0.8],
+             id: i
+          });
+       }
     }
 
-    // Generate highly structured parallel buses!
-    for (let b = 0; b < 60; b++) {
-      let startX = Math.floor(rnd() * 40) * 2 - 40;
-      let startZ = Math.floor(rnd() * 40) * 2 - 40;
-      let numLines = 3 + Math.floor(rnd() * 7); 
-      
-      let dirs: {angle: number, len: number}[] = [];
-      let currentDir = Math.floor(rnd() * 4) * 90; 
-      
-      for(let s=0; s<4; s++) {
-         let len = 10 + Math.floor(rnd() * 25);
-         dirs.push({ angle: currentDir, len });
-         currentDir += (rnd() < 0.5 ? 45 : -45);
-      }
-      
-      let perpAngle = (dirs[0].angle + 90) * Math.PI / 180;
-      
-      for (let l = 0; l < numLines; l++) {
-         let px = startX + Math.cos(perpAngle) * l * 1.0; // 1.0 spacing
-         let pz = startZ + Math.sin(perpAngle) * l * 1.0;
-         let pb = new PathBuilder(px, pz, (b * 10) + l);
-         
-         for(let d of dirs) {
-            pb.go(d.len, d.angle);
-         }
-         
-         if (rnd() < 0.25) {
-            smdData.push({ pos: [pb.x, 0.2, pb.z], rot: [0, -dirs[dirs.length-1].angle * Math.PI/180, 0], scale: [1.2, 0.4, 0.8] });
-         }
-         if (rnd() < 0.05) {
-            ledData.push({ pos: [pb.x, 0.25, pb.z], rot: [0,0,0], scale: [0.6, 0.6, 0.6], id: (b * 10) + l });
-         }
-      }
+    const dirs = [[1,0], [0,1], [-1,0], [0,-1]];
+    
+    const outputSegment = (gx: number, gz: number, dir: number, len: number, traceId: number) => {
+        if (len <= 1) return;
+        let centerGx = gx + dirs[dir][0] * (len - 1) / 2;
+        let centerGz = gz + dirs[dir][1] * (len - 1) / 2;
+        let posX = centerGx * STEP - 40 + STEP/2;
+        let posZ = centerGz * STEP - 40 + STEP/2;
+        let rotY = (dir === 1 || dir === 3) ? Math.PI / 2 : 0;
+        let physLen = len * STEP + STEP * 0.15;
+        traceData.push({ pos: [posX, 0.1, posZ], rot: [0, rotY, 0], scale: [physLen, 0.1, STEP * 0.35], id: traceId });
+    };
+
+    for (let attempt = 0; attempt < 4000; attempt++) {
+       let cx = Math.floor(rnd() * GRID_RES);
+       let cz = Math.floor(rnd() * GRID_RES);
+       if (getGrid(cx, cz) !== 0) continue;
+       
+       let currentDir = Math.floor(rnd() * 4);
+       let segLen = 0;
+       let startX = cx;
+       let startZ = cz;
+       let id = attempt;
+       
+       setGrid(cx, cz, 1);
+       segLen++;
+       
+       let pathTurns = 0;
+       while (pathTurns < 12) {
+           let rawNx = cx + dirs[currentDir][0];
+           let rawNz = cz + dirs[currentDir][1];
+           let wrapped = (rawNx < 0 || rawNx >= GRID_RES || rawNz < 0 || rawNz >= GRID_RES);
+           
+           let nx = (rawNx % GRID_RES + GRID_RES) % GRID_RES;
+           let nz = (rawNz % GRID_RES + GRID_RES) % GRID_RES;
+           
+           if (getGrid(nx, nz) === 0) {
+               if (wrapped) {
+                   outputSegment(startX, startZ, currentDir, segLen, id);
+                   segLen = 0;
+                   startX = nx;
+                   startZ = nz;
+               }
+               setGrid(nx, nz, 1);
+               cx = nx;
+               cz = nz;
+               segLen++;
+           } else {
+               outputSegment(startX, startZ, currentDir, segLen, id);
+               
+               let leftDir = (currentDir + 3) % 4;
+               let rightDir = (currentDir + 1) % 4;
+               
+               let leftFree = getGrid((cx + dirs[leftDir][0] % GRID_RES + GRID_RES) % GRID_RES, (cz + dirs[leftDir][1] % GRID_RES + GRID_RES) % GRID_RES) === 0;
+               let rightFree = getGrid((cx + dirs[rightDir][0] % GRID_RES + GRID_RES) % GRID_RES, (cz + dirs[rightDir][1] % GRID_RES + GRID_RES) % GRID_RES) === 0;
+               
+               if (leftFree && rightFree) {
+                   currentDir = rnd() < 0.5 ? leftDir : rightDir;
+               } else if (leftFree) {
+                   currentDir = leftDir;
+               } else if (rightFree) {
+                   currentDir = rightDir;
+               } else {
+                   break;
+               }
+               
+               segLen = 1;
+               startX = cx; 
+               startZ = cz;
+               pathTurns++;
+           }
+       }
+       outputSegment(startX, startZ, currentDir, segLen, id);
     }
     
     const offsets: [number, number, number][] = [];
@@ -334,36 +372,35 @@ export const MicrochipProcessorCircuit: React.FC<{
   }, []);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: '#090D16' }}>
+    <AbsoluteFill style={{ backgroundColor: '#050508' }}>
       <ThreeCanvas
         width={width}
         height={height}
         camera={{ position: [-35, 45, 30], fov: 40 }}
         shadows
       >
-        <ambientLight intensity={0.4} />
+        <ambientLight intensity={0.2} />
         <directionalLight 
           position={[60, 80, 20]} 
-          intensity={1.8} 
+          intensity={2.5} 
           castShadow 
           shadow-mapSize={[2048, 2048]} 
           shadow-camera-left={-100}
           shadow-camera-right={100}
           shadow-camera-top={100}
           shadow-camera-bottom={-100}
-          shadow-bias={-0.0005}
+          shadow-bias={-0.001}
         />
-        <directionalLight position={[-40, 20, -40]} intensity={0.3} />
+        <directionalLight position={[-40, 20, -40]} intensity={0.5} />
 
         <TargetCamera />
 
         {/* Static Base Board */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.1, 0]}>
           <planeGeometry args={[1000, 1000]} />
-          <meshStandardMaterial color="#0A0A0C" roughness={0.8} />
+          <meshStandardMaterial color="#050508" roughness={0.9} metalness={0.1} />
         </mesh>
 
-        {/* Sliding Circuit Components */}
         <group position={groupOffset}>
           <Traces data={globalTraces} uTimeUniform={uTimeUniform} />
           <SMDs data={globalSmds} />
@@ -371,8 +408,7 @@ export const MicrochipProcessorCircuit: React.FC<{
           <CPUs offsets={tileOffsets} />
         </group>
         
-        {/* Depth of Field Fog */}
-        <fog attach="fog" args={['#090D16', 60, 150]} />
+        <fog attach="fog" args={['#050508', 60, 140]} />
       </ThreeCanvas>
     </AbsoluteFill>
   );
