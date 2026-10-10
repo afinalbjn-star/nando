@@ -150,6 +150,81 @@ const LEDs = ({ data, uTimeUniform }: { data: BoxData[], uTimeUniform: THREE.IUn
   return <primitive object={mesh} />;
 };
 
+const createAITexture = () => {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  
+  ctx.clearRect(0, 0, 512, 512);
+  
+  ctx.font = 'bold 220px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  const grad = ctx.createLinearGradient(0, 100, 0, 412);
+  grad.addColorStop(0, '#FFFFFF');
+  grad.addColorStop(1, '#A0A0A0');
+  
+  ctx.fillStyle = grad;
+  ctx.shadowColor = '#FFFFFF';
+  ctx.shadowBlur = 15;
+  ctx.fillText('AI', 256, 256 + 15); // visual centering tweak
+  
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 12;
+  ctx.beginPath();
+  ctx.roundRect(40, 40, 432, 432, 40);
+  ctx.stroke();
+  
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.anisotropy = 16;
+  return tex;
+};
+
+const AILogos = ({ offsets }: { offsets: [number, number, number][] }) => {
+  const tex = useMemo(() => createAITexture(), []);
+  
+  const mesh = useMemo(() => {
+    if (!tex) return null;
+    const geo = new THREE.PlaneGeometry(1, 1);
+    const mat = new THREE.MeshStandardMaterial({ 
+      map: tex, 
+      transparent: true, 
+      emissive: '#FFFFFF', 
+      emissiveMap: tex,
+      emissiveIntensity: 0.8,
+      roughness: 0.2,
+      metalness: 0.8
+    });
+    
+    const im = new THREE.InstancedMesh(geo, mat, offsets.length * 4);
+    const dummy = new THREE.Object3D();
+    let idx = 0;
+    
+    offsets.forEach((offset) => {
+      const positions = [
+        [20, 20, 24], [-20, -20, 24],
+        [-25, 15, 12], [15, -25, 12]
+      ];
+      
+      positions.forEach(([cx, cz, size]) => {
+        dummy.position.set(cx + offset[0], 1.16, cz + offset[2]);
+        dummy.rotation.set(-Math.PI / 2, 0, 0);
+        dummy.scale.set(size * 0.5, size * 0.5, 1); 
+        dummy.updateMatrix();
+        im.setMatrixAt(idx++, dummy.matrix);
+      });
+    });
+    return im;
+  }, [offsets, tex]);
+  
+  if (!mesh) return null;
+  return <primitive object={mesh} />;
+};
+
 const CPUs = ({ offsets }: { offsets: [number, number, number][] }) => {
   const mesh = useMemo(() => {
     const geo = new THREE.BoxGeometry(1, 1, 1);
@@ -406,6 +481,7 @@ export const MicrochipProcessorCircuit: React.FC<{
           <SMDs data={globalSmds} />
           <LEDs data={globalLeds} uTimeUniform={uTimeUniform} />
           <CPUs offsets={tileOffsets} />
+          <AILogos offsets={tileOffsets} />
         </group>
         
         <fog attach="fog" args={['#050508', 60, 140]} />
