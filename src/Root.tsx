@@ -1,6 +1,7 @@
 import React from 'react';
 import { HolographicRadarHUD } from './components/HolographicRadarHUD';
 import { HologramGlobe } from './components/HologramGlobe';
+import { ConstructionSafetyHelmet } from './components/ConstructionSafetyHelmet';
 import { Composition } from 'remotion';
 import { GridDots } from './components/GridDots';
 import { SphereRipple } from './components/SphereRipple';
@@ -3670,6 +3671,14 @@ export const RemotionRoot: React.FC = () => {
           <BokehRibbon width={3840} height={2160} totalFrames={600} scheme="emerald" />
         )}
         durationInFrames={601}
+        fps={60}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="ConstructionSafetyHelmet"
+        component={ConstructionSafetyHelmet}
+        durationInFrames={600}
         fps={60}
         width={3840}
         height={2160}
