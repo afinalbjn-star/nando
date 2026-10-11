@@ -156,3 +156,5 @@ export { BeamLattice } from './BeamLattice';
 export type { BeamLatticeScheme } from './BeamLattice';
 export { SignalGlobe } from './SignalGlobe';
 export type { SignalGlobeScheme } from './SignalGlobe';
+export { BokehRibbon } from './BokehRibbon';
+export type { BokehRibbonScheme } from './BokehRibbon';

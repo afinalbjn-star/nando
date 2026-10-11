@@ -170,6 +170,8 @@ import { BinaryMatrixWaterfall } from './components/BinaryMatrixWaterfall';
 import { MicrochipProcessorCircuit } from './components/MicrochipCircuit';
 import type { DahliaScheme } from './components/VelvetDahlia';
 import { palettes } from './utils/colors';
+import { BokehRibbon } from './components/BokehRibbon';
+import type { BokehRibbonScheme } from './components/BokehRibbon';
 
 const FPS = 30;
 const DURATION = FPS * 8;
@@ -3632,6 +3634,46 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="MicrochipProcessorCircuit" component={MicrochipProcessorCircuit} durationInFrames={600} fps={60} width={3840} height={2160} />
       <Composition id="HolographicRadarHUD" component={HolographicRadarHUD} durationInFrames={600} fps={60} width={3840} height={2160} />
       <Composition id="HologramGlobe" component={HologramGlobe} durationInFrames={600} fps={60} width={3840} height={2160} />
+      <Composition
+        id="BokehRibbonGold"
+        component={() => (
+          <BokehRibbon width={3840} height={2160} totalFrames={600} scheme="gold" />
+        )}
+        durationInFrames={601}
+        fps={60}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BokehRibbonCyan"
+        component={() => (
+          <BokehRibbon width={3840} height={2160} totalFrames={600} scheme="cyan" />
+        )}
+        durationInFrames={601}
+        fps={60}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BokehRibbonMagenta"
+        component={() => (
+          <BokehRibbon width={3840} height={2160} totalFrames={600} scheme="magenta" />
+        )}
+        durationInFrames={601}
+        fps={60}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="BokehRibbonEmerald"
+        component={() => (
+          <BokehRibbon width={3840} height={2160} totalFrames={600} scheme="emerald" />
+        )}
+        durationInFrames={601}
+        fps={60}
+        width={3840}
+        height={2160}
+      />
     </>
   );
 };

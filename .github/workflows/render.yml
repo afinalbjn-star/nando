@@ -10,7 +10,10 @@ jobs:
       fail-fast: false
       matrix:
         composition:
-          - HolographicRadarHUD
+          - BokehRibbonGold
+          - BokehRibbonCyan
+          - BokehRibbonMagenta
+          - BokehRibbonEmerald
 
     steps:
       - name: Checkout
@@ -24,58 +27,102 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Render ProRes HQ intermediate
+      - name: Render ProRes 4444 with alpha (stock deliverable)
         env:
           ID: ${{ matrix.composition }}
-        # --gl=swangle --timeout 120000 is the recommended software rasterizer for Three.js on GitHub Actions
-        run: npx remotion render src/index.tsx "$ID" "output/$ID-prores.mov" --codec prores --prores-profile hq --gl=swangle --timeout 120000
+        # Remotion refuses transparency unless --image-format=png. Without both
+        # flags it errors out; with them the alpha plane is real (verified locally
+        # with alphaextract: min 0 / max 255).
+        run: |
+          npx remotion render src/index.tsx "$ID" "output/$ID-4444.mov" \
+            --codec prores \
+            --prores-profile 4444 \
+            --image-format png \
+            --pixel-format yuva444p10le \
+            --concurrency 4 \
+            --timeout 300000 \
+            --log info
 
-      - name: Encode to size-targeted MP4
+      - name: Verify deliverable (alpha, resolution, frame rate, loop seam)
         env:
           ID: ${{ matrix.composition }}
         run: |
           set -euo pipefail
-          IN="output/${ID}-prores.mov"
-          OUT="output/${ID}.mp4"
-          DUR=$(ffprobe -v error -select_streams v:0 -show_entries stream=duration -of csv=p=0 "$IN")
-          DUR_MS=$(awk -v d="$DUR" 'BEGIN{printf "%d", d*1000}')
-          if [ "$DUR_MS" -lt 1 ]; then DUR_MS=1; fi
-          echo "source duration ${DUR}s (${DUR_MS}ms)"
-          # Target the middle of the band. ABR alone (-b:v only) undershoots badly on
-          # smooth/gradient-heavy 4K content: the encoder never spends the bits it is
-          # given, so a "150MB" bitrate yields ~21MB. Pin the rate with min/maxrate +
-          # bufsize and nal-hrd=cbr so the padding is actually written into the stream.
-          TARGET_BYTES=$(( 150 * 1000 * 1000 ))
-          BITRATE=$(( TARGET_BYTES * 8 / DUR_MS ))
-          SIZE_MB=0
-          for ATTEMPT in 1 2 3; do
-            echo "attempt ${ATTEMPT}: bitrate ${BITRATE} kbps"
-            ffmpeg -y -v error -i "$IN" \
-              -c:v libx264 -b:v "${BITRATE}k" -minrate "${BITRATE}k" -maxrate "${BITRATE}k" \
-              -bufsize "$(( BITRATE * 2 ))k" -x264-params "nal-hrd=cbr:force-cfr=1" \
-              -pix_fmt yuv420p -pass 1 -an -f null /dev/null
-            ffmpeg -y -v error -i "$IN" \
-              -c:v libx264 -b:v "${BITRATE}k" -minrate "${BITRATE}k" -maxrate "${BITRATE}k" \
-              -bufsize "$(( BITRATE * 2 ))k" -x264-params "nal-hrd=cbr:force-cfr=1" \
-              -pix_fmt yuv420p -pass 2 -an -movflags +faststart "$OUT"
-            BYTES=$(stat -c%s "$OUT")
-            SIZE_MB=$(( BYTES / 1048576 ))
-            echo "produced ${SIZE_MB}MB (${BYTES} bytes)"
-            if [ "$SIZE_MB" -ge 100 ] && [ "$SIZE_MB" -le 300 ]; then break; fi
-            # Rescale from the size actually produced, not from the nominal target.
-            BITRATE=$(( BITRATE * TARGET_BYTES / BYTES ))
-          done
-          if [ "$SIZE_MB" -lt 100 ] || [ "$SIZE_MB" -gt 300 ]; then
-            echo "::warning::final size ${SIZE_MB}MB is outside the 100-300MB band"
-          fi
-          ls -la "$OUT"
+          F="output/${ID}-4444.mov"
+          ls -la "$F"
 
-      - name: Upload MP4
+          echo "--- container/codec ---"
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=codec_name,profile,pix_fmt,width,height,r_frame_rate \
+            -of default=nw=1 "$F" | tee /tmp/probe.txt
+
+          grep -q 'codec_name=prores' /tmp/probe.txt || { echo "::error::not ProRes"; exit 1; }
+          grep -q 'profile=4444'    /tmp/probe.txt || { echo "::error::not ProRes 4444"; exit 1; }
+          grep -q 'pix_fmt=yuva'    /tmp/probe.txt || { echo "::error::no alpha pixel format"; exit 1; }
+          grep -q 'width=3840'      /tmp/probe.txt || { echo "::error::not 4K wide"; exit 1; }
+          grep -q 'height=2160'     /tmp/probe.txt || { echo "::error::not 2160 tall"; exit 1; }
+          grep -q 'r_frame_rate=60' /tmp/probe.txt || { echo "::error::not 60fps"; exit 1; }
+
+          # A 4444 file can still carry a fully opaque alpha plane. Prove the
+          # matte is genuinely empty somewhere, or the deliverable is worthless.
+          ffmpeg -y -v error -i "$F" -vf "alphaextract,format=gray" \
+            -frames:v 1 -f rawvideo -pix_fmt gray /tmp/a.gray
+          python3 - <<'PY'
+          d = open('/tmp/a.gray','rb').read()
+          mn, mx = min(d), max(d)
+          transparent = sum(1 for v in d if v < 16) / len(d) * 100
+          print(f"alpha plane: min={mn} max={mx} fully-transparent={transparent:.1f}%")
+          assert mn < 250, f"alpha plane is opaque (min={mn})"
+          assert transparent > 5, f"less than 5% of the frame is transparent ({transparent:.1f}%)"
+          print("alpha OK")
+          PY
+
+          # Loop check: the 601st frame is the loop-point hold, so the wrap step
+          # 599->600 must be no larger than a normal interior step 598->599.
+          ffmpeg -y -v error -i "$F" -vf "select=eq(n\,598)" -frames:v 1 /tmp/f598.png
+          ffmpeg -y -v error -i "$F" -vf "select=eq(n\,599)" -frames:v 1 /tmp/f599.png
+          ffmpeg -y -v error -i "$F" -vf "select=eq(n\,600)" -frames:v 1 /tmp/f600.png
+          python3 - <<'PY'
+          import subprocess
+          def gray(p):
+              r = subprocess.run(['ffmpeg','-v','error','-i',p,'-vf','format=gray',
+                                  '-f','rawvideo','-pix_fmt','gray','-'],
+                                 capture_output=True)
+              return r.stdout
+          a, b, c = gray('/tmp/f598.png'), gray('/tmp/f599.png'), gray('/tmp/f600.png')
+          def md(x, y):
+              d = [abs(x[i]-y[i]) for i in range(min(len(x), len(y)))]
+              return sum(d)/len(d)
+          interior, wrap = md(a, b), md(b, c)
+          print(f"loop seam: interior 598->599 = {interior:.4f}, wrap 599->600 = {wrap:.4f}")
+          assert wrap <= interior * 1.25, (
+              f"seam pops: wrap step {wrap:.4f} is much larger than an interior step {interior:.4f}")
+          print("seam OK")
+          PY
+
+      - name: Render thumbnail and review preview
+        env:
+          ID: ${{ matrix.composition }}
+        run: |
+          set -euo pipefail
+          # Portal thumbnail: frame 0 composited over dark so a transparent
+          # deliverable still reads on a white admin page.
+          ffmpeg -y -v error -i "output/${ID}-4444.mov" -frames:v 1 \
+            -f lavfi -i "color=c=0x101018:s=3840x2160" \
+            -filter_complex "[0][1]overlay" -frames:v 1 "output/${ID}-thumb.jpg"
+          # Small H.264 preview for the marketplace listing / quick review.
+          ffmpeg -y -v error -i "output/${ID}-4444.mov" \
+            -vf "scale=1920:1080" -c:v libx264 -preset slow -crf 18 \
+            -pix_fmt yuv420p -movflags +faststart -an "output/${ID}-preview.mp4"
+          ls -la output/
+
+      - name: Upload deliverables
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.composition }}
-          path: output/${{ matrix.composition }}.mp4
+          path: |
+            output/${{ matrix.composition }}-4444.mov
+            output/${{ matrix.composition }}-thumb.jpg
+            output/${{ matrix.composition }}-preview.mp4
           if-no-files-found: error
+          retention-days: 30
