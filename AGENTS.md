@@ -3,10 +3,12 @@
 Remotion 4 (React 18, TypeScript) video compositions. One repo, one GitHub workflow,
 one git remote that actually works.
 
-## Hard rule: preview first, render only on command
+## Hard rules
 
-**Never trigger a full video render, and never add/keep a `push:` trigger, until the
-user explicitly asks for it.** Creating or changing a composition is a *preview* task.
+1. **Alpha Channel by default**: Mulai sekarang SEMUA video/komposisi WAJIB memiliki **Alpha Channel (latar belakang transparan)** tanpa background solid/hitam, kecuali elemen objek video itu sendiri.
+2. **100% Seamless Loop**: Setiap video wajib tepat 10 detik (600 frame @ 60fps atau sesuai konfigurasi) dan berputar secara mulus tanpa sambungan (looping 100% sempurna).
+3. **Preview First, Render Only on Command**: Jangan pernah render video final atau memicu GitHub Actions sebelum user menyetujuinya secara eksplisit.
+4. **Metadata Video Setelah Render/Disetujui**: Setiap kali video selesai dibuat dan disetujui untuk dirender di GitHub Actions, WAJIB sertakan paket **metadata lengkap** (Title SEO, Deskripsi Komersial, Kategori, Spesifikasi Teknis, dan 40-50 Tags/Keywords bahasa Inggris) yang siap di-copy-paste ke marketplace stock footage (Shutterstock, Adobe Stock, Pond5, Envato).
 
 1. Build/change the composition.
 2. Typecheck it: `npx tsc --noEmit` and confirm no errors mention the new files.

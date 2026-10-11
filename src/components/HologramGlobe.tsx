@@ -243,12 +243,12 @@ const Globe = ({ u, mapData, earthTex }: { u: number, mapData: ImageData, earthT
       
       <mesh>
          <sphereGeometry args={[R - 0.5, 64, 64]} />
-         <meshBasicMaterial color="#020617" transparent opacity={0.8} />
+         <meshBasicMaterial color="#0b1e47" transparent opacity={0.35} />
       </mesh>
       
       <mesh>
          <sphereGeometry args={[R + 1.0, 64, 64]} />
-         <meshBasicMaterial color="#1D4ED8" transparent opacity={0.15} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
+         <meshBasicMaterial color="#1D4ED8" transparent opacity={0.2} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
       </mesh>
       
       <mesh>
@@ -323,12 +323,13 @@ export const HologramGlobe: React.FC<{
   }, []);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: '#020617' }}>
+    <AbsoluteFill style={{ backgroundColor: 'transparent' }}>
       {mapData && earthTex ? (
         <ThreeCanvas
           width={width}
           height={height}
           camera={{ fov: 45 }}
+          style={{ backgroundColor: 'transparent' }}
         >
           <ambientLight intensity={1.5} />
           <directionalLight position={[20, 20, 50]} intensity={2.5} />
@@ -336,8 +337,6 @@ export const HologramGlobe: React.FC<{
           <TargetCamera />
           <SpaceBackground />
           <Globe u={u} mapData={mapData} earthTex={earthTex} />
-          
-          <fog attach="fog" args={['#020617', 60, 200]} />
         </ThreeCanvas>
       ) : (
         <div style={{ color: 'white', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontFamily: 'monospace', fontSize: 24 }}>
