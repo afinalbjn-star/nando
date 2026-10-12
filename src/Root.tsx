@@ -2,6 +2,7 @@ import React from 'react';
 import { HolographicRadarHUD } from './components/HolographicRadarHUD';
 import { HologramGlobe } from './components/HologramGlobe';
 import { ConstructionSafetyHelmet } from './components/ConstructionSafetyHelmet';
+import { SpookyBackgroundLoop } from './components/SpookyBackgroundLoop';
 import { Composition } from 'remotion';
 import { GridDots } from './components/GridDots';
 import { SphereRipple } from './components/SphereRipple';
@@ -3679,6 +3680,22 @@ export const RemotionRoot: React.FC = () => {
         id="ConstructionSafetyHelmet"
         component={ConstructionSafetyHelmet}
         durationInFrames={600}
+        fps={60}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="SpookyBackgroundLoop"
+        component={SpookyBackgroundLoop}
+        durationInFrames={720}
+        fps={60}
+        width={3840}
+        height={2160}
+      />
+      <Composition
+        id="SpookyBackgroundAlpha"
+        component={() => <SpookyBackgroundLoop transparentSky={true} />}
+        durationInFrames={720}
         fps={60}
         width={3840}
         height={2160}
