@@ -21,44 +21,57 @@ function createRoundedRectShape(w: number, h: number, r: number): THREE.Shape {
   return shape;
 }
 
-// Helper: 3D Thumbs-Up Hand Silhouette Shape
-function createThumbsUpHandShape(): THREE.Shape {
+// Helper: Professional 3D Thumbs-Up Hand Silhouette Shape
+function createProfessionalThumbsUpHand(): THREE.Shape {
   const s = new THREE.Shape();
-  // Left palm edge adjacent to the cuff
-  s.moveTo(-0.6, -1.8);
-  // Bottom palm base
-  s.lineTo(1.6, -1.8);
-  s.quadraticCurveTo(2.1, -1.8, 2.1, -1.35);
+  // Start at bottom wrist edge
+  s.moveTo(-1.2, -1.6);
+  // Bottom horizontal line towards pinky side
+  s.lineTo(1.8, -1.6);
+  // Bottom-right corner rounding up to pinky
+  s.quadraticCurveTo(2.4, -1.6, 2.4, -1.1);
 
-  // 4 fingers stacked vertically on the right
-  // Finger 1 (pinky)
-  s.quadraticCurveTo(2.6, -1.35, 2.6, -0.9);
-  s.quadraticCurveTo(2.6, -0.45, 2.0, -0.45);
+  // Finger 1 (Bottom / Pinky)
+  s.lineTo(2.4, -0.9);
+  s.quadraticCurveTo(2.5, -0.5, 2.0, -0.5);
 
-  // Finger 2 (ring)
-  s.quadraticCurveTo(2.7, -0.45, 2.7, 0.0);
-  s.quadraticCurveTo(2.7, 0.45, 2.1, 0.45);
+  // Indentation between Finger 1 & 2
+  s.lineTo(1.7, -0.5);
 
-  // Finger 3 (middle)
-  s.quadraticCurveTo(2.8, 0.45, 2.8, 0.9);
-  s.quadraticCurveTo(2.8, 1.35, 2.1, 1.35);
+  // Finger 2 (Ring finger)
+  s.lineTo(2.3, -0.5);
+  s.quadraticCurveTo(2.7, -0.5, 2.7, -0.1);
+  s.quadraticCurveTo(2.7, 0.35, 2.2, 0.35);
 
-  // Finger 4 (index)
-  s.quadraticCurveTo(2.7, 1.35, 2.7, 1.75);
-  s.quadraticCurveTo(2.7, 2.15, 1.8, 2.15);
+  // Indentation between Finger 2 & 3
+  s.lineTo(1.8, 0.35);
 
-  // Dip into thumb crook
-  s.lineTo(0.5, 2.15);
-  // Thumb rising up-right
-  s.lineTo(1.2, 3.6);
-  // Thumb tip
-  s.quadraticCurveTo(1.4, 4.2, 0.9, 4.4);
-  s.quadraticCurveTo(0.3, 4.4, 0.1, 3.9);
-  // Thumb outer curve going down
-  s.quadraticCurveTo(-0.2, 3.2, -0.4, 2.3);
-  // Left palm edge returning to cuff
-  s.lineTo(-0.6, 2.0);
-  s.lineTo(-0.6, -1.8);
+  // Finger 3 (Middle finger - longest finger)
+  s.lineTo(2.5, 0.35);
+  s.quadraticCurveTo(2.95, 0.35, 2.95, 0.75);
+  s.quadraticCurveTo(2.95, 1.2, 2.4, 1.2);
+
+  // Indentation between Finger 3 & 4
+  s.lineTo(1.9, 1.2);
+
+  // Finger 4 (Index finger)
+  s.lineTo(2.5, 1.2);
+  s.quadraticCurveTo(2.85, 1.2, 2.85, 1.6);
+  s.quadraticCurveTo(2.85, 2.0, 2.2, 2.0);
+
+  // Deep web / valley between index finger knuckle and thumb base
+  s.lineTo(0.6, 2.0);
+  s.quadraticCurveTo(0.1, 2.0, -0.2, 2.4);
+
+  // Thumb inner edge shooting up-right at ~65 degree angle
+  s.lineTo(0.5, 4.0);
+  // Rounded thumb tip
+  s.quadraticCurveTo(0.8, 4.5, 0.3, 4.7);
+  s.quadraticCurveTo(-0.3, 4.7, -0.6, 4.2);
+  // Thumb outer back slope descending down towards wrist
+  s.quadraticCurveTo(-1.1, 3.4, -1.2, 2.2);
+  // Left vertical wrist edge going straight down
+  s.lineTo(-1.2, -1.6);
 
   return s;
 }
@@ -66,26 +79,26 @@ function createThumbsUpHandShape(): THREE.Shape {
 // Studio Lighting Rig with Animated Sheen Sweep
 const StudioLighting: React.FC<{ progress: number }> = ({ progress }) => {
   useThree(({ camera }) => {
-    camera.position.set(0, 1.5, 25);
+    camera.position.set(0, 1.2, 27);
     camera.lookAt(0, 0, 0);
   });
 
   // Dynamic light sheen sweep across the glossy red surface
   const sweepAngle = progress * Math.PI * 4;
-  const sweepX = Math.cos(sweepAngle) * 12;
-  const sweepY = Math.sin(sweepAngle) * 10;
+  const sweepX = Math.cos(sweepAngle) * 14;
+  const sweepY = Math.sin(sweepAngle) * 12;
 
   return (
     <>
-      <ambientLight intensity={0.85} color="#fff1f2" />
+      <ambientLight intensity={0.9} color="#fff1f2" />
       {/* Key Light: Crisp warm studio light */}
-      <directionalLight position={[14, 18, 16]} intensity={2.6} color="#ffffff" castShadow />
+      <directionalLight position={[14, 18, 16]} intensity={2.8} color="#ffffff" castShadow />
       {/* Fill Light: Soft coral/pink bounce */}
-      <directionalLight position={[-16, -10, 12]} intensity={1.2} color="#fecdd3" />
+      <directionalLight position={[-16, -10, 12]} intensity={1.4} color="#fecdd3" />
       {/* Rim Light: Sharp highlight defining the 3D silhouette */}
-      <directionalLight position={[-8, 16, -18]} intensity={3.8} color="#ffe4e6" />
+      <directionalLight position={[-10, 16, -18]} intensity={4.2} color="#ffe4e6" />
       {/* Dynamic glossy specular sweep */}
-      <pointLight position={[sweepX, sweepY, 14]} intensity={2.2} distance={35} color="#ffffff" />
+      <pointLight position={[sweepX, sweepY, 15]} intensity={2.6} distance={38} color="#ffffff" />
     </>
   );
 };
@@ -94,7 +107,7 @@ const StudioLighting: React.FC<{ progress: number }> = ({ progress }) => {
 const LikeBadge3DModel: React.FC<{ progress: number }> = ({ progress }) => {
   // Badge base geometry (Extruded Rounded Rectangle with smooth bevels)
   const badgeGeo = useMemo(() => {
-    const shape = createRoundedRectShape(10.8, 10.8, 2.4);
+    const shape = createRoundedRectShape(11.2, 11.2, 2.6);
     const extrudeSettings: THREE.ExtrudeGeometryOptions = {
       depth: 1.8,
       bevelEnabled: true,
@@ -110,11 +123,11 @@ const LikeBadge3DModel: React.FC<{ progress: number }> = ({ progress }) => {
 
   // Hand silhouette geometry
   const handGeo = useMemo(() => {
-    const shape = createThumbsUpHandShape();
+    const shape = createProfessionalThumbsUpHand();
     const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-      depth: 0.85,
+      depth: 0.9,
       bevelEnabled: true,
-      bevelSegments: 5,
+      bevelSegments: 6,
       steps: 1,
       bevelSize: 0.18,
       bevelThickness: 0.18,
@@ -124,13 +137,13 @@ const LikeBadge3DModel: React.FC<{ progress: number }> = ({ progress }) => {
     return geo;
   }, []);
 
-  // Cuff pill bar geometry
+  // Cuff pill bar geometry (matching reference proportions)
   const cuffGeo = useMemo(() => {
-    const shape = createRoundedRectShape(1.15, 4.0, 0.45);
+    const shape = createRoundedRectShape(1.2, 4.4, 0.5);
     const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-      depth: 0.85,
+      depth: 0.9,
       bevelEnabled: true,
-      bevelSegments: 5,
+      bevelSegments: 6,
       steps: 1,
       bevelSize: 0.18,
       bevelThickness: 0.18,
@@ -144,14 +157,14 @@ const LikeBadge3DModel: React.FC<{ progress: number }> = ({ progress }) => {
   // Premium candy red glossy plastic with clearcoat shine
   const badgeMaterial = useMemo(() => {
     return new THREE.MeshPhysicalMaterial({
-      color: '#f43f5e', // Vibrant coral/ruby red
-      roughness: 0.12,
+      color: '#f43f5e', // Vibrant coral/ruby red matching reference
+      roughness: 0.1,
       metalness: 0.04,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.08,
+      clearcoatRoughness: 0.06,
       transmission: 0.12, // Subsurface jelly glow
-      ior: 1.52,
-      reflectivity: 0.95,
+      ior: 1.54,
+      reflectivity: 0.98,
       specularColor: new THREE.Color('#ffffff'),
     });
   }, []);
@@ -160,20 +173,20 @@ const LikeBadge3DModel: React.FC<{ progress: number }> = ({ progress }) => {
   const backPlateMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       color: '#e11d48',
-      roughness: 0.25,
+      roughness: 0.22,
       metalness: 0.08,
     });
   }, []);
 
-  // Porcelain glossy white for the Thumbs-Up icon
+  // Porcelain glossy white with pink rim subsurface effect for the Thumbs-Up icon
   const iconMaterial = useMemo(() => {
     return new THREE.MeshPhysicalMaterial({
       color: '#f8fafc', // Ultra clean white
-      roughness: 0.18,
+      roughness: 0.16,
       metalness: 0.02,
-      clearcoat: 0.9,
-      clearcoatRoughness: 0.1,
-      reflectivity: 0.8,
+      clearcoat: 0.95,
+      clearcoatRoughness: 0.08,
+      reflectivity: 0.85,
     });
   }, []);
 
@@ -192,15 +205,21 @@ const LikeBadge3DModel: React.FC<{ progress: number }> = ({ progress }) => {
 
       {/* 2. Embedded Interior Glow Core */}
       <mesh position={[0, 0, -0.1]} material={backPlateMaterial}>
-        <boxGeometry args={[9.5, 9.5, 1.2]} />
+        <boxGeometry args={[9.8, 9.8, 1.2]} />
       </mesh>
 
       {/* 3. 3D White Embossed Thumbs-Up Icon */}
-      <group position={[-0.2, -0.2, iconPopZ]}>
-        {/* Left vertical cuff bar */}
-        <mesh position={[-1.75, -0.2, 0]} geometry={cuffGeo} material={iconMaterial} castShadow />
+      <group position={[-0.15, -0.2, iconPopZ]}>
+        {/* Left vertical cuff bar tilted ~12 degrees matching reference */}
+        <mesh
+          position={[-1.9, -0.15, 0]}
+          rotation={[0, 0, 0.2]}
+          geometry={cuffGeo}
+          material={iconMaterial}
+          castShadow
+        />
 
-        {/* Hand with thumb & 4 fingers */}
+        {/* Hand with angled thumb & sculpted 4 fingers */}
         <mesh position={[0.7, 0, 0]} geometry={handGeo} material={iconMaterial} castShadow />
       </group>
     </group>
@@ -215,7 +234,7 @@ const FloatingSparkles: React.FC<{ progress: number }> = ({ progress }) => {
     const list = [];
     for (let i = 0; i < sparkleCount; i++) {
       const angleOffset = (i / sparkleCount) * Math.PI * 2;
-      const radius = 8.5 + (i % 3) * 1.8;
+      const radius = 9.2 + (i % 3) * 1.8;
       const yOffset = ((i % 5) - 2) * 1.8;
       const scale = 0.35 + (i % 4) * 0.14;
       const rotSpeed = 1 + (i % 3);
@@ -232,7 +251,7 @@ const FloatingSparkles: React.FC<{ progress: number }> = ({ progress }) => {
       metalness: 0.85,
       clearcoat: 1.0,
       emissive: '#eab308',
-      emissiveIntensity: 0.3,
+      emissiveIntensity: 0.35,
     });
   }, []);
 
@@ -242,7 +261,7 @@ const FloatingSparkles: React.FC<{ progress: number }> = ({ progress }) => {
       roughness: 0.2,
       clearcoat: 0.8,
       emissive: '#f43f5e',
-      emissiveIntensity: 0.25,
+      emissiveIntensity: 0.3,
     });
   }, []);
 
@@ -280,17 +299,22 @@ const FloatingSparkles: React.FC<{ progress: number }> = ({ progress }) => {
   );
 };
 
-// Scene Orchestration: Floating 3D Showcase with Dynamic Isometric Presentation
+// Scene Orchestration: Centered Hero Isometric Showcase with Elegant 3D Float
 const LikeButtonScene: React.FC<{ progress: number }> = ({ progress }) => {
-  // 100% Seamless Looping 360-degree turntable with dynamic rocking tilt
-  const rotY = progress * Math.PI * 2 - Math.PI * 0.28; // Starts at heroic 3/4 isometric perspective
+  // Hero Isometric perspective matching reference:
+  // Base Hero Orientation: ~35 deg yaw, ~22 deg pitch, ~-12 deg roll
+  // Elegant periodic floating dance (starts & ends at exact Hero Isometric pose)
+  const heroYaw = -0.58; // ~33 degrees yaw showing both front face and bevel sides
+  const heroPitch = 0.36; // ~21 degrees pitch showing top bevel
+  const heroRoll = -0.22; // ~-12 degrees roll
 
-  // Harmonic vertical hover bobbing (2 full cycles in 10s = seamless)
+  // Smooth harmonic oscillation (100% Seamless Loop across 10 seconds)
+  const rotY = heroYaw + Math.sin(progress * Math.PI * 2) * 0.28;
+  const tiltX = heroPitch + Math.cos(progress * Math.PI * 2) * 0.12;
+  const rollZ = heroRoll + Math.sin(progress * Math.PI * 2) * 0.08;
+
+  // Gentle vertical levitation bob (2 full cycles = seamless)
   const hoverY = Math.sin(progress * Math.PI * 4) * 0.45;
-
-  // Gentle 3D floating pitch & roll
-  const tiltX = 0.32 + Math.sin(progress * Math.PI * 2) * 0.12;
-  const rollZ = -0.22 + Math.cos(progress * Math.PI * 2) * 0.08;
 
   return (
     <>
