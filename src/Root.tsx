@@ -2,7 +2,6 @@ import React from 'react';
 import { HolographicRadarHUD } from './components/HolographicRadarHUD';
 import { HologramGlobe } from './components/HologramGlobe';
 import { ConstructionSafetyHelmet } from './components/ConstructionSafetyHelmet';
-import { GlossyLikeButton3D } from './components/GlossyLikeButton3D';
 import { Composition } from 'remotion';
 import { GridDots } from './components/GridDots';
 import { SphereRipple } from './components/SphereRipple';
@@ -3679,14 +3678,6 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="ConstructionSafetyHelmet"
         component={ConstructionSafetyHelmet}
-        durationInFrames={600}
-        fps={60}
-        width={3840}
-        height={2160}
-      />
-      <Composition
-        id="GlossyLikeButton3D"
-        component={GlossyLikeButton3D}
         durationInFrames={600}
         fps={60}
         width={3840}
